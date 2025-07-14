@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
+import * as React from "react";
 
 import {
   Sidebar,
@@ -6,72 +6,79 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
 } from "@/components/ui/sidebar";
 
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "#",
-    icon: Home,
-  },
-  {
-    title: "Alumnos",
-    url: "#",
-    icon: Inbox,
-  },
-  {
-    title: "Profesores",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Equipos",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Disciplinas",
-    url: "#",
-    icon: Settings,
-  },
-  {
-    title: "Eventos",
-    url: "#",
-    icon: Settings,
-  },
-  {
-    title: "Reportes",
-    url: "#",
-    icon: Settings,
-  },
-];
+// This is sample data.
+const data = {
+  versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
+  navMain: [
+    {
+      title: "Secciones",
+      url: "#",
+      items: [
+        {
+          title: "Inicio",
+          url: "/",
+        },
+        {
+          title: "Alumnos",
+          url: "/alumnos",
+        },
+        {
+          title: "Profesores",
+          url: "/profesores",
+          isActive: true,
+        },
+        {
+          title: "Equipos",
+          url: "/equipos",
+        },
+        {
+          title: "Disciplinas",
+          url: "/disciplinas",
+        },
+        {
+          title: "Eventos",
+          url: "/eventos",
+        },
+        {
+          title: "Reportes",
+          url: "/reportes",
+        },
+      ],
+    },
+  ],
+};
 
-export function AppSidebar() {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar>
+    <Sidebar {...props}>
+      <SidebarHeader></SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>SADUNEG</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {/* We create a SidebarGroup for each parent. */}
+        {data.navMain.map((item) => (
+          <SidebarGroup key={item.title}>
+            <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {item.items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild isActive={item.isActive}>
+                      <a href={item.url}>{item.title}</a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
+      <SidebarRail />
     </Sidebar>
   );
 }
