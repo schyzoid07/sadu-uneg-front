@@ -10,49 +10,50 @@ import {
 } from "@/components/ui/table";
 import { HammerIcon, Trash2Icon } from "lucide-react";
 
-export default function Disciplinas() {
-  const disciplines = [
+export default function Eventos() {
+  const events = [
     {
       id: 1,
-      name: "Harbert",
+      name: "Kristan",
     },
     {
       id: 2,
-      name: "Marketa",
+      name: "Hesther",
     },
     {
       id: 3,
-      name: "Clair",
+      name: "Courtnay",
     },
     {
       id: 4,
-      name: "Di",
+      name: "Hall",
     },
     {
       id: 5,
-      name: "Cletis",
+      name: "Brittni",
     },
     {
       id: 6,
-      name: "Karlotta",
+      name: "Lurette",
     },
     {
       id: 7,
-      name: "Channa",
+      name: "Ricki",
     },
     {
       id: 8,
-      name: "Gerard",
+      name: "Phedra",
     },
     {
       id: 9,
-      name: "Raquela",
+      name: "Maxim",
     },
     {
       id: 10,
-      name: "Diane",
+      name: "Salomone",
     },
   ];
+
   return (
     <Table>
       <TableCaption>A list of your recent invoices.</TableCaption>
@@ -60,12 +61,11 @@ export default function Disciplinas() {
         <TableRow>
           <TableHead>Id</TableHead>
           <TableHead>Nombre</TableHead>
-
           <TableHead></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {disciplines.map((data) => (
+        {events.map((data) => (
           <TableRow key={data.id}>
             <TableCell>{data.id}</TableCell>
             <TableCell>{data.name}</TableCell>

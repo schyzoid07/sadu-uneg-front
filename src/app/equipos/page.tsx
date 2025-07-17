@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -7,88 +8,89 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { CheckIcon, HammerIcon, Trash2Icon, X } from "lucide-react";
 
 export default function Equipos() {
   const teams = [
     {
       id: 1,
-      name: "Cecelia",
-      disciplineId: 1,
+      name: "Brandtr",
+      discipline: "Regen",
       regular: false,
-      universityId: 1,
-      category: "Kitchen",
+      university: "Jacky",
+      category: "Toys",
     },
     {
       id: 2,
-      name: "Mozelle",
-      disciplineId: 2,
-      regular: false,
-      universityId: 2,
-      category: "Food - Frozen Foods",
-    },
-    {
-      id: 3,
-      name: "Court",
-      disciplineId: 3,
+      name: "Retha",
+      discipline: "Cassy",
       regular: true,
-      universityId: 3,
-      category: "Toys",
-    },
-    {
-      id: 4,
-      name: "Paige",
-      disciplineId: 4,
-      regular: true,
-      universityId: 4,
-      category: "Food - Meat",
-    },
-    {
-      id: 5,
-      name: "Benedick",
-      disciplineId: 5,
-      regular: false,
-      universityId: 5,
+      university: "Lizzie",
       category: "Kitchen",
     },
     {
-      id: 6,
-      name: "Jacqueline",
-      disciplineId: 6,
+      id: 3,
+      name: "Weylin",
+      discipline: "Josefa",
+      regular: true,
+      university: "Oliy",
+      category: "Food - Snacks",
+    },
+    {
+      id: 4,
+      name: "Teena",
+      discipline: "Stephan",
       regular: false,
-      universityId: 6,
-      category: "Food - Salads",
+      university: "Natale",
+      category: "Accessories",
+    },
+    {
+      id: 5,
+      name: "Augustine",
+      discipline: "Dyanna",
+      regular: false,
+      university: "Herculie",
+      category: "Accessories",
+    },
+    {
+      id: 6,
+      name: "Bruno",
+      discipline: "Loydie",
+      regular: true,
+      university: "Myer",
+      category: "Food - Frozen Food",
     },
     {
       id: 7,
-      name: "Alexio",
-      disciplineId: 7,
+      name: "Lenna",
+      discipline: "Robby",
       regular: true,
-      universityId: 7,
-      category: "Food - Produce",
+      university: "Teddie",
+      category: "Food - Frozen Foods",
     },
     {
       id: 8,
-      name: "Adelaida",
-      disciplineId: 8,
-      regular: true,
-      universityId: 8,
-      category: "Fitness",
+      name: "Morie",
+      discipline: "Davina",
+      regular: false,
+      university: "Lizabeth",
+      category: "Food - Dressings",
     },
     {
       id: 9,
-      name: "Heidie",
-      disciplineId: 9,
+      name: "Julius",
+      discipline: "Gusty",
       regular: false,
-      universityId: 9,
-      category: "Clothing - Outerwear",
+      university: "Tova",
+      category: "Kitchen",
     },
     {
       id: 10,
-      name: "Ricardo",
-      disciplineId: 10,
-      regular: true,
-      universityId: 10,
-      category: "Toys",
+      name: "Susanne",
+      discipline: "Casie",
+      regular: false,
+      university: "Ban",
+      category: "Fitness",
     },
   ];
 
@@ -102,16 +104,33 @@ export default function Equipos() {
           <TableHead>Universidad</TableHead>
           <TableHead>Categoria</TableHead>
           <TableHead>Titular</TableHead>
+          <TableHead></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {teams.map((data) => (
           <TableRow key={data.id}>
             <TableCell>{data.name}</TableCell>
-            <TableCell>{data.disciplineId}</TableCell>
-            <TableCell>{data.universityId}</TableCell>
+            <TableCell>{data.discipline}</TableCell>
+            <TableCell>{data.university}</TableCell>
             <TableCell>{data.category}</TableCell>
-            <TableCell>{data.regular}</TableCell>
+            <TableCell>{data.regular ? <CheckIcon /> : <X />}</TableCell>
+            <TableCell>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="bg-blue-100 hover:bg-blue-200 "
+              >
+                <HammerIcon />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="bg-red-100 hover:bg-red-200"
+              >
+                <Trash2Icon />
+              </Button>
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>

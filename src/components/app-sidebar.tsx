@@ -47,8 +47,12 @@ const data = {
           url: "/eventos",
         },
         {
-          title: "Reportes",
-          url: "/reportes",
+          title: "Universidad",
+          url: "/universidad",
+        },
+        {
+          title: "Partidos",
+          url: "/partidos",
         },
       ],
     },
