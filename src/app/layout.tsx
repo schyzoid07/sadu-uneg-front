@@ -67,11 +67,11 @@ export default function RootLayout({
                       alt="SADUNEG Logo"
                       width={100}
                       height={100}
-                      className="hover:scale-110 transition duration-200"
+                      
                     />
                   </div>
                   <div className="flex flex-col items-center">
-                    <h1 className="text-4xl font-extrabold text-blue-800 tracking-tight hover:scale-150 transition duration-300">
+                    <h1 className="text-4xl font-extrabold text-blue-800 tracking-tight">
                       SADUNEG
                     </h1>
                     <p>Sistema de administracion deportiva 2025</p>

@@ -14,7 +14,7 @@ export default function Disciplinas() {
   const disciplines = [
     {
       id: 1,
-      name: "Harbert",
+      name: "Futbol",
     },
     {
       id: 2,
