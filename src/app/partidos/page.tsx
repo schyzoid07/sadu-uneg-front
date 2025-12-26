@@ -23,8 +23,8 @@ export default function Partidos() {
       winner: "jfeedham0",
       remark:
         "Integer tincidunt ante vel ipsum. Praesent blandit lacinia erat. Vestibulum sed magna at nunc commodo placerat. Praesent blandit. Nam nulla. Integer pede justo, lacinia eget, tincidunt eget, tempus vel, pede. Morbi porttitor lorem id ligula. Suspendisse ornare consequat lectus. In est risus, auctor sed, tristique in, tempus sit amet, sem.",
-      "pointResults-local": 1,
-      "pointResults-oponent": 1,
+      pointResultsLocal: 1,
+      pointResultsOponent: 1,
       location: "10",
     },
     {
@@ -38,8 +38,8 @@ export default function Partidos() {
       winner: "cmccuthais1",
       remark:
         "Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros. Vestibulum ac est lacinia nisi venenatis tristique. Fusce congue, diam id ornare imperdiet, sapien urna pretium nisl, ut volutpat sapien arcu sed augue. Aliquam erat volutpat. In congue.",
-      "pointResults-local": 2,
-      "pointResults-oponent": 2,
+      pointResultsLocal: 2,
+      pointResultsOponent: 2,
       location: "67050",
     },
     {
@@ -53,8 +53,8 @@ export default function Partidos() {
       winner: "lcabel2",
       remark:
         "Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros. Vestibulum ac est lacinia nisi venenatis tristique. Fusce congue, diam id ornare imperdiet, sapien urna pretium nisl, ut volutpat sapien arcu sed augue. Aliquam erat volutpat. In congue.",
-      "pointResults-local": 3,
-      "pointResults-oponent": 3,
+      pointResultsLocal: 3,
+      pointResultsOponent: 3,
       location: "6385",
     },
     {
@@ -67,8 +67,8 @@ export default function Partidos() {
       hour: "11:15",
       winner: "folliver3",
       remark: "Proin risus.",
-      "pointResults-local": 4,
-      "pointResults-oponent": 4,
+      pointResultsLocal: 4,
+      pointResultsOponent: 4,
       location: "1",
     },
     {
@@ -82,8 +82,8 @@ export default function Partidos() {
       winner: "arimmington4",
       remark:
         "Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id, turpis. Integer aliquet, massa id lobortis convallis, tortor risus dapibus augue, vel accumsan tellus nisi eu orci. Mauris lacinia sapien quis libero. Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh.",
-      "pointResults-local": 5,
-      "pointResults-oponent": 5,
+      pointResultsLocal: 5,
+      pointResultsOponent: 5,
       location: "6226",
     },
     {
@@ -97,8 +97,8 @@ export default function Partidos() {
       winner: "gromanin5",
       remark:
         "Nullam molestie nibh in lectus. Pellentesque at nulla. Suspendisse potenti. Cras in purus eu magna vulputate luctus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus vestibulum sagittis sapien. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam vel augue.",
-      "pointResults-local": 6,
-      "pointResults-oponent": 6,
+      pointResultsLocal: 6,
+      pointResultsOponent: 6,
       location: "14",
     },
     {
@@ -112,8 +112,8 @@ export default function Partidos() {
       winner: "bparkinson6",
       remark:
         "Fusce lacus purus, aliquet at, feugiat non, pretium quis, lectus. Suspendisse potenti.",
-      "pointResults-local": 7,
-      "pointResults-oponent": 7,
+      pointResultsLocal: 7,
+      pointResultsOponent: 7,
       location: "09",
     },
     {
@@ -127,8 +127,8 @@ export default function Partidos() {
       winner: "gegleofgermany7",
       remark:
         "Ut at dolor quis odio consequat varius. Integer ac leo. Pellentesque ultrices mattis odio. Donec vitae nisi. Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla.",
-      "pointResults-local": 8,
-      "pointResults-oponent": 8,
+      pointResultsLocal: 8,
+      pointResultsOponent: 8,
       location: "526",
     },
     {
@@ -142,8 +142,8 @@ export default function Partidos() {
       winner: "ejone8",
       remark:
         "Mauris sit amet eros. Suspendisse accumsan tortor quis turpis. Sed ante. Vivamus tortor.",
-      "pointResults-local": 9,
-      "pointResults-oponent": 9,
+      pointResultsLocal: 9,
+      pointResultsOponent: 9,
       location: "566",
     },
     {
@@ -157,8 +157,8 @@ export default function Partidos() {
       winner: "sscatchar9",
       remark:
         "Ut at dolor quis odio consequat varius. Integer ac leo. Pellentesque ultrices mattis odio. Donec vitae nisi. Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus. Curabitur at ipsum ac tellus semper interdum. Mauris ullamcorper purus sit amet nulla. Quisque arcu libero, rutrum ac, lobortis vel, dapibus at, diam.",
-      "pointResults-local": 10,
-      "pointResults-oponent": 10,
+      pointResultsLocal: 10,
+      pointResultsOponent: 10,
       location: "8",
     },
   ];
@@ -192,8 +192,8 @@ export default function Partidos() {
             <TableCell>{data.location}</TableCell>
             <TableCell>{data.eventId}</TableCell>
             <TableCell>{data.localTeam}</TableCell>
-            <TableCell>{data["pointResults-local"]}</TableCell>
-            <TableCell>{data["pointResults-oponent"]}</TableCell>
+            <TableCell>{data.pointResultsLocal}</TableCell>
+            <TableCell>{data.pointResultsOponent}</TableCell>
             <TableCell>{data.winner}</TableCell>
             <TableCell>{data.remark}</TableCell>
             <TableCell>

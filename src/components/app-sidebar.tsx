@@ -26,8 +26,8 @@ const data = {
           url: "/",
         },
         {
-          title: "Alumnos",
-          url: "/alumnos",
+          title: "Atletas",
+          url: "/atletas",
         },
         {
           title: "Profesores",
