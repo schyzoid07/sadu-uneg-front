@@ -1,3 +1,6 @@
+'use client'
+import * as z from "zod/v4";
+import ky from "ky";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -8,51 +11,35 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useQuery } from "@tanstack/react-query";
 import { HammerIcon, Trash2Icon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+
 
 export default function Disciplinas() {
-  const disciplines = [
-    {
-      id: 1,
-      name: "Futbol",
-    },
-    {
-      id: 2,
-      name: "Marketa",
-    },
-    {
-      id: 3,
-      name: "Clair",
-    },
-    {
-      id: 4,
-      name: "Di",
-    },
-    {
-      id: 5,
-      name: "Cletis",
-    },
-    {
-      id: 6,
-      name: "Karlotta",
-    },
-    {
-      id: 7,
-      name: "Channa",
-    },
-    {
-      id: 8,
-      name: "Gerard",
-    },
-    {
-      id: 9,
-      name: "Raquela",
-    },
-    {
-      id: 10,
-      name: "Diane",
-    },
-  ];
+const {data, isLoading} = useQuery({
+    queryKey: ["disciplines"],
+    queryFn: async () => {
+      const disciplinesSchema = z.array(
+        z.object({
+          ID: z.number(),
+          Nombre: z.string(),
+        })
+      );
+
+      const resSchema = z.object({
+        data: disciplinesSchema,
+        message: z.string(),
+      });
+
+      const res = await ky.get("http://localhost:8080/disciplines/").json();
+
+      const parsed = resSchema.parse(res);
+
+      return parsed.data;
+  }});
+
+  
   return (
     <Table>
       <TableCaption>A list of your recent invoices.</TableCaption>
@@ -65,10 +52,20 @@ export default function Disciplinas() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {disciplines.map((data) => (
-          <TableRow key={data.id}>
-            <TableCell>{data.id}</TableCell>
-            <TableCell>{data.name}</TableCell>
+        {isLoading
+          ? Array.from({ length: 10 }).map((_, i) => (
+              <TableRow key={i}>
+                <TableCell colSpan={7}>
+                  <Skeleton className="w-full h-10"></Skeleton>
+                </TableCell>
+              </TableRow>
+            ))
+          : null}
+        {data ?
+         data.map((data) => (
+          <TableRow key={data.ID}>
+            <TableCell>{data.ID}</TableCell>
+            <TableCell>{data.Nombre}</TableCell>
             <TableCell>
               <Button
                 size="icon"
@@ -86,8 +83,11 @@ export default function Disciplinas() {
               </Button>
             </TableCell>
           </TableRow>
-        ))}
+        ))
+        : null}
       </TableBody>
     </Table>
+
+    //add buttons of "añadir and delete"
   );
 }

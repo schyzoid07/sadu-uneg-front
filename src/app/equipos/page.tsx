@@ -11,6 +11,9 @@ import {
 import { CheckIcon, HammerIcon, Trash2Icon, X } from "lucide-react";
 
 export default function Equipos() {
+
+  
+
   const teams = [
     {
       id: 1,

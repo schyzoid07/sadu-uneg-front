@@ -105,5 +105,6 @@ export default function Atletas() {
           : null}
       </TableBody>
     </Table>
+    //add buttons of "añadir and delete"
   );
 }
