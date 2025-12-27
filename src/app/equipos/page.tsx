@@ -1,3 +1,6 @@
+'use client'
+import * as z from "zod/v4";
+import ky from "ky";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -8,11 +11,37 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CheckIcon, HammerIcon, Trash2Icon, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { HammerIcon, Trash2Icon, CheckIcon, X } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Equipos() {
 
-  
+  const {data, isLoading} = useQuery({
+    queryKey: ["teams"],
+    queryFn: async () => {
+      const teamsSchema = z.array(
+        z.object({
+          ID: z.number(),
+          Nombre: z.string(),
+          DisciplinaID: z.number(),
+          UniversidadID: z.number(),
+          Categoria: z.string(),
+          Regular: z.boolean(),
+        })
+      );
+
+      const resSchema = z.object({
+        data: teamsSchema,
+        message: z.string(),
+      });
+
+      const res = await ky.get("http://localhost:8080/teams/").json();
+      const parsed = resSchema.parse(res);
+
+      return parsed.data;
+  }});
+
 
   const teams = [
     {
@@ -111,13 +140,23 @@ export default function Equipos() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {teams.map((data) => (
-          <TableRow key={data.id}>
-            <TableCell>{data.name}</TableCell>
-            <TableCell>{data.discipline}</TableCell>
-            <TableCell>{data.university}</TableCell>
-            <TableCell>{data.category}</TableCell>
-            <TableCell>{data.regular ? <CheckIcon /> : <X />}</TableCell>
+        {isLoading
+          ? Array.from({ length: 10 }).map((_, i) => (
+              <TableRow key={i}>
+                <TableCell colSpan={7}>
+                  <Skeleton className="w-full h-10"></Skeleton>
+                </TableCell>
+              </TableRow>
+            ))
+          : null}
+        {data ?
+        data.map((data) => (
+          <TableRow key={data.ID}>
+            <TableCell>{data.Nombre}</TableCell>
+            <TableCell>{data.DisciplinaID}</TableCell>
+            <TableCell>{data.UniversidadID}</TableCell>
+            <TableCell>{data.Categoria}</TableCell>
+            <TableCell>{data.Regular ? <CheckIcon /> : <X />}</TableCell>
             <TableCell>
               <Button
                 size="icon"
@@ -135,7 +174,8 @@ export default function Equipos() {
               </Button>
             </TableCell>
           </TableRow>
-        ))}
+        ))
+      : null}
       </TableBody>
     </Table>
   );
