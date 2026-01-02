@@ -71,13 +71,13 @@ export default function RootLayout({
                     />
                   </div>
                   <div className="flex flex-col items-center">
-                    <h1 className="text-4xl font-extrabold text-blue-800 tracking-tight">
+                    <h1 className="text-4xl font-extrabold text-blue-900 tracking-tight">
                       SADUNEG
                     </h1>
                     <p>Sistema de administracion deportiva 2025</p>
                   </div>
                   <div>
-                    <button className="hover:bg-blue-500 bg-blue-900 text-white font-bold py-2 px-4 rounded cursor-pointer hover:scale-110 transition duration-200">
+                    <button className="hover:bg-blue-800 bg-blue-900 text-white font-bold py-2 px-4 rounded cursor-pointer transition duration-100">
                       Iniciar Sesión
                     </button>
                   </div>
