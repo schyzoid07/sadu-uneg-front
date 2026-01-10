@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -8,128 +10,60 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { HammerIcon, Trash2Icon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useTeachers } from "@/hooks/use-teachers";
 
 export default function Profesores() {
-  const teachers = [
-    {
-      id: 1,
-      firstName: "Alaric",
-      lastName: "Petrolli",
-      identityCard: 73567072,
-      email: "apetrolli0@cafepress.com",
-      telephone: "326-209-9706",
-    },
-    {
-      id: 2,
-      firstName: "Abagael",
-      lastName: "Laite",
-      identityCard: 82450146,
-      email: "alaite1@epa.gov",
-      telephone: "871-227-1337",
-    },
-    {
-      id: 3,
-      firstName: "Sibyl",
-      lastName: "Juza",
-      identityCard: 89509085,
-      email: "sjuza2@infoseek.co.jp",
-      telephone: "357-882-1147",
-    },
-    {
-      id: 4,
-      firstName: "Adriana",
-      lastName: "Shard",
-      identityCard: 8408150,
-      email: "ashard3@forbes.com",
-      telephone: "125-168-8986",
-    },
-    {
-      id: 5,
-      firstName: "Robert",
-      lastName: "Semor",
-      identityCard: 57904966,
-      email: "rsemor4@cpanel.net",
-      telephone: "952-916-9135",
-    },
-    {
-      id: 6,
-      firstName: "Roberta",
-      lastName: "Scripps",
-      identityCard: 15303792,
-      email: "rscripps5@wisc.edu",
-      telephone: "819-428-8324",
-    },
-    {
-      id: 7,
-      firstName: "Marcelle",
-      lastName: "Anton",
-      identityCard: 69254081,
-      email: "manton6@amazon.com",
-      telephone: "860-915-3177",
-    },
-    {
-      id: 8,
-      firstName: "Clevey",
-      lastName: "Kleinhausen",
-      identityCard: 32748748,
-      email: "ckleinhausen7@ask.com",
-      telephone: "928-961-1571",
-    },
-    {
-      id: 9,
-      firstName: "Kendall",
-      lastName: "Boatwright",
-      identityCard: 91709343,
-      email: "kboatwright8@blinklist.com",
-      telephone: "228-323-6974",
-    },
-    {
-      id: 10,
-      firstName: "Simon",
-      lastName: "Brotherhood",
-      identityCard: 2852863,
-      email: "sbrotherhood9@blogtalkradio.com",
-      telephone: "584-803-5569",
-    },
-  ];
+  const { data: teachers, isLoading } = useTeachers();
+
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Cedula</TableHead>
+          <TableHead>Cédula</TableHead>
           <TableHead>Nombre</TableHead>
           <TableHead>Apellido</TableHead>
           <TableHead className="text-left">Correo</TableHead>
-          <TableHead className="text-right">Telefono</TableHead>
-
-          <TableHead className="text-right">Disciplina</TableHead>
-          <TableHead></TableHead>
+          <TableHead className="text-right">Teléfono</TableHead>
+          <TableHead className="text-right">Acciones</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {teachers.map((data) => (
-          <TableRow key={data.id}>
-            <TableCell>{data.identityCard}</TableCell>
-            <TableCell>{data.firstName}</TableCell>
-            <TableCell>{data.lastName}</TableCell>
-            <TableCell className="text-left">{data.email}</TableCell>
-            <TableCell className="text-right">{data.telephone}</TableCell>
+        {/* Estado de Carga */}
+        {isLoading &&
+          Array.from({ length: 5 }).map((_, i) => (
+            <TableRow key={i}>
+              <TableCell colSpan={6}>
+                <Skeleton className="w-full h-10" />
+              </TableCell>
+            </TableRow>
+          ))}
 
+        {/* Mapeo de Datos Reales */}
+        {teachers?.map((teacher) => (
+          <TableRow key={teacher.ID}>
+            <TableCell>{teacher.IdentityCard}</TableCell>
+            <TableCell>{teacher.FirstName}</TableCell>
+            <TableCell>{teacher.LastName}</TableCell>
+            <TableCell className="text-left">{teacher.Email}</TableCell>
+            <TableCell className="text-right">{teacher.Telephone}</TableCell>
             <TableCell>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="bg-blue-100 hover:bg-blue-200 "
-              >
-                <HammerIcon />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="bg-red-100 hover:bg-red-200"
-              >
-                <Trash2Icon />
-              </Button>
+              <div className="flex justify-end gap-2">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="bg-blue-100 hover:bg-blue-200 text-blue-700"
+                >
+                  <HammerIcon size={18} />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="bg-red-100 hover:bg-red-200 text-red-700"
+                >
+                  <Trash2Icon size={18} />
+                </Button>
+              </div>
             </TableCell>
           </TableRow>
         ))}
