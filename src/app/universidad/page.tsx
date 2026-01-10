@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -9,93 +11,65 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CheckIcon, HammerIcon, Trash2Icon, X } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useUniversities } from "@/hooks/use-universities";
 
 export default function Universidad() {
-  const university = [
-    {
-      id: 1,
-      name: "Nickolaus",
-      local: false,
-    },
-    {
-      id: 2,
-      name: "Tyrus",
-      local: true,
-    },
-    {
-      id: 3,
-      name: "Edee",
-      local: true,
-    },
-    {
-      id: 4,
-      name: "Obadiah",
-      local: false,
-    },
-    {
-      id: 5,
-      name: "Haroun",
-      local: false,
-    },
-    {
-      id: 6,
-      name: "Hashim",
-      local: false,
-    },
-    {
-      id: 7,
-      name: "Loella",
-      local: false,
-    },
-    {
-      id: 8,
-      name: "Isidro",
-      local: true,
-    },
-    {
-      id: 9,
-      name: "Madelena",
-      local: false,
-    },
-    {
-      id: 10,
-      name: "Nappy",
-      local: false,
-    },
-  ];
+  const { data: universities, isLoading } = useUniversities();
 
   return (
     <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption>
+      <TableCaption>Lista oficial de universidades registradas.</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead>Id</TableHead>
+          <TableHead className="w-[80px]">Id</TableHead>
           <TableHead>Nombre</TableHead>
-          <TableHead>Local</TableHead>
-          <TableHead></TableHead>
+          <TableHead className="text-center">Local</TableHead>
+          <TableHead className="text-right">Acciones</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {university.map((data) => (
-          <TableRow key={data.id}>
-            <TableCell>{data.id}</TableCell>
-            <TableCell>{data.name}</TableCell>
-            <TableCell>{data.local ? <CheckIcon /> : <X />}</TableCell>
+        {/* Skeleton para estado de carga */}
+        {isLoading &&
+          Array.from({ length: 5 }).map((_, i) => (
+            <TableRow key={i}>
+              <TableCell colSpan={4}>
+                <Skeleton className="w-full h-10" />
+              </TableCell>
+            </TableRow>
+          ))}
+
+        {/* Renderizado de datos de la API */}
+        {universities?.map((uni) => (
+          <TableRow key={uni.ID}>
+            <TableCell className="font-mono text-muted-foreground">{uni.ID}</TableCell>
+            <TableCell className="font-medium">{uni.Nombre}</TableCell>
             <TableCell>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="bg-blue-100 hover:bg-blue-200 "
-              >
-                <HammerIcon />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="bg-red-100 hover:bg-red-200"
-              >
-                <Trash2Icon />
-              </Button>
+              <div className="flex justify-center">
+                {uni.Local ? (
+                  <CheckIcon className="text-green-600" size={20} />
+                ) : (
+                  <X className="text-red-400" size={20} />
+                )}
+              </div>
+            </TableCell>
+            <TableCell>
+              <div className="flex justify-end gap-2">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="bg-blue-50 hover:bg-blue-200 text-blue-600"
+                >
+                  <HammerIcon size={18} />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="bg-red-50 hover:bg-red-200 text-red-600"
+                >
+                  <Trash2Icon size={18} />
+                </Button>
+              </div>
             </TableCell>
           </TableRow>
         ))}
