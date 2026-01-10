@@ -1,6 +1,5 @@
-'use client'
-import * as z from "zod/v4";
-import ky from "ky";
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -11,88 +10,72 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useQuery } from "@tanstack/react-query";
 import { HammerIcon, Trash2Icon, CheckIcon, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTeams } from "@/hooks/use-teams";
 
 export default function Equipos() {
-
-  const {data, isLoading} = useQuery({
-    queryKey: ["teams"],
-    queryFn: async () => {
-      const teamsSchema = z.array(
-        z.object({
-          ID: z.number(),
-          Nombre: z.string(),
-          DisciplinaID: z.number(),
-          UniversidadID: z.number(),
-          Categoria: z.string(),
-          Regular: z.boolean(),
-        })
-      );
-
-      const resSchema = z.object({
-        data: teamsSchema,
-        message: z.string(),
-      });
-
-      const res = await ky.get("http://localhost:8080/teams/").json();
-      const parsed = resSchema.parse(res);
-
-      return parsed.data;
-  }});
-
+  const { data: teams, isLoading } = useTeams();
 
   return (
     <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption>
+      <TableCaption>Lista de equipos registrados.</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>Nombre</TableHead>
           <TableHead>Disciplina</TableHead>
           <TableHead>Universidad</TableHead>
-          <TableHead>Categoria</TableHead>
-          <TableHead>Titular</TableHead>
-          <TableHead></TableHead>
+          <TableHead>Categoría</TableHead>
+          <TableHead className="text-center">Titular</TableHead>
+          <TableHead className="text-right">Acciones</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {isLoading
-          ? Array.from({ length: 10 }).map((_, i) => (
-              <TableRow key={i}>
-                <TableCell colSpan={7}>
-                  <Skeleton className="w-full h-10"></Skeleton>
-                </TableCell>
-              </TableRow>
-            ))
-          : null}
-        {data ?
-        data.map((data) => (
-          <TableRow key={data.ID}>
-            <TableCell>{data.Nombre}</TableCell>
-            <TableCell>{data.DisciplinaID}</TableCell>
-            <TableCell>{data.UniversidadID}</TableCell>
-            <TableCell>{data.Categoria}</TableCell>
-            <TableCell>{data.Regular ? <CheckIcon /> : <X />}</TableCell>
+        {isLoading &&
+          Array.from({ length: 8 }).map((_, i) => (
+            <TableRow key={i}>
+              <TableCell colSpan={6}>
+                <Skeleton className="w-full h-10" />
+              </TableCell>
+            </TableRow>
+          ))
+        }
+
+        {teams?.map((team) => (
+          <TableRow key={team.ID}>
+            <TableCell className="font-medium">{team.Nombre}</TableCell>
+            <TableCell>{team.DisciplinaID}</TableCell>
+            <TableCell>{team.UniversidadID}</TableCell>
+            <TableCell>{team.Categoria}</TableCell>
             <TableCell>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="bg-blue-100 hover:bg-blue-200 "
-              >
-                <HammerIcon />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="bg-red-100 hover:bg-red-200"
-              >
-                <Trash2Icon />
-              </Button>
+              <div className="flex justify-center">
+                {team.Regular ? (
+                  <CheckIcon className="text-green-500" size={20} />
+                ) : (
+                  <X className="text-red-500" size={20} />
+                )}
+              </div>
+            </TableCell>
+            <TableCell className="text-right">
+              <div className="flex justify-end gap-2">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="bg-blue-50 hover:bg-blue-200 text-blue-600"
+                >
+                  <HammerIcon size={18} />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="bg-red-50 hover:bg-red-200 text-red-600"
+                >
+                  <Trash2Icon size={18} />
+                </Button>
+              </div>
             </TableCell>
           </TableRow>
-        ))
-      : null}
+        ))}
       </TableBody>
     </Table>
   );
