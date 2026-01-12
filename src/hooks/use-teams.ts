@@ -1,9 +1,14 @@
-// hooks/use-teams.ts
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ky from "ky";
 import { z } from "zod";
 
-// Esquema de un equipo individual
+interface CreateTeamInput {
+  Nombre: string;
+  DisciplinaID: number;
+  UniversidadID: number;
+  AtletasIDs: number[]; 
+}
+
 const teamSchema = z.object({
   ID: z.number(),
   Nombre: z.string(),
@@ -31,5 +36,20 @@ export function useTeams() {
   return useQuery({
     queryKey: ["teams"],
     queryFn: fetchTeams,
+  });
+}
+
+
+export function useCreateTeam() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (newTeam: CreateTeamInput) => {
+      return await ky.post("http://localhost:8080/teams/", { json: newTeam }).json();
+    },
+    onSuccess: () => {
+      // Esto refresca la lista de equipos automáticamente al crear uno nuevo
+      queryClient.invalidateQueries({ queryKey: ["teams"] });
+    },
   });
 }
