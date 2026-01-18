@@ -6,7 +6,7 @@ interface CreateTeamInput {
   Nombre: string;
   DisciplinaID: number;
   UniversidadID: number;
-  AtletasIDs: number[]; 
+  AtletasIDs: number[];
 }
 
 const teamSchema = z.object({
@@ -27,7 +27,7 @@ const resSchema = z.object({
 export type Team = z.infer<typeof teamSchema>;
 
 const fetchTeams = async () => {
-  const res = await ky.get("http://localhost:8080/teams/").json();
+  const res = await ky.get("http://localhost:8080/teams").json();
   const parsed = resSchema.parse(res);
   return parsed.data;
 };

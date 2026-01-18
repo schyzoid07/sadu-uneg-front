@@ -17,7 +17,7 @@ const resSchema = z.object({
 export type University = z.infer<typeof universitySchema>;
 
 const fetchUniversities = async () => {
-  const res = await ky.get("http://localhost:8080/universities/").json();
+  const res = await ky.get("http://localhost:8080/universities").json();
   const parsed = resSchema.parse(res);
   return parsed.data;
 };

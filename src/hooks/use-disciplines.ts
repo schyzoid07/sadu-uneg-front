@@ -19,7 +19,7 @@ const resSchema = z.object({
 export type Discipline = z.infer<typeof disciplineSchema>;
 
 const fetchDisciplines = async () => {
-  const res = await ky.get("http://localhost:8080/disciplines/").json();
+  const res = await ky.get("http://localhost:8080/disciplines").json();
   const parsed = resSchema.parse(res);
   return parsed.data;
 };

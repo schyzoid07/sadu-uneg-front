@@ -21,7 +21,7 @@ export type Teacher = z.infer<typeof teacherSchema>;
 
 const fetchTeachers = async () => {
   // Ajusta la URL según tu API
-  const res = await ky.get("http://localhost:8080/teachers/").json();
+  const res = await ky.get("http://localhost:8080/teachers").json();
   const parsed = resSchema.parse(res);
   return parsed.data;
 };
