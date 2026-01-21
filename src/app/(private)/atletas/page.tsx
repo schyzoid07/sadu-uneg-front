@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { HammerIcon, Trash2Icon, PlusIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAthletes } from "@/hooks/use-athletes"; // Importamos el hook
+import { useAthletes, Athlete } from "@/hooks/use-athletes"; // Importamos el hook y tipo
 import {
   Dialog,
   DialogContent,
@@ -25,7 +25,11 @@ import CrearAtletaForm from "@/components/atleta-form";
 
 export default function Atletas() {
   const { data: athletes, isLoading, isError } = useAthletes();
-  const [open, setOpen] = useState(false);
+  const [openCreate, setOpenCreate] = useState(false);
+
+  // Edición
+  const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null);
+  const [openEdit, setOpenEdit] = useState(false);
 
   if (isError) return <p>Error al cargar los atletas...</p>;
 
@@ -33,7 +37,9 @@ export default function Atletas() {
     <>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Atletas</h2>
-        <Dialog open={open} onOpenChange={setOpen}>
+
+        {/* Botón Crear */}
+        <Dialog open={openCreate} onOpenChange={setOpenCreate}>
           <DialogTrigger asChild>
             <Button variant="outline" className="flex items-center gap-2">
               <PlusIcon size={16} />
@@ -46,8 +52,7 @@ export default function Atletas() {
             </DialogHeader>
             <CrearAtletaForm
               onSuccess={() => {
-                // Cerramos el diálogo después de crear
-                setOpen(false);
+                setOpenCreate(false);
               }}
             />
           </DialogContent>
@@ -86,13 +91,19 @@ export default function Atletas() {
               <TableCell className="text-right">{athlete.PhoneNum}</TableCell>
               <TableCell className="text-right">{athlete.Gender}</TableCell>
               <TableCell className="flex gap-2 justify-end">
+                {/* Botón para editar: abre diálogo controlado pasando el atleta */}
                 <Button
                   size="icon"
                   variant="ghost"
                   className="bg-blue-100 hover:bg-blue-200"
+                  onClick={() => {
+                    setEditingAthlete(athlete);
+                    setOpenEdit(true);
+                  }}
                 >
                   <HammerIcon size={16} />
                 </Button>
+
                 <Button
                   size="icon"
                   variant="ghost"
@@ -105,6 +116,31 @@ export default function Atletas() {
           ))}
         </TableBody>
       </Table>
+
+      {/* Dialog de edición controlado */}
+      <Dialog open={openEdit} onOpenChange={(val) => {
+        setOpenEdit(val);
+        if (!val) setEditingAthlete(null);
+      }}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Editar atleta</DialogTitle>
+          </DialogHeader>
+
+          {/* Pasamos el atleta a editar; si es null mostramos mensaje */}
+          {editingAthlete ? (
+            <CrearAtletaForm
+              athlete={editingAthlete}
+              onSuccess={() => {
+                setOpenEdit(false);
+                setEditingAthlete(null);
+              }}
+            />
+          ) : (
+            <p>No se encontró el atleta seleccionado.</p>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
