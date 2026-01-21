@@ -10,7 +10,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Separator } from "@radix-ui/react-separator";
 import { Lato } from "next/font/google";
-
+import Link from "next/link";
 import Image from "next/image";
 import { Providers } from "@/components/Providers";
 const lato = Lato({
@@ -67,7 +67,7 @@ export default function RootLayout({
                       alt="SADUNEG Logo"
                       width={100}
                       height={100}
-                      
+
                     />
                   </div>
                   <div className="flex flex-col items-center">
@@ -77,9 +77,11 @@ export default function RootLayout({
                     <p>Sistema de administracion deportiva 2025</p>
                   </div>
                   <div>
-                    <button className="hover:bg-blue-800 bg-blue-900 text-white font-bold py-2 px-4 rounded cursor-pointer transition duration-100">
-                      Iniciar Sesión
-                    </button>
+                    <Link href="/login">
+                      <button className="hover:bg-blue-800 bg-blue-900 text-white font-bold py-2 px-4 rounded cursor-pointer transition duration-100">
+                        Iniciar Sesión
+                      </button>
+                    </Link>
                   </div>
                 </header>
                 {children}
