@@ -1,3 +1,4 @@
+'use client'
 import Image from "next/image";
 import LOGO_UNEG from "@/../public/LOGO_UNEG.webp";
 import {
@@ -8,24 +9,14 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Link from "next/link";
+import { useDisciplines } from "@/hooks/use-disciplines";
 
-export async function SportsCarousel() {
-  const disciplinas = [
-    { id: 1, name: "Fútbol", image: { LOGO_UNEG } },
-    { id: 2, name: "Baloncesto", image: { LOGO_UNEG } },
-    { id: 3, name: "Voleibol", image: { LOGO_UNEG } },
-    { id: 4, name: "Béisbol", image: { LOGO_UNEG } },
-    { id: 5, name: "Natación", image: { LOGO_UNEG } },
-    { id: 6, name: "Atletismo", image: { LOGO_UNEG } },
-    { id: 7, name: "Boxeo", image: { LOGO_UNEG } },
-    { id: 8, name: "Artes Marciales", image: { LOGO_UNEG } },
-    { id: 9, name: "Ciclismo", image: { LOGO_UNEG } },
-    { id: 10, name: "Tenis", image: { LOGO_UNEG } },
-  ];
+export function SportsCarousel() {
+  const { data: disciplines, isLoading } = useDisciplines();
   return (
     <Carousel className="mx-10">
       <CarouselContent>
-        {disciplinas.map((disciplina) => (
+        {disciplines?.map((disciplina) => (
           <CarouselItem
             key={disciplina.id}
             className="basis=1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6 flex flex-col items-center justify-center p-4  border-4 rounded-2xl mx-2"

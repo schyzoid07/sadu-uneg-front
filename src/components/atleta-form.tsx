@@ -82,114 +82,102 @@ export default function CrearAtletaForm({ onSuccess }: CrearAtletaFormProps) {
     };
 
     return (
-        <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
+        <form className="space-y-6 mt-4 mb-4" onSubmit={handleSubmit}>
+            {/* Grid principal - 1 columna en móvil, 2 en tablets/pc */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-medium">Nombres</label>
-                    <Input value={firstNames} onChange={(e) => setFirstNames(e.target.value)} />
+                    <Input value={firstNames} placeholder="Pepito Antonio" onChange={(e) => setFirstNames(e.target.value)} />
                 </div>
-                <div>
+                <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-medium">Apellidos</label>
-                    <Input value={lastNames} onChange={(e) => setLastNames(e.target.value)} />
+                    <Input value={lastNames} placeholder="Gonzalez Jimenez" onChange={(e) => setLastNames(e.target.value)} />
                 </div>
-                <div>
-                    <label className="text-sm font-medium">Cédula (GovID)</label>
-                    <Input value={govId} onChange={(e) => setGovId(e.target.value)} />
+                <div className="flex flex-col gap-1.5">
+                    <label className="text-sm font-medium">Cédula</label>
+                    <Input value={govId} placeholder="V-12345678" onChange={(e) => setGovId(e.target.value)} />
                 </div>
-                <div>
+                <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-medium">Teléfono</label>
-                    <Input value={phoneNum} onChange={(e) => setPhoneNum(e.target.value)} />
+                    <Input value={phoneNum} placeholder="04124512365" onChange={(e) => setPhoneNum(e.target.value)} />
                 </div>
-                <div>
+                <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-medium">Correo</label>
-                    <Input value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <Input value={email} placeholder="correoejemplo@gmail.com" onChange={(e) => setEmail(e.target.value)} />
                 </div>
-                <div>
+                <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-medium">Género</label>
                     <Select onValueChange={(v) => setGender(v)} defaultValue={gender}>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="M">Masculino</SelectItem>
-                            <SelectItem value="F">Femenino</SelectItem>
-                            <SelectItem value="O">Otro</SelectItem>
+                            <SelectItem value="Masculino">Masculino</SelectItem>
+                            <SelectItem value="Femenino">Femenino</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
-                <div>
+                <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-medium">Fecha de Inscripción</label>
-                    <Input type="date" value={inscriptionDate} onChange={(e) => setInscriptionDate(e.target.value)} />
+                    <Input className="w-full" type="date" value={inscriptionDate} onChange={(e) => setInscriptionDate(e.target.value)} />
                 </div>
-                <div className="flex items-center space-x-2 mt-5">
+
+                {/* Checkbox alineado mejor para móvil */}
+                <div className="flex items-center space-x-2 md:mt-8 pt-2">
                     <Checkbox id="active-checkbox" checked={active} onCheckedChange={() => setActive(!active)} />
-                    <label htmlFor="active-checkbox" className="text-sm">Activo en la universidad</label>
+                    <label htmlFor="active-checkbox" className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        Activo en la universidad
+                    </label>
                 </div>
             </div>
 
-            {/* Selección de Disciplinas */}
-            <div>
-                <label className="text-sm font-semibold">Disciplinas seleccionadas ({selectedDisciplines.length})</label>
-                <div className="border rounded-md bg-slate-50/30 mt-2">
-                    <ScrollArea className="h-40 p-3">
-                        {disciplines?.map((d) => (
-                            <div key={d.id} className="flex items-center space-x-3 py-1">
-                                <Checkbox
-                                    id={`disc-${d.id}`}
-                                    checked={selectedDisciplines.includes(d.id)}
-                                    onCheckedChange={() => toggleArray(selectedDisciplines, setSelectedDisciplines, d.id)}
-                                />
-                                <label htmlFor={`disc-${d.id}`} className="text-sm">{d.name}</label>
-                            </div>
-                        ))}
-                    </ScrollArea>
+            {/* Secciones de Selección (Disciplinas y Equipos) */}
+            <div className="grid grid-cols-1 gap-6">
+                {/* Disciplinas */}
+                <div>
+                    <label className="text-sm font-semibold">Disciplinas seleccionadas ({selectedDisciplines.length})</label>
+                    <div className="border rounded-md bg-slate-50/30 mt-2">
+                        <ScrollArea className="h-40 p-3">
+                            {disciplines?.map((d) => (
+                                <div key={d.id} className="flex items-center space-x-3 py-1.5">
+                                    <Checkbox
+                                        id={`disc-${d.id}`}
+                                        checked={selectedDisciplines.includes(d.id)}
+                                        onCheckedChange={() => toggleArray(selectedDisciplines, setSelectedDisciplines, d.id)}
+                                    />
+                                    <label htmlFor={`disc-${d.id}`} className="text-sm cursor-pointer">{d.name}</label>
+                                </div>
+                            ))}
+                        </ScrollArea>
+                    </div>
+                </div>
+
+                {/* Equipos */}
+                <div>
+                    <label className="text-sm font-semibold">Equipos ({selectedTeams.length})</label>
+                    <div className="border rounded-md bg-slate-50/30 mt-2">
+                        <ScrollArea className="h-40 p-3">
+                            {teams?.map((t) => (
+                                <div key={t.ID} className="flex items-center space-x-3 py-1.5">
+                                    <Checkbox
+                                        id={`team-${t.ID}`}
+                                        checked={selectedTeams.includes(t.ID)}
+                                        onCheckedChange={() => toggleArray(selectedTeams, setSelectedTeams, t.ID)}
+                                    />
+                                    <label htmlFor={`team-${t.ID}`} className="text-sm cursor-pointer">{t.Nombre}</label>
+                                </div>
+                            ))}
+                        </ScrollArea>
+                    </div>
                 </div>
             </div>
 
-            {/* Selección de Equipos */}
-            <div>
-                <label className="text-sm font-semibold">Equipos ({selectedTeams.length})</label>
-                <div className="border rounded-md bg-slate-50/30 mt-2">
-                    <ScrollArea className="h-40 p-3">
-                        {teams?.map((t) => (
-                            <div key={t.ID} className="flex items-center space-x-3 py-1">
-                                <Checkbox
-                                    id={`team-${t.ID}`}
-                                    checked={selectedTeams.includes(t.ID)}
-                                    onCheckedChange={() => toggleArray(selectedTeams, setSelectedTeams, t.ID)}
-                                />
-                                <label htmlFor={`team-${t.ID}`} className="text-sm">{t.Nombre}</label>
-                            </div>
-                        ))}
-                    </ScrollArea>
-                </div>
-            </div>
-
-            {/* Selección de Partidos / Eventos */}
-            <div>
-                <label className="text-sm font-semibold">Partidos / Eventos ({selectedEvents.length})</label>
-                <div className="border rounded-md bg-slate-50/30 mt-2">
-                    <ScrollArea className="h-40 p-3">
-                        {events?.map((ev) => (
-                            <div key={ev.ID} className="flex items-center space-x-3 py-1">
-                                <Checkbox
-                                    id={`evt-${ev.ID}`}
-                                    checked={selectedEvents.includes(ev.ID)}
-                                    onCheckedChange={() => toggleArray(selectedEvents, setSelectedEvents, ev.ID)}
-                                />
-                                <label htmlFor={`evt-${ev.ID}`} className="text-sm">{ev.Nombre}</label>
-                            </div>
-                        ))}
-                    </ScrollArea>
-                </div>
-            </div>
-
-            {/* Footer acciones */}
-            <div className="flex justify-end gap-3 pt-2">
-                <Button variant="outline" type="button" onClick={() => { /* limpiar campos si se desea */ }}>
+            {/* Footer acciones - En móvil se ven mejor uno sobre otro o con gap amplio */}
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t">
+                <Button className="w-full sm:w-auto" variant="outline" type="button">
                     Cancelar
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button className="w-full sm:w-auto" type="submit" disabled={isSubmitting}>
                     {isSubmitting ? <Loader2 className="animate-spin h-4 w-4" /> : "Crear atleta"}
                 </Button>
             </div>

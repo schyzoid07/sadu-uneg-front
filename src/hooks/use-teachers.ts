@@ -4,12 +4,12 @@ import ky from "ky";
 import { z } from "zod";
 
 const teacherSchema = z.object({
-  ID: z.number(),
-  FirstName: z.string(),
-  LastName: z.string(),
-  IdentityCard: z.number(),
-  Email: z.string().email(),
-  Telephone: z.string(),
+  id: z.number(),
+  first_names: z.string(),
+  last_names: z.string(),
+  gov_id: z.string(),
+  email: z.string().optional(),
+  phone_num: z.string().optional(),
 });
 
 const resSchema = z.object({

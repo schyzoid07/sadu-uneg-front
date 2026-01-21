@@ -8,6 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableCaption
 } from "@/components/ui/table";
 import { HammerIcon, Trash2Icon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,6 +19,7 @@ export default function Profesores() {
 
   return (
     <Table>
+      <TableCaption>Lista de atletas registrados.</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>Cédula</TableHead>
@@ -25,7 +27,7 @@ export default function Profesores() {
           <TableHead>Apellido</TableHead>
           <TableHead className="text-left">Correo</TableHead>
           <TableHead className="text-right">Teléfono</TableHead>
-          <TableHead className="text-right">Acciones</TableHead>
+          <TableHead></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -41,12 +43,12 @@ export default function Profesores() {
 
         {/* Mapeo de Datos Reales */}
         {teachers?.map((teacher) => (
-          <TableRow key={teacher.ID}>
-            <TableCell>{teacher.IdentityCard}</TableCell>
-            <TableCell>{teacher.FirstName}</TableCell>
-            <TableCell>{teacher.LastName}</TableCell>
-            <TableCell className="text-left">{teacher.Email}</TableCell>
-            <TableCell className="text-right">{teacher.Telephone}</TableCell>
+          <TableRow key={teacher.id}>
+            <TableCell>{teacher.gov_id}</TableCell>
+            <TableCell>{teacher.first_names}</TableCell>
+            <TableCell>{teacher.last_names}</TableCell>
+            <TableCell className="text-left">{teacher.email}</TableCell>
+            <TableCell className="text-right">{teacher.phone_num}</TableCell>
             <TableCell>
               <div className="flex justify-end gap-2">
                 <Button
