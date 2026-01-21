@@ -68,9 +68,9 @@ export default function Eventos() {
             ))}
 
           {events?.map((evento) => (
-            <TableRow key={evento.ID}>
-              <TableCell className="font-mono">{evento.ID}</TableCell>
-              <TableCell>{evento.Nombre}</TableCell>
+            <TableRow key={evento.id}>
+              <TableCell className="font-mono">{evento.id}</TableCell>
+              <TableCell>{evento.name}</TableCell>
               <TableCell className="flex gap-2 justify-end">
                 <Button
                   size="icon"

@@ -4,8 +4,8 @@ import ky from "ky";
 import { z } from "zod";
 
 const eventSchema = z.object({
-  ID: z.number(),
-  Nombre: z.string(),
+  id: z.number(),
+  name: z.string(),
 });
 
 const resSchema = z.object({
