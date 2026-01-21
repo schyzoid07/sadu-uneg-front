@@ -39,9 +39,9 @@ export default function Disciplinas() {
         }
 
         {disciplines?.map((item) => (
-          <TableRow key={item.ID}>
-            <TableCell>{item.ID}</TableCell>
-            <TableCell>{item.Nombre}</TableCell>
+          <TableRow key={item.id}>
+            <TableCell>{item.id}</TableCell>
+            <TableCell>{item.name}</TableCell>
             <TableCell className="text-right">
               <div className="flex justify-end gap-2">
                 <Button

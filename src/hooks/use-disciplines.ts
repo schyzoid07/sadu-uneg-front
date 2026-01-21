@@ -5,8 +5,8 @@ import * as z from "zod";
 
 // Definimos el esquema de la disciplina individual
 const disciplineSchema = z.object({
-  ID: z.number(),
-  Nombre: z.string(),
+  id: z.number(),
+  name: z.string(),
 });
 
 // Esquema de la respuesta de la API
@@ -19,7 +19,7 @@ const resSchema = z.object({
 export type Discipline = z.infer<typeof disciplineSchema>;
 
 const fetchDisciplines = async () => {
-  const res = await ky.get("http://localhost:8080/disciplines").json();
+  const res = await ky.get("http://localhost:8080/discipline").json();
   const parsed = resSchema.parse(res);
   return parsed.data;
 };
