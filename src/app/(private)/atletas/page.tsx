@@ -66,11 +66,12 @@ export default function Atletas() {
             <DialogHeader>
               <DialogTitle>Crear nuevo atleta</DialogTitle>
             </DialogHeader>
-            <CrearAtletaForm
+            <div className="no-scrollbar -mx-4 max-h-[50vh] overflow-y-auto px-4"><CrearAtletaForm
               onSuccess={() => {
                 setOpenCreate(false);
               }}
-            />
+            /></div>
+
           </DialogContent>
         </Dialog>
       </div>
@@ -117,7 +118,7 @@ export default function Atletas() {
                     setOpenDelete(true);
                   }}
                 >
-                  <HammerIcon size={16} />
+                  <Trash2Icon size={16} />
                 </Button>
 
                 {/* Mantengo Trash2Icon (puedes reasignarlo o eliminarlo) */}
@@ -131,7 +132,7 @@ export default function Atletas() {
                     setOpenEdit(true);
                   }}
                 >
-                  <Trash2Icon size={16} />
+                  <HammerIcon size={16} />
                 </Button>
               </TableCell>
             </TableRow>
@@ -150,13 +151,13 @@ export default function Atletas() {
           </DialogHeader>
 
           {editingAthlete ? (
-            <CrearAtletaForm
+            <div className="no-scrollbar -mx-4 max-h-[50vh] overflow-y-auto px-4"> <CrearAtletaForm
               athlete={editingAthlete}
               onSuccess={() => {
                 setOpenEdit(false);
                 setEditingAthlete(null);
               }}
-            />
+            /> </div>
           ) : (
             <p>No se encontró el atleta seleccionado.</p>
           )}
