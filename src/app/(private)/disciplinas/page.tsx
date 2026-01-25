@@ -56,7 +56,7 @@ export default function DisciplinasPage() {
 
         <Dialog open={openCreate} onOpenChange={setOpenCreate}>
           <DialogTrigger asChild>
-            <Button className="bg-green-700 hover:bg-green-800 text-white shadow-sm flex items-center gap-2">
+            <Button variant='outline' className="shadow-sm flex items-center gap-2">
               <PlusIcon className="mr-2 h-4 w-4" /> Nueva Disciplina
             </Button>
           </DialogTrigger>
