@@ -56,7 +56,7 @@ export default function DisciplinasPage() {
 
         <Dialog open={openCreate} onOpenChange={setOpenCreate}>
           <DialogTrigger asChild>
-            <Button variant='outline' className="shadow-sm flex items-center gap-2">
+            <Button variant="outline" className="shadow-sm flex items-center gap-2">
               <PlusIcon className="mr-2 h-4 w-4" /> Nueva Disciplina
             </Button>
           </DialogTrigger>
@@ -100,7 +100,7 @@ export default function DisciplinasPage() {
                 <TableCell>{d.name}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    {/* Editar */}
+                    {/* EDITAR: HammerIcon abre diálogo de edición */}
                     <Button
                       size="icon"
                       variant="ghost"
@@ -113,7 +113,7 @@ export default function DisciplinasPage() {
                       <HammerIcon size={16} />
                     </Button>
 
-                    {/* Borrar */}
+                    {/* BORRAR: Trash2Icon abre confirmación de borrado */}
                     <Button
                       size="icon"
                       variant="ghost"
@@ -133,7 +133,7 @@ export default function DisciplinasPage() {
         </Table>
       </div>
 
-      {/* Dialog edición */}
+      {/* Dialog edición controlado */}
       <Dialog open={openEdit} onOpenChange={(val) => {
         setOpenEdit(val);
         if (!val) setEditing(null);

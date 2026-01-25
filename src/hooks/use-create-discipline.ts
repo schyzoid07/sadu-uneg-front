@@ -11,7 +11,7 @@ export function useCreateDiscipline() {
     return useMutation({
         mutationFn: async (newDiscipline: CreateDisciplineInput) => {
             // Ajusta la URL si es necesario
-            const res = await ky.post("http://localhost:8080/discipline", { json: newDiscipline }).json();
+            const res = await ky.post("http://localhost:8080/discipline/create", { json: newDiscipline }).json();
             return res;
         },
         onSuccess: () => {

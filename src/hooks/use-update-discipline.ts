@@ -11,7 +11,7 @@ export function useUpdateDiscipline() {
 
     return useMutation({
         mutationFn: async ({ id, data }: UpdateDisciplineInput) => {
-            const res = await ky.put(`http://localhost:8080/discipline/${id}`, { json: data }).json();
+            const res = await ky.put(`http://localhost:8080/discipline/edit/${id}`, { json: data }).json();
             return res;
         },
         onSuccess: () => {

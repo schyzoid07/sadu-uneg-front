@@ -7,7 +7,7 @@ export function useDeleteDiscipline() {
     return useMutation({
         mutationFn: async (id: number) => {
             // Si la API responde 204 No Content, omite .json()
-            const res = await ky.delete(`http://localhost:8080/discipline/${id}`).json();
+            const res = await ky.delete(`http://localhost:8080/discipline/delete/${id}`).json();
             return res;
         },
         onSuccess: () => {
