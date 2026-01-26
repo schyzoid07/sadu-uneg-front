@@ -104,7 +104,7 @@ export default function DisciplinasPage() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-8 w-8 bg-blue-50 hover:bg-blue-200 text-blue-600"
+                      className="bg-blue-100 hover:bg-blue-200"
                       onClick={() => {
                         setEditing(d);
                         setOpenEdit(true);
@@ -117,7 +117,7 @@ export default function DisciplinasPage() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-8 w-8 bg-red-50 hover:bg-red-200 text-red-600"
+                      className="bg-red-100 hover:bg-red-200"
                       onClick={() => {
                         setDeleting(d);
                         setOpenDelete(true);
@@ -131,13 +131,14 @@ export default function DisciplinasPage() {
             ))}
           </TableBody>
         </Table>
-      </div>
+      </div >
 
       {/* Dialog edición controlado */}
-      <Dialog open={openEdit} onOpenChange={(val) => {
+      < Dialog open={openEdit} onOpenChange={(val) => {
         setOpenEdit(val);
         if (!val) setEditing(null);
-      }}>
+      }
+      }>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Editar Disciplina</DialogTitle>
@@ -155,10 +156,10 @@ export default function DisciplinasPage() {
             <p>No se encontró la disciplina seleccionada.</p>
           )}
         </DialogContent>
-      </Dialog>
+      </Dialog >
 
       {/* Dialog confirmación de borrado */}
-      <Dialog open={openDelete} onOpenChange={(val) => {
+      < Dialog open={openDelete} onOpenChange={(val) => {
         setOpenDelete(val);
         if (!val) setDeleting(null);
       }}>
@@ -187,7 +188,7 @@ export default function DisciplinasPage() {
             </Button>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog >
     </>
   );
 }
