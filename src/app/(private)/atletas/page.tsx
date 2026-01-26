@@ -109,18 +109,6 @@ export default function Atletas() {
                 <TableCell className="text-right">{athlete.PhoneNum}</TableCell>
                 <TableCell className="text-right">{athlete.Gender}</TableCell>
                 <TableCell className="flex gap-2 justify-end">
-                  {/* Botón para BORRAR usando HammerIcon */}
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="bg-red-100 hover:bg-red-200"
-                    onClick={() => {
-                      setDeletingAthlete(athlete);
-                      setOpenDelete(true);
-                    }}
-                  >
-                    <Trash2Icon size={16} />
-                  </Button>
 
                   {/* Mantengo Trash2Icon (puedes reasignarlo o eliminarlo) */}
                   <Button
@@ -135,6 +123,21 @@ export default function Atletas() {
                   >
                     <HammerIcon size={16} />
                   </Button>
+
+                  {/* Botón para BORRAR usando HammerIcon */}
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="bg-red-100 hover:bg-red-200"
+                    onClick={() => {
+                      setDeletingAthlete(athlete);
+                      setOpenDelete(true);
+                    }}
+                  >
+                    <Trash2Icon size={16} />
+                  </Button>
+
+
                 </TableCell>
               </TableRow>
             ))}
