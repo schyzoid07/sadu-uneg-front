@@ -76,75 +76,77 @@ export default function Atletas() {
         </Dialog>
       </div>
 
-      <Table>
-        <TableCaption>Lista de atletas registrados.</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Cedula</TableHead>
-            <TableHead>Nombre</TableHead>
-            <TableHead>Apellido</TableHead>
-            <TableHead className="text-left">Correo</TableHead>
-            <TableHead className="text-right">Telefono</TableHead>
-            <TableHead className="text-right">Género</TableHead>
-            <TableHead></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isLoading &&
-            Array.from({ length: 5 }).map((_, i) => (
-              <TableRow key={i}>
-                <TableCell colSpan={7}>
-                  <Skeleton className="w-full h-10" />
+      <div className="border rounded-lg bg-white shadow-sm overflow-hidden">
+        <Table>
+          <TableCaption>Lista de atletas registrados.</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Cedula</TableHead>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Apellido</TableHead>
+              <TableHead className="text-left">Correo</TableHead>
+              <TableHead className="text-right">Telefono</TableHead>
+              <TableHead className="text-right">Género</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading &&
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell colSpan={7}>
+                    <Skeleton className="w-full h-10" />
+                  </TableCell>
+                </TableRow>
+              ))}
+
+            {athletes?.map((athlete) => (
+              <TableRow key={athlete.ID}>
+                <TableCell>{athlete.GovID}</TableCell>
+                <TableCell>{athlete.FirstNames}</TableCell>
+                <TableCell>{athlete.LastNames}</TableCell>
+                <TableCell className="text-left">{athlete.Email}</TableCell>
+                <TableCell className="text-right">{athlete.PhoneNum}</TableCell>
+                <TableCell className="text-right">{athlete.Gender}</TableCell>
+                <TableCell className="flex gap-2 justify-end">
+                  {/* Botón para BORRAR usando HammerIcon */}
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="bg-red-100 hover:bg-red-200"
+                    onClick={() => {
+                      setDeletingAthlete(athlete);
+                      setOpenDelete(true);
+                    }}
+                  >
+                    <Trash2Icon size={16} />
+                  </Button>
+
+                  {/* Mantengo Trash2Icon (puedes reasignarlo o eliminarlo) */}
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="bg-blue-100 hover:bg-blue-200"
+                    onClick={() => {
+                      // ejemplo: abrir edición si lo deseas
+                      setEditingAthlete(athlete);
+                      setOpenEdit(true);
+                    }}
+                  >
+                    <HammerIcon size={16} />
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
-
-          {athletes?.map((athlete) => (
-            <TableRow key={athlete.ID}>
-              <TableCell>{athlete.GovID}</TableCell>
-              <TableCell>{athlete.FirstNames}</TableCell>
-              <TableCell>{athlete.LastNames}</TableCell>
-              <TableCell className="text-left">{athlete.Email}</TableCell>
-              <TableCell className="text-right">{athlete.PhoneNum}</TableCell>
-              <TableCell className="text-right">{athlete.Gender}</TableCell>
-              <TableCell className="flex gap-2 justify-end">
-                {/* Botón para BORRAR usando HammerIcon */}
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="bg-red-100 hover:bg-red-200"
-                  onClick={() => {
-                    setDeletingAthlete(athlete);
-                    setOpenDelete(true);
-                  }}
-                >
-                  <Trash2Icon size={16} />
-                </Button>
-
-                {/* Mantengo Trash2Icon (puedes reasignarlo o eliminarlo) */}
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="bg-blue-100 hover:bg-blue-200"
-                  onClick={() => {
-                    // ejemplo: abrir edición si lo deseas
-                    setEditingAthlete(athlete);
-                    setOpenEdit(true);
-                  }}
-                >
-                  <HammerIcon size={16} />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
+          </TableBody>
+        </Table>
+      </div >
       {/* Dialog de edición controlado (si lo usas) */}
-      <Dialog open={openEdit} onOpenChange={(val) => {
+      < Dialog open={openEdit} onOpenChange={(val) => {
         setOpenEdit(val);
         if (!val) setEditingAthlete(null);
-      }}>
+      }
+      }>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Editar atleta</DialogTitle>
@@ -162,10 +164,10 @@ export default function Atletas() {
             <p>No se encontró el atleta seleccionado.</p>
           )}
         </DialogContent>
-      </Dialog>
+      </Dialog >
 
       {/* Dialog de confirmación de eliminación */}
-      <Dialog open={openDelete} onOpenChange={(val) => {
+      < Dialog open={openDelete} onOpenChange={(val) => {
         setOpenDelete(val);
         if (!val) setDeletingAthlete(null);
       }}>
@@ -195,7 +197,7 @@ export default function Atletas() {
             </Button>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog >
     </>
   );
 }
