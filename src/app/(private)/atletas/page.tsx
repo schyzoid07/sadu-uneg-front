@@ -101,13 +101,12 @@ export default function Atletas() {
               ))}
 
             {athletes?.map((athlete) => (
-              <TableRow key={athlete.ID}>
-                <TableCell>{athlete.GovID}</TableCell>
-                <TableCell>{athlete.FirstNames}</TableCell>
-                <TableCell>{athlete.LastNames}</TableCell>
-                <TableCell className="text-left">{athlete.Email}</TableCell>
-                <TableCell className="text-right">{athlete.PhoneNum}</TableCell>
-                <TableCell className="text-right">{athlete.Gender}</TableCell>
+              <TableRow key={athlete.id}>
+                <TableCell>{athlete.id_personal}</TableCell>
+                <TableCell>{athlete.name}</TableCell>
+                <TableCell>{athlete.lastname}</TableCell>
+                <TableCell className="text-left">{athlete.email}</TableCell>
+                <TableCell className="text-right">{athlete.phonenumber}</TableCell>
                 <TableCell className="flex gap-2 justify-end">
 
                   {/* Mantengo Trash2Icon (puedes reasignarlo o eliminarlo) */}

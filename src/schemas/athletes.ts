@@ -1,5 +1,18 @@
 import * as z from "zod"; // Corregido el import de zod
 
+export const athletesSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    lastname: z.string(),
+    phonenumber: z.string(),
+    email: z.string().email(), // Corregido: z.string().email()
+
+    inscripted: z.boolean(),
+    regular: z.boolean(),
+    id_personal: z.string(),
+
+});
+
 export const athleteSchema = z.object({
     ID: z.number(),
     CreatedAt: z.coerce.date(),
