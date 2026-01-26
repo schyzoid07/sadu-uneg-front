@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { HammerIcon, Trash2Icon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useTeachers } from "@/hooks/use-teachers";
+import { useTeachers } from "@/hooks/teachers/use-teachers";
 
 export default function Profesores() {
   const { data: teachers, isLoading } = useTeachers();

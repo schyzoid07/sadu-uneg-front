@@ -11,21 +11,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
 } from "@/components/ui/dialog";
 import { HammerIcon, Trash2Icon, CheckIcon, X, PlusIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useTeams } from "@/hooks/use-teams";
+import { useTeams } from "@/hooks/teams/use-teams";
 import CrearEquipoForm from "@/components/equipo-form";
 
 export default function Equipos() {
   const { data: teams, isLoading } = useTeams();
-  
+
   // Estado para controlar la apertura del modal
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -34,7 +34,7 @@ export default function Equipos() {
       {/* 1. Encabezado con Título y Botón de Creación */}
       <div className="flex justify-between items-center px-2">
         <h1 className="text-xl font-bold text-slate-800">Gestión de Equipos</h1>
-        
+
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogTrigger asChild>
             <Button className="bg-green-700 hover:bg-green-800 text-white shadow-sm">
@@ -45,10 +45,10 @@ export default function Equipos() {
             <DialogHeader>
               <DialogTitle>Registrar Nuevo Equipo</DialogTitle>
             </DialogHeader>
-            
+
             {/* Formulario que recibe la función para cerrar el modal */}
             <CrearEquipoForm onSuccess={() => setIsModalOpen(false)} />
-            
+
           </DialogContent>
         </Dialog>
       </div>

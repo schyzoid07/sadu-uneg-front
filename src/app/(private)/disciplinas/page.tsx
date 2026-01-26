@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { HammerIcon, Trash2Icon, PlusIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useDisciplines, Discipline } from "@/hooks/use-disciplines";
+import { useDisciplines, Discipline } from "@/hooks/disciplines/use-disciplines";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import DisciplinaForm from "@/components/disciplina-form";
-import { useDeleteDiscipline } from "@/hooks/use-delete-discipline";
+import { useDeleteDiscipline } from "@/hooks/disciplines/use-delete-discipline";
 
 export default function DisciplinasPage() {
   const { data: disciplines, isLoading, isError } = useDisciplines();

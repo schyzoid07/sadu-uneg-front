@@ -9,7 +9,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Link from "next/link";
-import { useDisciplines } from "@/hooks/use-disciplines";
+import { useDisciplines } from "@/hooks/disciplines/use-disciplines";
 
 export function SportsCarousel() {
   const { data: disciplines, isLoading } = useDisciplines();

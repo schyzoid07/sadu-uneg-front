@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { HammerIcon, Trash2Icon, PlusIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAthletes, Athlete } from "@/hooks/use-athletes"; // Importamos el hook y tipo
+import { useAthletes, Athlete } from "@/hooks/athletes/use-athletes"; // Importamos el hook y tipo
 import {
   Dialog,
   DialogContent,
@@ -22,7 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import CrearAtletaForm from "@/components/atleta-form";
-import { useDeleteAthlete } from "@/hooks/use-delete-athlete";
+import { useDeleteAthlete } from "@/hooks/athletes/use-delete-athlete";
 
 export default function Atletas() {
   const { data: athletes, isLoading, isError } = useAthletes();

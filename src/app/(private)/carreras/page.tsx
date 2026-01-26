@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { HammerIcon, Trash2Icon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useMajors } from "@/hooks/use-major";
+import { useMajors } from "@/hooks/majors/use-major";
 
 export default function Carreras() {
     const { data: majors, isLoading } = useMajors();

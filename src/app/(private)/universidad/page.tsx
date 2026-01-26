@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { CheckIcon, HammerIcon, Trash2Icon, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useUniversities } from "@/hooks/use-universities";
+import { useUniversities } from "@/hooks/universities/use-universities";
 
 export default function Universidad() {
   const { data: universities, isLoading } = useUniversities();

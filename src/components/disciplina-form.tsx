@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { useCreateDiscipline } from "@/hooks/use-create-discipline";
-import { useUpdateDiscipline } from "@/hooks/use-update-discipline";
-import { Discipline } from "@/hooks/use-disciplines";
+import { useCreateDiscipline } from "@/hooks/disciplines/use-create-discipline";
+import { useUpdateDiscipline } from "@/hooks/disciplines/use-update-discipline";
+import { Discipline } from "@/hooks/disciplines/use-disciplines";
 
 interface DisciplinaFormProps {
     onSuccess?: () => void;

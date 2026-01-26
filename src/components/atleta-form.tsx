@@ -7,15 +7,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 // Si no tienes select UI, reemplaza por <select> nativo o el componente UI que uses
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useDisciplines } from "@/hooks/use-disciplines";
-import { useTeams } from "@/hooks/use-teams";
-import { useEvents } from "@/hooks/use-events";
-import { useCreateAthlete } from "@/hooks/use-create-athlete";
-import { useUpdateAthlete } from "@/hooks/use-update-athlete";
+import { useDisciplines } from "@/hooks/disciplines/use-disciplines";
+import { useTeams } from "@/hooks/teams/use-teams";
+import { useEvents } from "@/hooks/events/use-events";
+import { useCreateAthlete } from "@/hooks/athletes/use-create-athlete";
+import { useUpdateAthlete } from "@/hooks/athletes/use-update-athlete";
 import { Loader2, SearchIcon } from "lucide-react";
 import { athleteSchema } from "@/schemas/athletes";
 import * as z from "zod";
-import { Athlete } from "@/hooks/use-athletes";
+import { Athlete } from "@/hooks/athletes/use-athletes";
 
 interface CrearAtletaFormProps {
     onSuccess?: () => void;

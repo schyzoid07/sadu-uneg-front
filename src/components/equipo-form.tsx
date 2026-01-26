@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useAthletes } from "@/hooks/use-athletes";
-import { useCreateTeam } from "@/hooks/use-teams";
+import { useAthletes } from "@/hooks/athletes/use-athletes";
+import { useCreateTeam } from "@/hooks/teams/use-teams";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -94,8 +94,8 @@ export default function CrearEquipoForm({ onSuccess }: CrearEquipoFormProps) {
             ) : (
               <div className="space-y-3">
                 {filteredAthletes?.map((athlete) => (
-                  <div 
-                    key={athlete.ID} 
+                  <div
+                    key={athlete.ID}
                     className="flex items-center space-x-3 bg-white p-2 rounded-md border border-transparent hover:border-slate-200 transition-all shadow-sm"
                   >
                     <Checkbox
@@ -130,15 +130,15 @@ export default function CrearEquipoForm({ onSuccess }: CrearEquipoFormProps) {
 
       {/* Footer del Formulario */}
       <div className="flex justify-end gap-3 pt-4 border-t">
-        <Button 
+        <Button
           type="button"
-          variant="outline" 
+          variant="outline"
           onClick={() => setSelectedIds([])}
           disabled={createTeamMutation.isPending}
         >
           Limpiar
         </Button>
-        <Button 
+        <Button
           onClick={handleSave}
           disabled={!teamName || selectedIds.length === 0 || createTeamMutation.isPending}
           className="bg-blue-600 hover:bg-blue-700"
