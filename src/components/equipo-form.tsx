@@ -26,8 +26,8 @@ export default function CrearEquipoForm({ onSuccess }: CrearEquipoFormProps) {
 
   // 3. Lógica de filtrado de atletas para la lista
   const filteredAthletes = athletes?.filter((a) =>
-    `${a.FirstNames} ${a.LastNames}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    a.GovID.includes(searchTerm)
+    `${a.name} ${a.lastname}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    a.id_personal.includes(searchTerm)
   );
 
   const toggleAtleta = (id: number) => {
@@ -95,23 +95,23 @@ export default function CrearEquipoForm({ onSuccess }: CrearEquipoFormProps) {
               <div className="space-y-3">
                 {filteredAthletes?.map((athlete) => (
                   <div
-                    key={athlete.ID}
+                    key={athlete.id}
                     className="flex items-center space-x-3 bg-white p-2 rounded-md border border-transparent hover:border-slate-200 transition-all shadow-sm"
                   >
                     <Checkbox
-                      id={`athlete-${athlete.ID}`}
-                      checked={selectedIds.includes(athlete.ID)}
-                      onCheckedChange={() => toggleAtleta(athlete.ID)}
+                      id={`athlete-${athlete.id}`}
+                      checked={selectedIds.includes(athlete.id)}
+                      onCheckedChange={() => toggleAtleta(athlete.id)}
                     />
                     <label
-                      htmlFor={`athlete-${athlete.ID}`}
+                      htmlFor={`athlete-${athlete.id}`}
                       className="flex flex-col flex-1 cursor-pointer"
                     >
                       <span className="text-sm font-medium text-slate-800">
-                        {athlete.FirstNames} {athlete.LastNames}
+                        {athlete.name} {athlete.lastname}
                       </span>
                       <span className="text-[11px] text-slate-500 font-mono">
-                        Cédula: {athlete.GovID}
+                        Cédula: {athlete.id_personal}
                       </span>
                     </label>
                   </div>

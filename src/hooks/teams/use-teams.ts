@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import ky from "ky";
+import ky, { HTTPError } from "ky";
 import { z } from "zod";
-
+import { teamsSchema } from "@/schemas/teams";
 interface CreateTeamInput {
   Nombre: string;
   DisciplinaID: number;
@@ -9,27 +9,25 @@ interface CreateTeamInput {
   AtletasIDs: number[];
 }
 
-const teamSchema = z.object({
-  ID: z.number(),
-  Nombre: z.string(),
-  DisciplinaID: z.number(),
-  UniversidadID: z.number(),
-  Categoria: z.string(),
-  Regular: z.boolean(),
-});
+
 
 // Esquema de la respuesta completa
 const resSchema = z.object({
-  data: z.array(teamSchema),
-  message: z.string(),
+  data: z.array(teamsSchema),
+
 });
 
-export type Team = z.infer<typeof teamSchema>;
+export type Team = z.infer<typeof teamsSchema>;
 
 const fetchTeams = async () => {
-  const res = await ky.get("http://localhost:8080/teams").json();
-  const parsed = resSchema.parse(res);
-  return parsed.data;
+  try {
+    const res = await ky.get("http://localhost:8080/teams").json();
+    const parsed = resSchema.parse(res);
+    return parsed.data;
+  } catch (error: unknown) {
+    console.log(error)
+
+  }
 };
 
 export function useTeams() {
