@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import ky, { HTTPError } from "ky";
+import ky from "ky";
 import { z } from "zod";
 import { teamsSchema } from "@/schemas/teams";
 interface CreateTeamInput {

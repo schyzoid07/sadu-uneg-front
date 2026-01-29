@@ -6,7 +6,6 @@ export const athletesSchema = z.object({
     lastname: z.string(),
     phonenumber: z.string(),
     email: z.string().email(), // Corregido: z.string().email()
-
     inscripted: z.boolean(),
     regular: z.boolean(),
     id_personal: z.string(),

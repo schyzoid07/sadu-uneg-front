@@ -41,7 +41,7 @@ export default function Atletas() {
 
   const confirmDelete = () => {
     if (!deletingAthlete) return;
-    deleteMutation.mutate(deletingAthlete.ID, {
+    deleteMutation.mutate(deletingAthlete.id, {
       onSuccess: () => {
         setOpenDelete(false);
         setDeletingAthlete(null);
@@ -181,7 +181,7 @@ export default function Atletas() {
           <div className="py-4">
             <p className="text-sm text-slate-700">
               ¿Estás seguro que quieres eliminar al atleta{" "}
-              <strong>{deletingAthlete?.FirstNames} {deletingAthlete?.LastNames}</strong> (Cédula: {deletingAthlete?.GovID})?
+              <strong>{deletingAthlete?.name} {deletingAthlete?.lastname}</strong> (Cédula: {deletingAthlete?.id_personal})?
               Esta acción no se puede deshacer.
             </p>
           </div>
