@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import CrearAtletaForm from "@/components/atleta-form";
 import { useDeleteAthlete } from "@/hooks/athletes/use-delete-athlete";
+import Link from "next/link";
 
 export default function Atletas() {
   const { data: athletes, isLoading, isError } = useAthletes();
@@ -86,7 +87,6 @@ export default function Atletas() {
               <TableHead>Apellido</TableHead>
               <TableHead className="text-left">Correo</TableHead>
               <TableHead className="text-right">Telefono</TableHead>
-              <TableHead className="text-right">Género</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
@@ -101,44 +101,48 @@ export default function Atletas() {
               ))}
 
             {athletes?.map((athlete) => (
+
               <TableRow key={athlete.id}>
-                <TableCell>{athlete.id_personal}</TableCell>
-                <TableCell>{athlete.name}</TableCell>
-                <TableCell>{athlete.lastname}</TableCell>
-                <TableCell className="text-left">{athlete.email}</TableCell>
-                <TableCell className="text-right">{athlete.phonenumber}</TableCell>
-                <TableCell className="flex gap-2 justify-end">
+                <Link href="#">
+                  <TableCell>{athlete.id_personal}</TableCell>
+                  <TableCell>{athlete.name}</TableCell>
+                  <TableCell>{athlete.lastname}</TableCell>
+                  <TableCell className="text-left">{athlete.email}</TableCell>
+                  <TableCell className="text-right">{athlete.phonenumber}</TableCell>
+                  <TableCell className="flex gap-2 justify-end">
 
-                  {/* Mantengo Trash2Icon (puedes reasignarlo o eliminarlo) */}
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="bg-blue-100 hover:bg-blue-200"
-                    onClick={() => {
-                      // ejemplo: abrir edición si lo deseas
-                      setEditingAthlete(athlete);
-                      setOpenEdit(true);
-                    }}
-                  >
-                    <HammerIcon size={16} />
-                  </Button>
+                    {/* Mantengo Trash2Icon (puedes reasignarlo o eliminarlo) */}
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="bg-blue-100 hover:bg-blue-200"
+                      onClick={() => {
+                        // ejemplo: abrir edición si lo deseas
+                        setEditingAthlete(athlete);
+                        setOpenEdit(true);
+                      }}
+                    >
+                      <HammerIcon size={16} />
+                    </Button>
 
-                  {/* Botón para BORRAR usando HammerIcon */}
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="bg-red-100 hover:bg-red-200"
-                    onClick={() => {
-                      setDeletingAthlete(athlete);
-                      setOpenDelete(true);
-                    }}
-                  >
-                    <Trash2Icon size={16} />
-                  </Button>
+                    {/* Botón para BORRAR usando HammerIcon */}
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="bg-red-100 hover:bg-red-200"
+                      onClick={() => {
+                        setDeletingAthlete(athlete);
+                        setOpenDelete(true);
+                      }}
+                    >
+                      <Trash2Icon size={16} />
+                    </Button>
 
 
-                </TableCell>
+                  </TableCell>
+                </Link>
               </TableRow>
+
             ))}
           </TableBody>
         </Table>
