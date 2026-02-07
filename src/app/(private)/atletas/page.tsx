@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Trash2Icon, PlusIcon, EyeIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAthletes, Athletes } from "@/hooks/athletes/use-athletes"; // Importamos el hook y tipo
+import { useAthletes, Athletes, Athlete } from "@/hooks/athletes/use-athletes"; // Importamos el hook y tipo
 import {
   Dialog,
   DialogContent,
@@ -65,11 +65,12 @@ export default function Atletas() {
             <DialogHeader>
               <DialogTitle>Crear nuevo atleta</DialogTitle>
             </DialogHeader>
-            <div className="no-scrollbar -mx-4 max-h-[50vh] overflow-y-auto px-4"><CrearAtletaForm
-              onSuccess={() => {
-                setOpenCreate(false);
-              }}
-            /></div>
+            <div className="no-scrollbar -mx-4 max-h-[50vh] overflow-y-auto px-4">
+              <CrearAtletaForm
+                onSuccess={() => {
+                  setOpenCreate(false);
+                }}
+              /></div>
 
           </DialogContent>
         </Dialog>
@@ -109,7 +110,7 @@ export default function Atletas() {
                 <TableCell className="text-right">{athlete.PhoneNumber}</TableCell>
                 <TableCell className="flex gap-2 justify-end">
 
-                  {/*Boton para entrar en un atleta al detalle*/}
+                  {/*Boton para ver  detalles de un atleta*/}
                   <Link href={`/atletas/${athlete.ID}`} passHref>
                     <Button
                       size="icon"

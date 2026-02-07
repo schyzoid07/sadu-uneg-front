@@ -14,7 +14,7 @@ interface CreateTeamInput {
 // Esquema de la respuesta completa
 const resSchema = z.object({
   data: z.array(teamsSchema),
-
+  //message: z.string()
 });
 
 export type Team = z.infer<typeof teamsSchema>;

@@ -15,15 +15,15 @@ export const baseAthletesSchema = z.object({
 });
 
 export const detailAthleteSchema = baseAthletesSchema.extend({
-    InscriptionDate: z.coerce.date().nullable(),
-    MajorID: z.number(),
+
+
     CreatedAt: z.coerce.date().nullable(),
     UpdatedAt: z.coerce.date().nullable(),
     DeletedAt: z.coerce.date().nullable(),
+    InscriptionDate: z.coerce.date().nullable(),
+    MajorID: z.number().nullable(),
     Teams: z.array(z.object({
-
-
-
+        ID: z.number(),
         Name: z.string(),
         Regular: z.boolean(),
         Category: z.string(),
@@ -41,4 +41,19 @@ export const detailAthleteSchema = baseAthletesSchema.extend({
             Teachers: z.null()
         }).nullable()
     }))
+})
+
+export const AthleteInputType = z.object({
+    ID: z.number(),
+    GovID: z.string(),
+    FirstNames: z.string(),
+    LastNames: z.string(),
+    PhoneNumber: z.string(),
+    Email: z.string().email(), // Corregido: z.string().email()
+    Gender: z.string(),
+    Enrolled: z.boolean(),
+    Regular: z.boolean(),
+    InscriptionDate: z.coerce.date().nullable(),
+    MajorID: z.number().nullable(),
+    Teams: z.array(z.number())
 })

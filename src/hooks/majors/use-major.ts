@@ -4,8 +4,8 @@ import ky from "ky";
 import * as z from "zod"; // Corregido el import de zod
 
 const majorSchema = z.object({
-    id: z.number(),
-    name: z.string(), // Ajusta según la estructura real
+    ID: z.number(),
+    Name: z.string(), // Ajusta según la estructura real
 });
 // 1. Definimos los esquemas y tipos fuera del hook
 
@@ -19,7 +19,7 @@ export type Major = z.infer<typeof majorSchema>;
 
 const fetchMajors = async () => {
     try {
-        const res = await ky.get("http://localhost:8080/major").json();
+        const res = await ky.get("http://localhost:8080/majors").json();
         const parsed = resSchema.parse(res);
         return parsed.data;
     }

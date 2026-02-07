@@ -8,12 +8,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDisciplines } from "@/hooks/disciplines/use-disciplines";
 import { useTeams } from "@/hooks/teams/use-teams";
+import { useMajors } from "@/hooks/majors/use-major";
 import { useCreateAthlete } from "@/hooks/athletes/use-create-athlete";
 import { useUpdateAthlete } from "@/hooks/athletes/use-update-athlete";
 import { Loader2 } from "lucide-react";
-import { detailAthleteSchema } from "@/schemas/athletes";
+import { baseAthletesSchema, detailAthleteSchema, AthleteInputType } from "@/schemas/athletes";
 import * as z from "zod";
 import { useAthlete } from "@/hooks/athletes/use-athletes";
+import Link from "next/link";
+import { id } from "zod/v4/locales";
 
 
 
@@ -23,14 +26,7 @@ interface CrearAtletaFormProps {
     athleteId?: string; // si se pasa, el formulario actúa en modo edición
 }
 
-type AthleteInput = Partial<
-    z.infer<typeof detailAthleteSchema>
-> & {
-    Active?: boolean; // atributo extra para status activo/inactivo
-    TeamsIDs?: number[];
-    DisciplineIDs?: number[];
-    EventIDs?: number[];
-};
+type AthleteInput = z.infer<typeof AthleteInputType>
 
 export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
 
@@ -43,7 +39,7 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
     const [gender, setGender] = useState("M");
     const [inscriptionDate, setInscriptionDate] = useState<string>("");
     const [majorId, setMajorId] = useState<number | null>(null);
-    const [active, setActive] = useState(true);
+    const [enrolled, setEnrolled] = useState(true);
 
     // Selecciones múltiples
     const [selectedTeams, setSelectedTeams] = useState<number[]>([]);
@@ -52,6 +48,7 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
 
     const { data: disciplines } = useDisciplines();
     const { data: teams } = useTeams();
+    const { data: majors } = useMajors()
 
 
     const createMutation = useCreateAthlete();
@@ -67,17 +64,19 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
             setEmail(athlete.Email ?? "");
             setGender(athlete.Gender ?? "M");
             setInscriptionDate(athlete.InscriptionDate ? new Date(athlete.InscriptionDate).toISOString().slice(0, 10) : "");
-            setMajorId((athlete.MajorID as number) ?? null);
+            setMajorId(athlete.MajorID ?? null);
             // Active no está en el schema original; si tu backend expone Regular vs Active ajusta aquí
-            setActive((athlete as any).Active ?? athlete.Regular ?? true);
+            setEnrolled(athlete.Enrolled ?? true);
+            console.log(athlete.Enrolled)
 
             // Teams: en schema es array de objetos Team => extraer IDs
-            const tIDs = (athlete.Teams ?? []).map((t: any) => t.ID).filter(Boolean);
+
+            const tIDs = [...new Set(athlete.Teams.map(team => team.ID))]
             setSelectedTeams(tIDs);
 
             // Si tu athlete trae disciplinas/eventos en un campo distinto ajusta
             // Intentamos extraer IDs desde athlete.Disciplines o RegularIDs etc.
-            const dIDs = (athlete as any).Disciplines ? (athlete as any).Disciplines.map((d: any) => d.ID).filter(Boolean) : [];
+            const dIDs = [...new Set(athlete.Teams.map(discipline => discipline.DisciplineID))]
             setSelectedDisciplines(dIDs);
 
 
@@ -91,9 +90,9 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
             setGender("M");
             setInscriptionDate("");
             setMajorId(null);
-            setActive(true);
+            setEnrolled(true);
             setSelectedTeams([]);
-            setSelectedDisciplines([]);
+
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [athlete]);
@@ -120,11 +119,10 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
             Email: email,
             Gender: gender,
             InscriptionDate: inscriptionDate ? new Date(inscriptionDate) : null,
-            MajorID: majorId ?? undefined,
+            MajorID: majorId,
             Regular: true,
-            Active: active,
-            TeamsIDs: selectedTeams,
-            DisciplineIDs: selectedDisciplines,
+            Enrolled: enrolled,
+            Teams: selectedTeams,
 
         };
 
@@ -167,7 +165,7 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
                         <Input value={lastNames} onChange={(e) => setLastNames(e.target.value)} />
                     </div>
                     <div>
-                        <label className="text-sm font-medium">Cédula (GovID)</label>
+                        <label className="text-sm font-medium">Cédula</label>
                         <Input value={govId} onChange={(e) => setGovId(e.target.value)} />
                     </div>
                     <div>
@@ -179,6 +177,15 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
                         <Input value={email} onChange={(e) => setEmail(e.target.value)} />
                     </div>
                     <div>
+                        <label className="text-sm font-medium">Carrera</label>
+                        <select className="w-full text-sm font-medium p-1.75 bg-white border border-gray-200 rounded-lg shadow-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none">
+
+                            {majors?.map((m) => (
+                                <option key={m.ID} value={m.ID}>{m.Name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
                         <label className="text-sm font-medium">Género</label>
 
                         <select
@@ -186,9 +193,9 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
                             value={gender}
                             onChange={(e) => setGender(e.target.value)}
                         >
-                            <option value="M">Masculino</option>
-                            <option value="F">Femenino</option>
-                            <option value="O">Otro</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+
                         </select>
                     </div>
                     <div>
@@ -196,7 +203,7 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
                         <Input type="date" value={inscriptionDate} onChange={(e) => setInscriptionDate(e.target.value)} />
                     </div>
                     <div className="flex items-center space-x-2 mt-5">
-                        <Checkbox id="active-checkbox" checked={active} onCheckedChange={() => setActive(!active)} />
+                        <Checkbox id="active-checkbox" checked={enrolled} onCheckedChange={() => setEnrolled(!enrolled)} />
                         <label htmlFor="active-checkbox" className="text-sm">Activo en la universidad</label>
                     </div>
                 </div>
@@ -207,13 +214,13 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
                     <div className="border rounded-md bg-slate-50/30 mt-2">
                         <ScrollArea className="h-40 p-3">
                             {disciplines?.map((d) => (
-                                <div key={d.id} className="flex items-center space-x-3 py-1">
+                                <div key={d.ID} className="flex items-center space-x-3 py-1">
                                     <Checkbox
-                                        id={`disc-${d.id}`}
-                                        checked={selectedDisciplines.includes(d.id)}
-                                        onCheckedChange={() => toggleArray(selectedDisciplines, setSelectedDisciplines, d.id)}
+                                        id={`disc-${d.ID}`}
+                                        checked={selectedDisciplines.includes(d.ID)}
+                                        onCheckedChange={() => toggleArray(selectedDisciplines, setSelectedDisciplines, d.ID)}
                                     />
-                                    <label htmlFor={`disc-${d.id}`} className="text-sm">{d.name}</label>
+                                    <label htmlFor={`disc-${d.ID}`} className="text-sm">{d.Name}</label>
                                 </div>
                             ))}
                         </ScrollArea>
@@ -226,13 +233,13 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
                     <div className="border rounded-md bg-slate-50/30 mt-2">
                         <ScrollArea className="h-40 p-3">
                             {teams?.map((t) => (
-                                <div key={t.id} className="flex items-center space-x-3 py-1">
+                                <div key={t.ID} className="flex items-center space-x-3 py-1">
                                     <Checkbox
-                                        id={`team-${t.id}`}
-                                        checked={selectedTeams.includes(t.id)}
-                                        onCheckedChange={() => toggleArray(selectedTeams, setSelectedTeams, t.id)}
+                                        id={`team-${t.ID}`}
+                                        checked={selectedTeams.includes(t.ID)}
+                                        onCheckedChange={() => toggleArray(selectedTeams, setSelectedTeams, t.ID)}
                                     />
-                                    <label htmlFor={`team-${t.id}`} className="text-sm">{t.name}</label>
+                                    <label htmlFor={`team-${t.ID}`} className="text-sm">{t.Name}</label>
                                 </div>
                             ))}
                         </ScrollArea>
@@ -242,11 +249,13 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
 
 
                 <div className="flex justify-end gap-3 pt-2">
-                    <Button variant="outline" type="button" onClick={() => { if (onSuccess) onSuccess(); }}>
-                        Cancelar
-                    </Button>
-                    <Button type="submit" disabled={isSubmitting}>
-                        {isSubmitting ? <Loader2 className="animate-spin h-4 w-4" /> : (athlete ? "Actualizar atleta" : "Crear atleta")}
+                    <Link href="/atletas">
+                        <Button variant="outline" type="button" >
+                            Retroceder
+                        </Button>
+                    </Link>
+                    <Button type="submit" disabled={isSubmitting} onClick={handleSubmit}>
+                        {isSubmitting ? <Loader2 className="animate-spin h-4 w-4" /> : (athlete ? "Modificar atleta" : "Crear atleta")}
                     </Button>
                 </div>
             </form>
