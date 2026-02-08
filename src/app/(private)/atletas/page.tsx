@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -24,12 +24,30 @@ import {
 import CrearAtletaForm from "@/components/atleta-form";
 import { useDeleteAthlete } from "@/hooks/athletes/use-delete-athlete";
 import Link from "next/link";
+import { useDebounce } from "@/hooks/use-debounce";
 
 export default function Atletas() {
   const { data: athletes, isLoading, isError } = useAthletes();
   const [openCreate, setOpenCreate] = useState(false);
 
+  //logica de filtrado
+  const [searchTerm, setSearchTerm] = useState('')
+  const debouncedSearch = useDebounce(searchTerm, 400)
 
+  const filteredAthletes = useMemo(() => {
+    if (!athletes) return [];
+    if (!debouncedSearch) return athletes;
+
+    const lowerSearch = debouncedSearch.toLowerCase()
+
+    return athletes.filter((a) => {
+      return (
+        a.FirstNames.toLowerCase().includes(lowerSearch) ||
+        a.LastNames.toLowerCase().includes(lowerSearch) ||
+        a.GovID.toLowerCase().includes(lowerSearch)
+      )
+    })
+  }, [athletes, debouncedSearch])
 
   // Eliminación
   const [deletingAthlete, setDeletingAthlete] = useState<Athletes | null>(null);
@@ -52,6 +70,19 @@ export default function Atletas() {
     <>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Atletas</h2>
+
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          {/*input de busqueda */}
+          <div className="relative w-full sm:w-64">
+            <search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <input
+              placeholder="Buscar por nombre o cédula..."
+              className="block w-64 p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
 
         {/* Botón Crear */}
         <Dialog open={openCreate} onOpenChange={setOpenCreate}>
@@ -78,8 +109,12 @@ export default function Atletas() {
 
       <div className="border rounded-lg bg-white shadow-sm overflow-hidden">
         <Table>
-          <TableCaption>Lista de atletas registrados.</TableCaption>
-          <TableHeader>
+          <TableCaption>
+            {filteredAthletes.length === 0 && !isLoading
+              ? "No se encontraron atletas con ese criterio."
+              : "Lista de atletas registrados."}
+          </TableCaption>
+          <TableHeader className="">
             <TableRow>
               <TableHead>Cedula</TableHead>
               <TableHead>Nombre</TableHead>
@@ -99,7 +134,7 @@ export default function Atletas() {
                 </TableRow>
               ))}
 
-            {athletes?.map((athlete) => (
+            {filteredAthletes?.map((athlete) => (
 
               <TableRow key={athlete.ID}>
 
