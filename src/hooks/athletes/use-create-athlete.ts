@@ -5,16 +5,14 @@ interface CreateAthleteInput {
     FirstNames: string;
     LastNames: string;
     GovID: string;
-    PhoneNum?: string;
+    PhoneNumber?: string;
     Email?: string;
     Gender?: string;
-    InscriptionDate?: string | null;
+    InscriptionDate?: Date | null;
     Regular?: boolean;
-    MajorID?: number;
-    Active?: boolean;
+    MajorID?: number | null;
+    Enrolled?: boolean;
     TeamsIDs?: number[];
-    DisciplineIDs?: number[];
-    EventIDs?: number[];
 }
 
 export function useCreateAthlete() {

@@ -14,9 +14,9 @@ import { useUpdateAthlete } from "@/hooks/athletes/use-update-athlete";
 import { Loader2 } from "lucide-react";
 import { baseAthletesSchema, detailAthleteSchema, AthleteInputType } from "@/schemas/athletes";
 import * as z from "zod";
-import { useAthlete } from "@/hooks/athletes/use-athletes";
+import { Athlete, useAthlete } from "@/hooks/athletes/use-athletes";
 import Link from "next/link";
-import { id } from "zod/v4/locales";
+
 
 
 
@@ -31,6 +31,7 @@ type AthleteInput = z.infer<typeof AthleteInputType>
 export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
 
     const { data: athlete } = useAthlete(athleteId)
+    const [id, setId] = useState<number | null>()
     const [firstNames, setFirstNames] = useState("");
     const [lastNames, setLastNames] = useState("");
     const [govId, setGovId] = useState("");
@@ -38,13 +39,14 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
     const [email, setEmail] = useState("");
     const [gender, setGender] = useState("M");
     const [inscriptionDate, setInscriptionDate] = useState<string>("");
-    const [majorId, setMajorId] = useState<number | null>(null);
+    const [majorId, setMajorId] = useState<number | null>(1);
     const [enrolled, setEnrolled] = useState(true);
 
     // Selecciones múltiples
     const [selectedTeams, setSelectedTeams] = useState<number[]>([]);
     const [selectedDisciplines, setSelectedDisciplines] = useState<number[]>([]);
-
+    const [selectedDisciplinesNames, setSelectedDisciplinesNames] = useState<string[] | undefined>([""])
+    const [mensaje, setMensaje] = useState<string | null>(null);
 
     const { data: disciplines } = useDisciplines();
     const { data: teams } = useTeams();
@@ -57,6 +59,7 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
     // Si llega prop athlete, inicializamos campos
     useEffect(() => {
         if (athlete) {
+            setId(athlete.ID ?? null)
             setFirstNames(athlete.FirstNames ?? "");
             setLastNames(athlete.LastNames ?? "");
             setGovId(athlete.GovID ?? "");
@@ -64,10 +67,11 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
             setEmail(athlete.Email ?? "");
             setGender(athlete.Gender ?? "M");
             setInscriptionDate(athlete.InscriptionDate ? new Date(athlete.InscriptionDate).toISOString().slice(0, 10) : "");
-            setMajorId(athlete.MajorID ?? null);
+            setMajorId(athlete.MajorID);
+
             // Active no está en el schema original; si tu backend expone Regular vs Active ajusta aquí
             setEnrolled(athlete.Enrolled ?? true);
-            console.log(athlete.Enrolled)
+
 
             // Teams: en schema es array de objetos Team => extraer IDs
 
@@ -76,8 +80,16 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
 
             // Si tu athlete trae disciplinas/eventos en un campo distinto ajusta
             // Intentamos extraer IDs desde athlete.Disciplines o RegularIDs etc.
-            const dIDs = [...new Set(athlete.Teams.map(discipline => discipline.DisciplineID))]
+            const dIDs = [...new Set(athlete.Teams.map(team => team.DisciplineID))]
             setSelectedDisciplines(dIDs);
+
+            const dNames = (disciplines?.filter((discipline) => dIDs.includes(discipline.ID)))
+
+            const namesOnly = dNames?.map(d => d.Name)
+
+            setSelectedDisciplinesNames(namesOnly);
+
+
 
 
         } else {
@@ -103,15 +115,14 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
 
     const isSubmitting = createMutation.isLoading || updateMutation.isLoading;
 
-    // Edición (se mantiene si lo usas)
-    const [editingAthlete, setEditingAthlete] = useState<Athletes | null>(null);
-    const [openEdit, setOpenEdit] = useState(false);
+
 
 
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault?.();
 
         const payload: AthleteInput = {
+
             FirstNames: firstNames,
             LastNames: lastNames,
             GovID: govId,
@@ -119,10 +130,10 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
             Email: email,
             Gender: gender,
             InscriptionDate: inscriptionDate ? new Date(inscriptionDate) : null,
-            MajorID: majorId,
+            MajorID: Number(majorId),
             Regular: true,
             Enrolled: enrolled,
-            Teams: selectedTeams,
+            Teams: selectedTeams.map(id => ({ ID: id })),
 
         };
 
@@ -133,18 +144,21 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
         if (athlete && athlete.ID) {
             // modo edición
             updateMutation.mutate(
-                { id: athlete.ID, data: payload as any },
+                { id: athlete.ID, data: payload },
                 {
                     onSuccess: () => {
-                        if (onSuccess) onSuccess();
+                        setMensaje("Atleta modificado con éxito");
+                        setTimeout(() => setMensaje(null), 3000); // Se borra tras 3 segundos
                     },
                 }
             );
         } else {
             // modo creación
-            createMutation.mutate(payload as any, {
+            createMutation.mutate(payload, {
                 onSuccess: () => {
-                    if (onSuccess) onSuccess();
+                    setMensaje("Atleta creado con éxito");
+                    setTimeout(() => setMensaje(null), 3000);
+
                 },
             });
         }
@@ -178,10 +192,14 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
                     </div>
                     <div>
                         <label className="text-sm font-medium">Carrera</label>
-                        <select className="w-full text-sm font-medium p-1.75 bg-white border border-gray-200 rounded-lg shadow-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none">
+                        <select value={majorId ?? ""}
+                            onChange={(e) => { setMajorId(e.target.value ? parseInt(e.target.value) : null) }}
+                            className="w-full text-sm font-medium p-1.75 bg-white border border-gray-200 rounded-lg shadow-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none">
 
+                            <option value="" disabled>Selecciona una carrera</option> {/* Opción neutra */}
                             {majors?.map((m) => (
-                                <option key={m.ID} value={m.ID}>{m.Name}</option>
+
+                                <option value={m.ID} key={m.ID}>{m.Name}</option>
                             ))}
                         </select>
                     </div>
@@ -208,24 +226,22 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
                     </div>
                 </div>
 
-
-                <div>
-                    <label className="text-sm font-semibold">Disciplinas seleccionadas ({selectedDisciplines.length})</label>
+                {athlete ? <div>
+                    <label className="text-sm font-semibold">Disciplinas ({selectedDisciplines.length})</label>
                     <div className="border rounded-md bg-slate-50/30 mt-2">
                         <ScrollArea className="h-40 p-3">
-                            {disciplines?.map((d) => (
-                                <div key={d.ID} className="flex items-center space-x-3 py-1">
-                                    <Checkbox
-                                        id={`disc-${d.ID}`}
-                                        checked={selectedDisciplines.includes(d.ID)}
-                                        onCheckedChange={() => toggleArray(selectedDisciplines, setSelectedDisciplines, d.ID)}
-                                    />
-                                    <label htmlFor={`disc-${d.ID}`} className="text-sm">{d.Name}</label>
+                            {selectedDisciplinesNames?.map((d, i) => (
+                                <div
+                                    key={i}
+                                    className="flex items-center space-x-3 py-1">
+
+                                    <label className="text-sm">{d}</label>
                                 </div>
                             ))}
                         </ScrollArea>
                     </div>
-                </div>
+                </div> : ''}
+
 
 
                 <div>
@@ -261,13 +277,6 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
             </form>
 
         </>
-
-
-
-
-
-
-
 
     );
 }

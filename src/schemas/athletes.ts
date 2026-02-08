@@ -1,12 +1,12 @@
 import * as z from "zod"; // Corregido el import de zod
 
 export const baseAthletesSchema = z.object({
-    ID: z.number(),
+    ID: z.number().nullable(),
     GovID: z.string(),
     FirstNames: z.string(),
     LastNames: z.string(),
     PhoneNumber: z.string(),
-    Email: z.string().email(), // Corregido: z.string().email()
+    Email: z.string(), // Corregido: z.string().email()
     Gender: z.string(),
     Enrolled: z.boolean(),
     Regular: z.boolean(),
@@ -21,7 +21,7 @@ export const detailAthleteSchema = baseAthletesSchema.extend({
     UpdatedAt: z.coerce.date().nullable(),
     DeletedAt: z.coerce.date().nullable(),
     InscriptionDate: z.coerce.date().nullable(),
-    MajorID: z.number().nullable(),
+    MajorID: z.number(),
     Teams: z.array(z.object({
         ID: z.number(),
         Name: z.string(),
@@ -44,7 +44,7 @@ export const detailAthleteSchema = baseAthletesSchema.extend({
 })
 
 export const AthleteInputType = z.object({
-    ID: z.number(),
+    //ID: z.number().nullish(),
     GovID: z.string(),
     FirstNames: z.string(),
     LastNames: z.string(),
@@ -55,5 +55,5 @@ export const AthleteInputType = z.object({
     Regular: z.boolean(),
     InscriptionDate: z.coerce.date().nullable(),
     MajorID: z.number().nullable(),
-    Teams: z.array(z.number())
+    Teams: z.array(z.object({ ID: z.number() }))
 })

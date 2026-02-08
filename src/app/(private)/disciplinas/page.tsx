@@ -41,7 +41,7 @@ export default function DisciplinasPage() {
 
   const confirmDelete = () => {
     if (!deleting) return;
-    deleteMutation.mutate(deleting.id, {
+    deleteMutation.mutate(deleting.ID, {
       onSuccess: () => {
         setOpenDelete(false);
         setDeleting(null);
@@ -95,9 +95,9 @@ export default function DisciplinasPage() {
               ))}
 
             {disciplines?.map((d) => (
-              <TableRow key={d.id} className="hover:bg-slate-50/50">
-                <TableCell className="font-medium text-slate-700">{d.id}</TableCell>
-                <TableCell>{d.name}</TableCell>
+              <TableRow key={d.ID} className="hover:bg-slate-50/50">
+                <TableCell className="font-medium text-slate-700">{d.ID}</TableCell>
+                <TableCell>{d.Name}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     {/* EDITAR: HammerIcon abre diálogo de edición */}
@@ -171,7 +171,7 @@ export default function DisciplinasPage() {
           <div className="py-4">
             <p className="text-sm text-slate-700">
               ¿Estás seguro que quieres eliminar la disciplina{" "}
-              <strong>{deleting?.name}</strong>? Esta acción no se puede deshacer.
+              <strong>{deleting?.Name}</strong>? Esta acción no se puede deshacer.
             </p>
           </div>
 

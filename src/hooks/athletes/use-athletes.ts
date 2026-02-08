@@ -32,6 +32,7 @@ const fetchAllAthletes = async () => {
 };
 
 const fetchAthlete = async (id?: string) => {
+  if (!id || id === "undefined") return null; // Salida temprana
   try {
     const res = await ky.get(`http://localhost:8080/athletes/${id}`).json();
     const parsed = resAthleteSchema.parse(res);
