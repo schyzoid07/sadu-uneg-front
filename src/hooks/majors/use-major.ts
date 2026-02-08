@@ -31,7 +31,27 @@ const fetchMajors = async () => {
 
 export function useMajors() {
     return useQuery({
-        queryKey: ["major"],
+        queryKey: ["majors"],
         queryFn: fetchMajors,
     });
+}
+
+const fetchMajor = async (id?: string) => {
+    try {
+        const res = await ky.get(`http://localhost:8080/majors/${id}`).json();
+        const parsed = resSchema.parse(res);
+        return parsed.data;
+    }
+    catch (error) {
+        console.error("Error fetching athletes:", error);
+        throw error;
+    }
+}
+
+
+export function useMajor(id?: string) {
+    return useQuery({
+        queryKey: ["major", id],
+        queryFn: () => fetchMajor(id)
+    })
 }

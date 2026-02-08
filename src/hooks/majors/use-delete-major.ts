@@ -1,18 +1,18 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import ky from "ky";
 
-export function useDeleteAthlete() {
+export function useDeleteMajor() {
     const qc = useQueryClient();
 
     return useMutation({
         mutationFn: async (id: number) => {
 
-            const res = await ky.delete(`http://localhost:8080/athletes/delete/${id}`).json();
+            const res = await ky.delete(`http://localhost:8080/major/delete/${id}`).json();
             return res;
         },
         onSuccess: () => {
-            // refrescar listado de atletas
-            qc.invalidateQueries({ queryKey: ["athletes"] });
+            // refrescar listado de carreras
+            qc.invalidateQueries({ queryKey: ["majors"] });
         },
     });
 }
