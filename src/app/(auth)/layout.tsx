@@ -3,12 +3,6 @@ import { Separator } from "@radix-ui/react-separator";
 import { Lato } from "next/font/google";
 import HeaderBar from "@/components/HeaderBar";
 
-const lato = Lato({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-lato",
-});
-
 export default function PrivateLayout({
   children,
 }: Readonly<{
