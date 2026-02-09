@@ -16,8 +16,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 
-
-
 export default function ProfileForm() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -33,21 +31,20 @@ export default function ProfileForm() {
         console.log(values)
     }
 
-
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 <FormField
                     control={form.control}
-                    name="username"
+                    name="email"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel>Username</FormLabel>
                             <FormControl>
                                 <Input placeholder="shadcn" {...field} />
                             </FormControl>
                             <FormDescription>
-                                This is your public display name.
+                                This is your private username.
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
