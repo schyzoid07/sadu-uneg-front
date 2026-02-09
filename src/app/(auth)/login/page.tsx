@@ -15,24 +15,23 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-
-
+import ky from "ky"
 
 export default function ProfileForm() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            email: "",
+            username: "",
         },
     })
 
     // 2. Define a submit handler.
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        console.log(values)
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        const res = await ky.post("http://localhost:8080/users/login", { json: values }).json();
+        const parsed = formSchema.parse(res);
+        console.log("Posted");
+        return parsed;
     }
-
 
     return (
         <Form {...form}>
@@ -42,12 +41,12 @@ export default function ProfileForm() {
                     name="username"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel>Username</FormLabel>
                             <FormControl>
                                 <Input placeholder="shadcn" {...field} />
                             </FormControl>
                             <FormDescription>
-                                This is your public display name.
+                                This is your private username.
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
