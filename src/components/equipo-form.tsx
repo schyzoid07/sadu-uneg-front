@@ -26,8 +26,8 @@ export default function CrearEquipoForm({ onSuccess }: CrearEquipoFormProps) {
 
   // 3. Lógica de filtrado de atletas para la lista
   const filteredAthletes = athletes?.filter((a) =>
-    `${a.name} ${a.lastname}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    a.id_personal.includes(searchTerm)
+    `${a.FirstNames} ${a.LastNames}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    a.GovID.includes(searchTerm)
   );
 
   const toggleAtleta = (id: number) => {
@@ -95,23 +95,23 @@ export default function CrearEquipoForm({ onSuccess }: CrearEquipoFormProps) {
               <div className="space-y-3">
                 {filteredAthletes?.map((athlete) => (
                   <div
-                    key={athlete.id}
+                    key={athlete.ID}
                     className="flex items-center space-x-3 bg-white p-2 rounded-md border border-transparent hover:border-slate-200 transition-all shadow-sm"
                   >
                     <Checkbox
-                      id={`athlete-${athlete.id}`}
-                      checked={selectedIds.includes(athlete.id)}
-                      onCheckedChange={() => toggleAtleta(athlete.id)}
+                      id={`athlete-${athlete.ID}`}
+                      checked={selectedIDs.includes(athlete.ID)}
+                      onCheckedChange={() => toggleAtleta(athlete.ID)}
                     />
                     <label
-                      htmlFor={`athlete-${athlete.id}`}
+                      htmlFor={`athlete-${athlete.ID}`}
                       className="flex flex-col flex-1 cursor-pointer"
                     >
                       <span className="text-sm font-medium text-slate-800">
-                        {athlete.name} {athlete.lastname}
+                        {athlete.FirstNames} {athlete.LastNames}
                       </span>
                       <span className="text-[11px] text-slate-500 font-mono">
-                        Cédula: {athlete.id_personal}
+                        Cédula: {athlete.GovID}
                       </span>
                     </label>
                   </div>

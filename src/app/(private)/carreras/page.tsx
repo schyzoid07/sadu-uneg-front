@@ -23,12 +23,13 @@ import { Trash2Icon, PlusIcon, EyeIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Major, useMajors } from "@/hooks/majors/use-major";
 import Link from "next/link";
-
+import CrearCarreraForm from "@/components/carrera-form";
 import { useDeleteMajor } from "@/hooks/majors/use-delete-major";
 
 
 export default function Carreras() {
     const { data: majors, isLoading, isError } = useMajors();
+    const [openCreate, setOpenCreate] = useState(false);
 
     //logica de filtrado
     const [searchTerm, setSearchTerm] = useState('')
@@ -71,14 +72,14 @@ export default function Carreras() {
         <>
 
             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold">Atletas</h2>
+                <h2 className="text-lg font-semibold">Carreras</h2>
 
                 <div className="flex items-center gap-3 w-full sm:w-auto">
                     {/*input de busqueda */}
                     <div className="relative w-full sm:w-64">
                         <search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                         <input
-                            placeholder="Buscar por nombre o cédula..."
+                            placeholder="Buscar por nombre..."
                             className="block w-64 p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -99,7 +100,7 @@ export default function Carreras() {
                             <DialogTitle>Crear nueva Carrera</DialogTitle>
                         </DialogHeader>
                         <div className="no-scrollbar -mx-4 max-h-[50vh] overflow-y-auto px-4">
-                            <CrearAtletaForm
+                            <CrearCarreraForm
                                 onSuccess={() => {
                                     setOpenCreate(false);
                                 }}
@@ -140,7 +141,7 @@ export default function Carreras() {
                                 <TableCell className="text-right">
                                     <div className="flex justify-end gap-2">
                                         {/*boton para ver detalles de carrera*/}
-                                        <Link href={`/atletas/${major.ID}`} passHref>
+                                        <Link href={`/carreras/${major.ID}`} passHref>
                                             <Button
                                                 size="icon"
                                                 variant="ghost"
@@ -156,6 +157,10 @@ export default function Carreras() {
                                             size="icon"
                                             variant="ghost"
                                             className="bg-red-100 hover:bg-red-200"
+                                            onClick={() => {
+                                                setDeletingMajor(major);
+                                                setOpenDelete(true);
+                                            }}
                                         >
                                             <Trash2Icon size={18} />
                                         </Button>
@@ -179,7 +184,7 @@ export default function Carreras() {
 
                     <div className="py-4">
                         <p className="text-sm text-slate-700">
-                            ¿Estás seguro que quieres eliminar al atleta
+                            ¿Estás seguro que quieres eliminar la carrera
                             <strong>{deletingMajor?.Name}</strong>?
                             Esta acción no se puede deshacer.
                         </p>

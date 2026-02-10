@@ -9,8 +9,13 @@ const majorSchema = z.object({
 });
 // 1. Definimos los esquemas y tipos fuera del hook
 
-const resSchema = z.object({
+const resMajorsSchema = z.object({
     data: z.array(majorSchema),
+    message: z.string(),
+});
+
+const resMajorSchema = z.object({
+    data: majorSchema,
     message: z.string(),
 });
 
@@ -20,7 +25,7 @@ export type Major = z.infer<typeof majorSchema>;
 const fetchMajors = async () => {
     try {
         const res = await ky.get("http://localhost:8080/majors").json();
-        const parsed = resSchema.parse(res);
+        const parsed = resMajorsSchema.parse(res);
         return parsed.data;
     }
     catch (error) {
@@ -37,9 +42,10 @@ export function useMajors() {
 }
 
 const fetchMajor = async (id?: string) => {
+    if (!id || id === "undefined") return null;
     try {
         const res = await ky.get(`http://localhost:8080/majors/${id}`).json();
-        const parsed = resSchema.parse(res);
+        const parsed = resMajorSchema.parse(res);
         return parsed.data;
     }
     catch (error) {

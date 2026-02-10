@@ -20,7 +20,7 @@ export function useCreateAthlete() {
 
     return useMutation({
         mutationFn: async (newAthlete: CreateAthleteInput) => {
-            // Ajusta la URL si tu backend está en otra ruta
+
             const res = await ky.post("http://localhost:8080/athletes/create", { json: newAthlete }).json();
             return res;
         },

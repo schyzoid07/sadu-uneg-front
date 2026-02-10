@@ -1,4 +1,4 @@
-import * as z from "zod"; // Corregido el import de zod
+import * as z from "zod";
 
 export const baseAthletesSchema = z.object({
     ID: z.number().nullable(),
@@ -6,7 +6,7 @@ export const baseAthletesSchema = z.object({
     FirstNames: z.string(),
     LastNames: z.string(),
     PhoneNumber: z.string(),
-    Email: z.string(), // Corregido: z.string().email()
+    Email: z.string(),
     Gender: z.string(),
     Enrolled: z.boolean(),
     Regular: z.boolean(),
@@ -49,7 +49,7 @@ export const AthleteInputType = z.object({
     FirstNames: z.string(),
     LastNames: z.string(),
     PhoneNumber: z.string(),
-    Email: z.string().email(), // Corregido: z.string().email()
+    Email: z.string(),
     Gender: z.string(),
     Enrolled: z.boolean(),
     Regular: z.boolean(),

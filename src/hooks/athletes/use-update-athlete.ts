@@ -11,7 +11,7 @@ export function useUpdateAthlete() {
 
     return useMutation({
         mutationFn: async ({ id, data }: UpdateAthleteInput) => {
-            // Ajusta la URL si tu backend usa otra ruta
+
             const res = await ky.put(`http://localhost:8080/athletes/edit/${id}`, { json: data }).json();
             return res;
         },

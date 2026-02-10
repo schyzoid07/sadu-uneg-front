@@ -20,7 +20,7 @@ export default function DisciplinaForm({ onSuccess, discipline }: DisciplinaForm
 
     useEffect(() => {
         if (discipline) {
-            setName(discipline.name ?? "");
+            setName(discipline.Name ?? "");
         } else {
             setName("");
         }
@@ -31,9 +31,9 @@ export default function DisciplinaForm({ onSuccess, discipline }: DisciplinaForm
     const handleSubmit = (e?: React.FormEvent) => {
         e?.preventDefault?.();
 
-        if (discipline && discipline.id) {
+        if (discipline && discipline.ID) {
             updateMutation.mutate(
-                { id: discipline.id, data: { name } },
+                { id: discipline.ID, data: { name } },
                 {
                     onSuccess: () => {
                         if (onSuccess) onSuccess();

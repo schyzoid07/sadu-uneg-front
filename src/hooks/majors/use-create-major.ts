@@ -1,13 +1,17 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import ky from "ky";
 
-export function useDeleteMajor() {
+interface CreateMajorInput {
+    Name: string;
+}
+
+export function useCreateMajor() {
     const qc = useQueryClient();
 
     return useMutation({
-        mutationFn: async (id: number) => {
+        mutationFn: async (newMajor: CreateMajorInput) => {
 
-            const res = await ky.delete(`http://localhost:8080/majors/delete/${id}`).json();
+            const res = await ky.post("http://localhost:8080/majors/create", { json: newMajor }).json();
             return res;
         },
         onSuccess: () => {

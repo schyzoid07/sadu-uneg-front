@@ -11,9 +11,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Trash2Icon, PlusIcon, EyeIcon } from "lucide-react";
+import { Trash2Icon, PlusIcon, EyeIcon, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAthletes, Athletes, Athlete } from "@/hooks/athletes/use-athletes"; // Importamos el hook y tipo
+import { useAthletes, Athletes } from "@/hooks/athletes/use-athletes"; // Importamos el hook y tipo
 import {
   Dialog,
   DialogContent,
@@ -54,7 +54,11 @@ export default function Atletas() {
   const [openDelete, setOpenDelete] = useState(false);
   const deleteMutation = useDeleteAthlete();
 
-  if (isError) return <p>Error al cargar los atletas...</p>;
+  if (isError) return (
+    <div className="p-4 text-center text-red-500 bg-red-50 rounded-lg border border-red-200">
+      Error al cargar los atletas. Por favor, intenta de nuevo.
+    </div>
+  );
 
   const confirmDelete = () => {
     if (!deletingAthlete) return;
@@ -193,7 +197,7 @@ export default function Atletas() {
 
           <div className="py-4">
             <p className="text-sm text-slate-700">
-              ¿Estás seguro que quieres eliminar al atleta{" "}
+              ¿Estás seguro que quieres eliminar al atleta
               <strong>{deletingAthlete?.FirstNames} {deletingAthlete?.LastNames}</strong> (Cédula: {deletingAthlete?.GovID})?
               Esta acción no se puede deshacer.
             </p>
@@ -208,7 +212,9 @@ export default function Atletas() {
               disabled={deleteMutation.isPending}
               className="bg-red-600 hover:bg-red-700"
             >
-              {deleteMutation.isPending ? "Eliminando..." : "Eliminar"}
+              {deleteMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : "Eliminar Atleta"}
             </Button>
           </div>
         </DialogContent>

@@ -1,17 +1,21 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import ky from "ky";
 
-export function useDeleteMajor() {
+interface UpdateMajorInput {
+    id: number;
+    data: any;
+}
+
+export function useUpdateMajor() {
     const qc = useQueryClient();
 
     return useMutation({
-        mutationFn: async (id: number) => {
+        mutationFn: async ({ id, data }: UpdateMajorInput) => {
 
-            const res = await ky.delete(`http://localhost:8080/majors/delete/${id}`).json();
+            const res = await ky.put(`http://localhost:8080/majors/edit/${id}`, { json: data }).json();
             return res;
         },
         onSuccess: () => {
-            // refrescar listado de carreras
             qc.invalidateQueries({ queryKey: ["majors"] });
         },
     });

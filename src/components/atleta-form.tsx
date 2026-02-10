@@ -12,9 +12,9 @@ import { useMajors } from "@/hooks/majors/use-major";
 import { useCreateAthlete } from "@/hooks/athletes/use-create-athlete";
 import { useUpdateAthlete } from "@/hooks/athletes/use-update-athlete";
 import { Loader2 } from "lucide-react";
-import { baseAthletesSchema, detailAthleteSchema, AthleteInputType } from "@/schemas/athletes";
+import { AthleteInputType } from "@/schemas/athletes";
 import * as z from "zod";
-import { Athlete, useAthlete } from "@/hooks/athletes/use-athletes";
+import { useAthlete } from "@/hooks/athletes/use-athletes";
 import Link from "next/link";
 
 
@@ -28,7 +28,7 @@ interface CrearAtletaFormProps {
 
 type AthleteInput = z.infer<typeof AthleteInputType>
 
-export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
+export default function CrearAtletaForm({ athleteId, onSuccess }: CrearAtletaFormProps) {
 
     const { data: athlete } = useAthlete(athleteId)
     const [id, setId] = useState<number | null>()
@@ -113,6 +113,35 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
         setArr(arr.includes(id) ? arr.filter((i) => i !== id) : [...arr, id]);
     };
 
+    // --- LÓGICA DE VALIDACIÓN ---
+    const isFormValid =
+        firstNames.trim() !== "" &&
+        lastNames.trim() !== "" &&
+        govId.trim() !== "" &&
+        email.trim() !== "" &&
+        phoneNum.trim() !== "" &&
+        majorId !== null;
+
+    const hasChanges = () => {
+        if (!athlete) return true; // En creación siempre "hay cambios"
+
+        const currentTeamsSorted = [...selectedTeams].sort().join(",");
+        const originalTeamsSorted = (athlete.Teams?.map(t => t.ID) || []).sort().join(",");
+
+        return (
+            firstNames.trim() !== (athlete.FirstNames || "") ||
+            lastNames.trim() !== (athlete.LastNames || "") ||
+            govId.trim() !== (athlete.GovID || "") ||
+            phoneNum.trim() !== (athlete.PhoneNumber || "") ||
+            email.trim() !== (athlete.Email || "") ||
+            majorId !== athlete.MajorID ||
+            currentTeamsSorted !== originalTeamsSorted ||
+            gender !== (athlete.Gender || "M") ||
+            enrolled !== (athlete.Enrolled ?? true)
+        );
+    };
+
+    const canSubmit = isFormValid && hasChanges();
     const isSubmitting = createMutation.isLoading || updateMutation.isLoading;
 
 
@@ -120,14 +149,15 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
 
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault?.();
+        if (!canSubmit) return;
 
         const payload: AthleteInput = {
 
-            FirstNames: firstNames,
-            LastNames: lastNames,
-            GovID: govId,
-            PhoneNumber: phoneNum,
-            Email: email,
+            FirstNames: firstNames.trim(),
+            LastNames: lastNames.trim(),
+            GovID: govId.trim(),
+            PhoneNumber: phoneNum.trim(),
+            Email: email.trim(),
             Gender: gender,
             InscriptionDate: inscriptionDate ? new Date(inscriptionDate) : null,
             MajorID: Number(majorId),
@@ -138,9 +168,6 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
         };
 
 
-
-
-
         if (athlete && athlete.ID) {
             // modo edición
             updateMutation.mutate(
@@ -149,6 +176,7 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
                     onSuccess: () => {
                         setMensaje("Atleta modificado con éxito");
                         setTimeout(() => setMensaje(null), 3000); // Se borra tras 3 segundos
+                        if (onSuccess) onSuccess();
                     },
                 }
             );
@@ -158,11 +186,14 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
                 onSuccess: () => {
                     setMensaje("Atleta creado con éxito");
                     setTimeout(() => setMensaje(null), 3000);
-
+                    if (onSuccess) onSuccess();
                 },
             });
         }
     };
+
+
+
 
     return (
 
@@ -172,29 +203,48 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label className="text-sm font-medium">Nombres</label>
-                        <Input value={firstNames} onChange={(e) => setFirstNames(e.target.value)} />
+                        <Input className={!firstNames.trim() ? "border-amber-200" : ""} value={firstNames} placeholder="Ej. Juan" onChange={(e) => setFirstNames(e.target.value)} />
+                        {!firstNames.trim() && (
+                            <p className="text-[10px] text-amber-600 mt-1 italic text-right">Requerido </p>
+                        )}
                     </div>
                     <div>
                         <label className="text-sm font-medium">Apellidos</label>
-                        <Input value={lastNames} onChange={(e) => setLastNames(e.target.value)} />
+                        <Input className={!lastNames.trim() ? "border-amber-200" : ""}
+                            value={lastNames} placeholder="Ej. Pérez" onChange={(e) => setLastNames(e.target.value)} />
+                        {!lastNames.trim() && (
+                            <p className="text-[10px] text-amber-600 mt-1 italic text-right">Requerido </p>
+                        )}
                     </div>
                     <div>
                         <label className="text-sm font-medium">Cédula</label>
-                        <Input value={govId} onChange={(e) => setGovId(e.target.value)} />
+                        <Input placeholder="V-00000000"
+                            className={!govId.trim() ? "border-amber-200" : ""} value={govId} onChange={(e) => setGovId(e.target.value)} />
+                        {!govId.trim() && (
+                            <p className="text-[10px] text-amber-600 mt-1 italic text-right">Requerido para contacto</p>
+                        )}
                     </div>
                     <div>
                         <label className="text-sm font-medium">Teléfono</label>
-                        <Input value={phoneNum} onChange={(e) => setPhoneNum(e.target.value)} />
+                        <Input className={!phoneNum.trim() ? "border-amber-200 focus:ring-amber-100" : "border-gray-200"}
+                            value={phoneNum} onChange={(e) => setPhoneNum(e.target.value)} />
+                        {!phoneNum.trim() && (
+                            <p className="text-[10px] text-amber-600 mt-1 italic text-right">Requerido para contacto</p>
+                        )}
                     </div>
                     <div>
                         <label className="text-sm font-medium">Correo</label>
-                        <Input value={email} onChange={(e) => setEmail(e.target.value)} />
+                        <Input type="email" value={email} placeholder="correo@ejemplo.com"
+                            className={!email.trim() ? "border-amber-200" : ""} onChange={(e) => setEmail(e.target.value)} />
+                        {!email.trim() && (
+                            <p className="text-[10px] text-amber-600 mt-1 italic text-right">Requerido para contacto</p>
+                        )}
                     </div>
                     <div>
                         <label className="text-sm font-medium">Carrera</label>
                         <select value={majorId ?? ""}
                             onChange={(e) => { setMajorId(e.target.value ? parseInt(e.target.value) : null) }}
-                            className="w-full text-sm font-medium p-1.75 bg-white border border-gray-200 rounded-lg shadow-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none">
+                            className={`w-full text-sm p-2 bg-white border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 ${!majorId ? "border-amber-200" : "border-gray-200"}`}>
 
                             <option value="" disabled>Selecciona una carrera</option> {/* Opción neutra */}
                             {majors?.map((m) => (
@@ -264,16 +314,23 @@ export default function CrearAtletaForm({ athleteId }: CrearAtletaFormProps) {
 
 
 
-                <div className="flex justify-end gap-3 pt-2">
+                <div className="flex justify-end gap-3 pt-2 border-t mt-4">
                     <Link href="/atletas">
                         <Button variant="outline" type="button" >
                             Retroceder
                         </Button>
                     </Link>
-                    <Button type="submit" disabled={isSubmitting} onClick={handleSubmit}>
-                        {isSubmitting ? <Loader2 className="animate-spin h-4 w-4" /> : (athlete ? "Modificar atleta" : "Crear atleta")}
+                    <Button className={canSubmit ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-300"}
+                        type="submit" disabled={!canSubmit || isSubmitting} onClick={handleSubmit}>
+                        {isSubmitting ? <Loader2 className="animate-spin h-4 w-4" /> : (athlete ? "Guardar cambios" : "Crear atleta")}
                     </Button>
                 </div>
+
+                {!isFormValid && (
+                    <p className="text-[10px] text-amber-600 text-right mt-1">
+                        * Los campos con asterisco son obligatorios
+                    </p>
+                )}
             </form>
 
         </>
