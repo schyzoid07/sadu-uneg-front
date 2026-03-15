@@ -6,9 +6,12 @@ export function useDeleteDiscipline() {
 
     return useMutation({
         mutationFn: async (id: number) => {
-            // Si la API responde 204 No Content, omite .json()
-            const res = await ky.delete(`http://localhost:8080/discipline/delete/${id}`).json();
-            return res;
+            const res = await ky.delete(`http://localhost:8080/discipline/delete/${id}`);
+            if (res.status === 204) {
+                // No hay contenido que devolver, pero la operación fue exitosa.
+                return;
+            }
+            return res.json();
         },
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ["disciplines"] });
