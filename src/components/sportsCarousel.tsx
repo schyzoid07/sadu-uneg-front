@@ -1,6 +1,7 @@
 'use client'
 import Image from "next/image";
 import LOGO_UNEG from "@/../public/LOGO_UNEG.webp";
+
 import {
   Carousel,
   CarouselContent,
@@ -30,7 +31,7 @@ export function SportsCarousel() {
                   className="w-full h-auto rounded-lg"
                 />
               )*/}
-              <h3 className="text-lg font-semibold pt-4">{disciplina.name}</h3>
+              <h3 className="text-lg font-semibold pt-4">{disciplina.Name}</h3>
             </div>
           </CarouselItem>
         ))}
