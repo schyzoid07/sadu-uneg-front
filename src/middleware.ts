@@ -18,10 +18,10 @@ export function middleware(request: NextRequest) {
   const sessionToken = request.cookies.get(SESSION_COOKIE_NAME)?.value;
 
   // 3. Logic for Redirecting
-  
+
   // If user is on an auth path (like /login) OR root and has a session, redirect them to a dashboard
   if ((isAuthPath || isRootPath) && sessionToken) {
-    return NextResponse.redirect(new URL('/atletas', request.url));
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   // If user is NOT on a public path and DOES NOT have a session, redirect them to /login
