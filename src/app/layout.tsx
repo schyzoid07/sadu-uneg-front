@@ -2,7 +2,14 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
-import { Navbar } from "@/components/NavBar";
+import HeaderBar from "@/components/HeaderBar";
+import { Separator } from "@radix-ui/react-separator";
+import { AppSidebar } from "@/components/app-sidebar";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,10 +37,18 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased w-full `}
       >
         <Providers>
-          <Navbar />
-          <div className="min-h-[calc(100vh-64px)]">
-            {children}
-          </div>
+          <SidebarProvider>
+            <AppSidebar />
+            <SidebarInset>
+              <SidebarTrigger className="-ml-1" />
+
+              <HeaderBar />
+              <div className="min-h-[calc(100vh-64px)]">
+                {children}
+              </div>
+
+            </SidebarInset>
+          </SidebarProvider>
         </Providers>
       </body>
     </html>
