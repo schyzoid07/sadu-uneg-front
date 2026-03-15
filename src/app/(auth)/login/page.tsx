@@ -42,7 +42,7 @@ export default function ProfileForm() {
             }
             console.debug(result);
         } catch (err) {
-            setError("Something went wrong");
+            setError("Algo salio mal. Intenta nuevamente.");
         } finally {
             setIsLoading(false);
         }
