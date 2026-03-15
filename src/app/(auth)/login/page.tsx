@@ -16,7 +16,8 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { loginAction } from "./actions"
-import { useState } from "react"
+import { useState } from "react";
+import Link from "next/link";
 
 export default function ProfileForm() {
     const [error, setError] = useState<string | null>(null);
@@ -48,7 +49,7 @@ export default function ProfileForm() {
 
     return (
         <div className="flex justify-center items-center py-10 px-4">
-            <div className="w-full max-w-md bg-white rounded-xl shadow-lg border border-slate-100 p-8">
+            <div className="w-full max-w-md bg-white rounded-xl shadow-lg border border-slate-200 p-8">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <h1 className="text-2xl font-bold mb-6 text-center text-[#2f34a0]">Iniciar Sesión</h1>
@@ -85,6 +86,12 @@ export default function ProfileForm() {
                         <Button type="submit" className="w-full bg-[#2f34a0] hover:bg-[#242885]" disabled={isLoading}>
                             {isLoading ? "Cargando..." : "Entrar"}
                         </Button>
+
+                        <div className="text-center pt-2">
+                            <Link href="/register" className="text-sm text-gray-500 hover:text-gray-700 hover:underline transition-colors">
+                                ¿No tienes usuario? Regístrate aquí {'\u2192'}
+                            </Link>
+                        </div>
                     </form>
                 </Form>
             </div>
