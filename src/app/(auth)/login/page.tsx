@@ -15,44 +15,74 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import ky from "ky"
+import { loginAction } from "./actions"
+import { useState } from "react"
 
 export default function ProfileForm() {
+    const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             username: "",
+            password: "",
         },
     })
 
-    // 2. Define a submit handler.
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        const res = await ky.post("http://localhost:8080/users/login", { json: values }).json();
-        const parsed = formSchema.parse(res);
-        console.log("Posted");
-        return parsed;
+        setIsLoading(true);
+        setError(null);
+        try {
+            const result = await loginAction(values);
+            if (result?.error) {
+                setError(result.error);
+            }
+            console.debug(result);
+        } catch (err) {
+            setError("Something went wrong");
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-sm mx-auto pt-10">
+                <h1 className="text-2xl font-bold mb-6">Iniciar Sesión</h1>
                 <FormField
                     control={form.control}
                     name="username"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Username</FormLabel>
+                            <FormLabel>Correo Electrónico</FormLabel>
                             <FormControl>
-                                <Input placeholder="shadcn" {...field} />
+                                <Input placeholder="correo@ejemplo.com" {...field} disabled={isLoading} />
                             </FormControl>
-                            <FormDescription>
-                                This is your private username.
-                            </FormDescription>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
-                <Button type="submit">Submit</Button>
+
+                <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Contraseña</FormLabel>
+                            <FormControl>
+                                <Input type="text" placeholder="********" {...field} disabled={isLoading} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Cargando..." : "Entrar"}
+                </Button>
             </form>
         </Form>
     )
