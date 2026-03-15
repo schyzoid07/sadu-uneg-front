@@ -1,8 +1,8 @@
-// hooks/use-athletes.ts
 import { useQuery } from "@tanstack/react-query";
-import ky from "ky";
-import * as z from "zod"; // Corregido el import de zod
+import { api } from "@/lib/api";
+import * as z from "zod";
 import { baseAthletesSchema, detailAthleteSchema } from "@/schemas/athletes";
+
 // 1. Definimos los esquemas y tipos fuera del hook
 
 const resAthletesSchema = z.object({
@@ -15,13 +15,12 @@ const resAthleteSchema = z.object({
   message: z.string(),
 });
 
-// Inferimos el tipo para usarlo en el componente si fuera necesario
 export type Athletes = z.infer<typeof baseAthletesSchema>;
 export type Athlete = z.infer<typeof detailAthleteSchema>;
 
 const fetchAllAthletes = async () => {
   try {
-    const res = await ky.get("http://localhost:8080/athletes").json();
+    const res = await api.get("athletes").json();
     const parsed = resAthletesSchema.parse(res);
     return parsed.data;
   }
@@ -32,15 +31,14 @@ const fetchAllAthletes = async () => {
 };
 
 const fetchAthlete = async (id?: string) => {
-  if (!id || id === "undefined") return null; // Salida temprana
+  if (!id || id === "undefined") return null;
   try {
-    const res = await ky.get(`http://localhost:8080/athletes/${id}`).json();
+    const res = await api.get(`athletes/${id}`).json();
     const parsed = resAthleteSchema.parse(res);
     return parsed.data;
   }
   catch (error) {
     console.error("Error fetching athlete:", error);
-    console.log("aypapa", error);
     throw error;
   }
 };

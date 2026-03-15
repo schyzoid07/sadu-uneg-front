@@ -1,8 +1,8 @@
 import LOGO_UNEG from "@/../public/LOGO_UNEG.webp";
 import "../app/globals.css";
 import { Lato } from "next/font/google";
-import Link from "next/link";
 import Image from "next/image";
+import { logoutAction } from "@/lib/actions";
 
 const lato = Lato({
   subsets: ["latin"],
@@ -30,11 +30,14 @@ export default function HeaderBar() {
         <p>Sistema de administracion deportiva 2025</p>
       </div>
       <div>
-        <Link href="/login">
-          <button className="hover:bg-blue-800 bg-blue-900 text-white font-bold py-2 px-4 rounded cursor-pointer transition duration-100">
-            Iniciar Sesión
+        <form action={logoutAction}>
+          <button 
+            type="submit"
+            className="hover:bg-red-800 bg-red-700 text-white font-bold py-2 px-4 rounded cursor-pointer transition duration-100"
+          >
+            Cerrar Sesión
           </button>
-        </Link>
+        </form>
       </div>
     </header>
   );
