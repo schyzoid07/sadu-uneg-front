@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input"
 import { loginAction } from "./actions"
 import { useState } from "react";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 
 export default function ProfileForm() {
     const [error, setError] = useState<string | null>(null);
@@ -84,7 +85,7 @@ export default function ProfileForm() {
                         {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
 
                         <Button type="submit" className="w-full bg-[#2f34a0] hover:bg-[#242885]" disabled={isLoading}>
-                            {isLoading ? "Cargando..." : "Entrar"}
+                            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
                         </Button>
 
                         <div className="text-center pt-2">
