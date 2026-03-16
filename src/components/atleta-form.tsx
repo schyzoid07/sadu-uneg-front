@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -11,7 +11,7 @@ import { useTeams } from "@/hooks/teams/use-teams";
 import { useMajors } from "@/hooks/majors/use-major";
 import { useCreateAthlete } from "@/hooks/athletes/use-create-athlete";
 import { useUpdateAthlete } from "@/hooks/athletes/use-update-athlete";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2Icon } from "lucide-react";
 import { AthleteInputType } from "@/schemas/athletes";
 import * as z from "zod";
 import { useAthlete } from "@/hooks/athletes/use-athletes";
@@ -44,9 +44,8 @@ export default function CrearAtletaForm({ athleteId, onSuccess }: CrearAtletaFor
 
     // Selecciones múltiples
     const [selectedTeams, setSelectedTeams] = useState<number[]>([]);
-    const [selectedDisciplines, setSelectedDisciplines] = useState<number[]>([]);
-    const [selectedDisciplinesNames, setSelectedDisciplinesNames] = useState<string[] | undefined>([""])
     const [mensaje, setMensaje] = useState<string | null>(null);
+    const [teamToAdd, setTeamToAdd] = useState<string>("");
 
     const { data: disciplines } = useDisciplines();
     const { data: teams } = useTeams();
@@ -78,20 +77,6 @@ export default function CrearAtletaForm({ athleteId, onSuccess }: CrearAtletaFor
             const tIDs = [...new Set(athlete.Teams.map(team => team.ID))]
             setSelectedTeams(tIDs);
 
-            // Si tu athlete trae disciplinas/eventos en un campo distinto ajusta
-            // Intentamos extraer IDs desde athlete.Disciplines o RegularIDs etc.
-            const dIDs = [...new Set(athlete.Teams.map(team => team.DisciplineID))]
-            setSelectedDisciplines(dIDs);
-
-            const dNames = (disciplines?.filter((discipline) => dIDs.includes(discipline.ID)))
-
-            const namesOnly = dNames?.map(d => d.Name)
-
-            setSelectedDisciplinesNames(namesOnly);
-
-
-
-
         } else {
             // limpiar si no hay athlete (modo creación)
             setFirstNames("");
@@ -106,11 +91,33 @@ export default function CrearAtletaForm({ athleteId, onSuccess }: CrearAtletaFor
             setSelectedTeams([]);
 
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [athlete]);
 
-    const toggleArray = (arr: number[], setArr: (v: number[]) => void, id: number) => {
-        setArr(arr.includes(id) ? arr.filter((i) => i !== id) : [...arr, id]);
+    const teamsWithDisciplines = useMemo(() => {
+        if (!teams || !disciplines) return [];
+        const disciplineMap = new Map(disciplines.map(d => [d.ID, d.Name]));
+        return teams.map(team => ({
+            ...team,
+            disciplineName: disciplineMap.get(team.DisciplineID) || 'Sin Disciplina'
+        }));
+    }, [teams, disciplines]);
+
+    const selectedTeamObjects = useMemo(() => {
+        return teamsWithDisciplines.filter(t => selectedTeams.includes(t.ID));
+    }, [selectedTeams, teamsWithDisciplines]);
+
+    const availableTeamsToAdd = useMemo(() => {
+        return teamsWithDisciplines.filter(t => !selectedTeams.includes(t.ID));
+    }, [selectedTeams, teamsWithDisciplines]);
+
+    const handleAddTeam = () => {
+        if (teamToAdd) {
+            const teamId = parseInt(teamToAdd, 10);
+            if (!selectedTeams.includes(teamId)) {
+                setSelectedTeams(prev => [...prev, teamId]);
+            }
+            setTeamToAdd(""); // Reset select
+        }
     };
 
     // --- LÓGICA DE VALIDACIÓN ---
@@ -276,39 +283,51 @@ export default function CrearAtletaForm({ athleteId, onSuccess }: CrearAtletaFor
                     </div>
                 </div>
 
-                {athlete ? <div>
-                    <label className="text-sm font-semibold">Disciplinas ({selectedDisciplines.length})</label>
-                    <div className="border rounded-md bg-slate-50/30 mt-2">
-                        <ScrollArea className="h-40 p-3">
-                            {selectedDisciplinesNames?.map((d, i) => (
-                                <div
-                                    key={i}
-                                    className="flex items-center space-x-3 py-1">
-
-                                    <label className="text-sm">{d}</label>
-                                </div>
-                            ))}
-                        </ScrollArea>
-                    </div>
-                </div> : ''}
-
-
-
                 <div>
                     <label className="text-sm font-semibold">Equipos ({selectedTeams.length})</label>
-                    <div className="border rounded-md bg-slate-50/30 mt-2">
-                        <ScrollArea className="h-40 p-3">
-                            {teams?.map((t) => (
-                                <div key={t.ID} className="flex items-center space-x-3 py-1">
-                                    <Checkbox
-                                        id={`team-${t.ID}`}
-                                        checked={selectedTeams.includes(t.ID)}
-                                        onCheckedChange={() => toggleArray(selectedTeams, setSelectedTeams, t.ID)}
-                                    />
-                                    <label htmlFor={`team-${t.ID}`} className="text-sm">{t.Name}</label>
+                    <div className="border rounded-md bg-slate-50/30 mt-2 p-3 space-y-2 min-h-[8rem]">
+                        {selectedTeamObjects.length > 0 ? (
+                            selectedTeamObjects.map((team) => (
+                                <div key={team.ID} className="flex items-center justify-between bg-white p-2 rounded-md shadow-sm">
+                                    <div>
+                                        <p className="text-sm font-medium">{team.Name}</p>
+                                        <p className="text-xs text-slate-500">({team.disciplineName})</p>
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-7 w-7 text-red-500 hover:bg-red-100"
+                                        onClick={() => setSelectedTeams(prev => prev.filter(id => id !== team.ID))}
+                                    >
+                                        <Trash2Icon size={14} />
+                                    </Button>
                                 </div>
-                            ))}
-                        </ScrollArea>
+                            ))
+                        ) : (
+                            <p className="text-sm text-slate-400 text-center py-4">El atleta no pertenece a ningún equipo.</p>
+                        )}
+                    </div>
+
+                    <div className="flex items-end gap-2 mt-2">
+                        <div className="flex-grow">
+                            <label htmlFor="team-select" className="text-xs font-medium text-slate-600">Añadir a equipo</label>
+                            <select
+                                id="team-select"
+                                value={teamToAdd}
+                                onChange={(e) => setTeamToAdd(e.target.value)}
+                                className="w-full text-sm p-2 bg-white border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 border-gray-200"
+                                disabled={availableTeamsToAdd.length === 0}
+                            >
+                                <option value="" disabled>Seleccionar un equipo...</option>
+                                {availableTeamsToAdd.map(team => (
+                                    <option key={team.ID} value={team.ID}>
+                                        {team.Name} ({team.disciplineName})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <Button type="button" variant="outline" onClick={handleAddTeam} disabled={!teamToAdd}>Añadir</Button>
                     </div>
                 </div>
 

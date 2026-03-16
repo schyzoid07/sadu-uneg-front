@@ -4,7 +4,7 @@ export default async function AthleteDetails({ params }: { params: Promise<{ ath
 
     return (
         <>
-            <div className="no-scrollbar -mx-4 overflow-y-auto px-4">
+            <div className="no-scrollbar -mx-4 overflow-y-auto px-10">
                 <CrearAtletaForm athleteId={athleteId} />
             </div>
 
