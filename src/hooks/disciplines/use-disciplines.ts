@@ -1,32 +1,91 @@
-// hooks/use-disciplines.ts
-import { useQuery } from "@tanstack/react-query";
-import ky from "ky";
+// src/hooks/disciplines/use-disciplines.ts
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 import * as z from "zod";
 
-// Definimos el esquema de la disciplina individual
+// 1. Esquema y Tipos
 const disciplineSchema = z.object({
   ID: z.number(),
   Name: z.string(),
 });
 
-// Esquema de la respuesta de la API
-const resSchema = z.object({
+// Para creación y actualización
+const disciplineInputSchema = disciplineSchema.omit({ ID: true });
+
+export type Discipline = z.infer<typeof disciplineSchema>;
+export type CreateDisciplineInput = z.infer<typeof disciplineInputSchema>;
+export type UpdateDisciplineInput = Partial<CreateDisciplineInput>;
+
+const resDisciplinesSchema = z.object({
   data: z.array(disciplineSchema),
   message: z.string(),
 });
 
-// Tipo inferido para TypeScript
-export type Discipline = z.infer<typeof disciplineSchema>;
+const resDisciplineSchema = z.object({
+  data: disciplineSchema,
+  message: z.string(),
+});
 
+// 2. Funciones de Fetching
 const fetchDisciplines = async () => {
-  const res = await ky.get("http://localhost:8080/disciplines").json();
-  const parsed = resSchema.parse(res);
-  return parsed.data;
+  try {
+    const res = await api.get("disciplines").json();
+    const parsed = resDisciplinesSchema.parse(res);
+    return parsed.data;
+  } catch (error) {
+    console.error("Error fetching disciplines:", error);
+    throw error;
+  }
 };
 
+const fetchDiscipline = async (id?: string) => {
+  if (!id || id === "undefined") return null;
+  try {
+    const res = await api.get(`disciplines/${id}`).json();
+    const parsed = resDisciplineSchema.parse(res);
+    return parsed.data;
+  } catch (error) {
+    console.error(`Error fetching discipline with id ${id}:`, error);
+    throw error;
+  }
+};
+
+// 3. Hooks
 export function useDisciplines() {
   return useQuery({
     queryKey: ["disciplines"],
     queryFn: fetchDisciplines,
+  });
+}
+
+export function useDiscipline(id?: string) {
+  return useQuery({
+    queryKey: ["discipline", id],
+    queryFn: () => fetchDiscipline(id),
+    enabled: !!id,
+  });
+}
+
+export function useCreateDiscipline() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (newDiscipline: CreateDisciplineInput) => {
+      return await api.post("disciplines", { json: newDiscipline }).json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["disciplines"] });
+    },
+  });
+}
+
+export function useDeleteDiscipline() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      return await api.delete(`disciplines/${id}`).json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["disciplines"] });
+    },
   });
 }
