@@ -72,8 +72,8 @@ export default function Atletas() {
   };
 
   return (
-    <>
-      <div className="flex items-center justify-between mb-4">
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-4 ">
         <h2 className="text-lg font-semibold">Atletas</h2>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -220,6 +220,6 @@ export default function Atletas() {
           </div>
         </DialogContent>
       </Dialog >
-    </>
+    </div>
   );
 }
