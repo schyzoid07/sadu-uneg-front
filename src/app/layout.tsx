@@ -3,13 +3,14 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import HeaderBar from "@/components/HeaderBar";
-import { Separator } from "@radix-ui/react-separator";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { AuthProvider } from "@/components/AuthProvider";
+import { getSession } from "@/lib/session";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,30 +27,33 @@ export const metadata: Metadata = {
   description: "App para la administracion de SADUNEG",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getSession();
+
   return (
     <html lang="es">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased w-full `}
       >
-        <Providers>
-          <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-              <SidebarTrigger className="-ml-1" />
+        <AuthProvider session={session}>
+          <Providers>
+            <SidebarProvider>
+              <AppSidebar />
+              <SidebarInset>
+                <SidebarTrigger className="-ml-1" />
 
-              <HeaderBar />
-              <div className="min-h-[calc(100vh-64px)]">
-                {children}
-              </div>
-
-            </SidebarInset>
-          </SidebarProvider>
-        </Providers>
+                <HeaderBar />
+                <div className="min-h-[calc(100vh-64px)]">
+                  {children}
+                </div>
+              </SidebarInset>
+            </SidebarProvider>
+          </Providers>
+        </AuthProvider>
       </body>
     </html>
   );
