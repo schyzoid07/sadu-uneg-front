@@ -7,8 +7,9 @@ import Image from "next/image";
 import { logoutAction } from "@/lib/actions";
 import Link from "next/link";
 import { useAuth } from "./AuthProvider";
-import { LogOut, User, UserCircle } from "lucide-react";
+import { LogOut, UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
 
 const lato = Lato({
   subsets: ["latin"],
@@ -23,20 +24,21 @@ export default function HeaderBar() {
     <header
       className={`flex items-center justify-between p-4 text-(--uneg-blue) ${lato.variable}`}
     >
-      <div>
-        <Image
-          src={LOGO_UNEG}
-          alt="SADUNEG Logo"
-          width={100}
-          height={100}
-        />
-      </div>
+      <Link href='https://uneg.edu.ve/'>
+        <div>
+          <Image
+            src={LOGO_UNEG}
+            alt="SADUNEG Logo"
+            width={100}
+            height={100}
+          />
+        </div>
+      </Link>
       <Link href='/'>
         <div className="flex flex-col items-center">
           <h1 className="text-4xl font-extrabold text-blue-900 tracking-tight">
             SADUNEG
           </h1>
-          <p>Sistema de administracion deportiva 2025</p>
         </div>
       </Link>
       <div className="flex items-center gap-4">

@@ -12,7 +12,8 @@ export async function loginAction(values: z.infer<typeof formSchema>) {
     console.log("Intentando iniciar sesión con:", values.username);
 
     // --- SIMULACIÓN DE LLAMADA A API ---
-    if (values.password !== "Password123@") {
+    // Actualizado para aceptar tus credenciales específicas
+    if (values.username !== "admin@gmail.com" || values.password !== "Az12345678Az.") {
         return { error: "Contraseña o correo incorrecto." };
     }
     // --- FIN DE SIMULACIÓN ---

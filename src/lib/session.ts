@@ -17,25 +17,29 @@ const sessionOptions = {
  * Se puede usar en Server Components, Server Actions y Route Handlers.
  */
 export async function getSession() {
-  const session = await getIronSession<Session>(cookies(), sessionOptions);
+  const cookieStore = await cookies();
+  const session = await getIronSession<Session>(cookieStore, sessionOptions);
   // Si la sesión no tiene un username, la consideramos vacía.
   if (!session.username) {
     return null;
   }
-  return session;
+  // Devolvemos un objeto nuevo con solo los datos necesarios.
+  // Esto elimina los métodos ocultos de la sesión que causan el error en Next.js.
+  return { username: session.username };
 }
 
 /**
  * Crea una nueva sesión para el usuario, guardando sus datos en la cookie.
  */
 export async function createSession(data: Session) {
-  const session = await getIronSession<Session>(cookies(), sessionOptions);
+  const cookieStore = await cookies();
+  const session = await getIronSession<Session>(cookieStore, sessionOptions);
   session.username = data.username;
   await session.save();
 }
 
 export async function deleteSession() {
-  const session = await getIronSession<Session>(cookies(), sessionOptions);
+  const cookieStore = await cookies();
+  const session = await getIronSession<Session>(cookieStore, sessionOptions);
   session.destroy();
 }
-

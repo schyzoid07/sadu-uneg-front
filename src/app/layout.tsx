@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/sidebar";
 import { AuthProvider } from "@/components/AuthProvider";
 import { getSession } from "@/lib/session";
+import { Separator } from "@/components/ui/separator";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,6 +49,7 @@ export default async function RootLayout({
                 <SidebarTrigger className="-ml-1" />
 
                 <HeaderBar />
+                <Separator />
                 <div className="min-h-[calc(100vh-64px)]">
                   {children}
                 </div>
