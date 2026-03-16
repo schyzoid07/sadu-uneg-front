@@ -6,7 +6,7 @@ import { Session } from "@/schemas/auth";
 // SESSION_PASSWORD debe ser una cadena secreta larga y compleja de al menos 32 caracteres.
 const sessionOptions = {
   password: process.env.SESSION_PASSWORD!,
-  cookieName: "sadu-uneg-session",
+  cookieName: process.env.SESSION_COOKIE_NAME || "sadu-uneg-session",
   cookieOptions: {
     secure: process.env.NODE_ENV === "production",
   },
@@ -25,7 +25,7 @@ export async function getSession() {
   }
   // Devolvemos un objeto nuevo con solo los datos necesarios.
   // Esto elimina los métodos ocultos de la sesión que causan el error en Next.js.
-  return { username: session.username };
+  return { username: session.username, token: session.token };
 }
 
 /**
@@ -35,11 +35,23 @@ export async function createSession(data: Session) {
   const cookieStore = await cookies();
   const session = await getIronSession<Session>(cookieStore, sessionOptions);
   session.username = data.username;
+  session.token = data.token;
   await session.save();
+
+  // Guardamos el token en una cookie visible para el cliente (ky/api.ts)
+  if (data.token) {
+    cookieStore.set("session_token", data.token, { // Nota: Esta es una cookie separada para acceso JS
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: false, // Permitir acceso desde JS del cliente para api.ts
+      path: "/",
+      sameSite: "lax",
+    });
+  }
 }
 
 export async function deleteSession() {
   const cookieStore = await cookies();
   const session = await getIronSession<Session>(cookieStore, sessionOptions);
   session.destroy();
+  cookieStore.delete("session_token"); // Borrar también la cookie del token
 }

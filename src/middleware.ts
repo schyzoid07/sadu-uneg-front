@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // El nombre de la cookie debe coincidir con el definido en `lib/session.ts`
-const SESSION_COOKIE_NAME = "sadu-uneg-session";
+const SESSION_COOKIE_NAME = process.env.SESSION_COOKIE_NAME || "sadu-uneg-session";
 
 // Define paths that are always public (e.g., login, static assets)
 const publicPaths = ['/login', '/favicon.ico'];

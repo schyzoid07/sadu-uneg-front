@@ -1,7 +1,7 @@
 import * as z from "zod"
 
 export const formSchema = z.object({
-    username: z.email(),
+    email: z.email(),
     password: z.string()
         .min(8, "La contraseña debe tener al menos 8 caracteres")
         .max(64, "La contraseña es demasiado larga")

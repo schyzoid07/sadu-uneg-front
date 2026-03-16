@@ -2,13 +2,22 @@
 
 import { SportsCarousel } from "@/components/sportsCarousel";
 import { useAthletes } from "@/hooks/athletes/use-athletes";
-import { Users } from "lucide-react";
+import { useEvents } from "@/hooks/events/use-events";
+import { useTeachers } from "@/hooks/teachers/use-teachers";
+import { useTeams } from "@/hooks/teams/use-teams";
+import { CalendarDays, Shield, UserCheck, Users } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
   const { data: athletes, isLoading: isLoadingAthletes } = useAthletes();
+  const { data: teachers, isLoading: isLoadingTeachers } = useTeachers();
+  const { data: teams, isLoading: isLoadingTeams } = useTeams();
+  const { data: events, isLoading: isLoadingEvents } = useEvents();
 
   const athleteCount = athletes?.length ?? 0;
+  const teacherCount = teachers?.length ?? 0;
+  const teamCount = teams?.length ?? 0;
+  const eventCount = events?.length ?? 0;
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50/50">
@@ -42,6 +51,66 @@ export default function Home() {
                 )}
               </div>
               <p className="text-xs text-slate-400 mt-4">Total de atletas registrados en el sistema.</p>
+            </div>
+          </Link>
+
+          {/* Tarjeta de Conteo de Profesores */}
+          <Link href='/profesores' className="block group">
+            <div className="p-6 bg-white border rounded-xl shadow-sm flex flex-col justify-between h-full transition-all duration-200 ease-in-out group-hover:scale-105 group-hover:shadow-lg">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-slate-500">
+                    Profesores
+                  </p>
+                  <UserCheck className="h-5 w-5 text-slate-400" />
+                </div>
+                {isLoadingTeachers ? (
+                  <div className="h-10 w-20 bg-slate-200 animate-pulse rounded-md"></div>
+                ) : (
+                  <p className="text-4xl font-bold text-slate-800">{teacherCount}</p>
+                )}
+              </div>
+              <p className="text-xs text-slate-400 mt-4">Entrenadores y profesores activos.</p>
+            </div>
+          </Link>
+
+          {/* Tarjeta de Conteo de Equipos */}
+          <Link href='/equipos' className="block group">
+            <div className="p-6 bg-white border rounded-xl shadow-sm flex flex-col justify-between h-full transition-all duration-200 ease-in-out group-hover:scale-105 group-hover:shadow-lg">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-slate-500">
+                    Equipos
+                  </p>
+                  <Shield className="h-5 w-5 text-slate-400" />
+                </div>
+                {isLoadingTeams ? (
+                  <div className="h-10 w-20 bg-slate-200 animate-pulse rounded-md"></div>
+                ) : (
+                  <p className="text-4xl font-bold text-slate-800">{teamCount}</p>
+                )}
+              </div>
+              <p className="text-xs text-slate-400 mt-4">Equipos formados por disciplina.</p>
+            </div>
+          </Link>
+
+          {/* Tarjeta de Conteo de Eventos */}
+          <Link href='/eventos' className="block group">
+            <div className="p-6 bg-white border rounded-xl shadow-sm flex flex-col justify-between h-full transition-all duration-200 ease-in-out group-hover:scale-105 group-hover:shadow-lg">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-slate-500">
+                    Eventos
+                  </p>
+                  <CalendarDays className="h-5 w-5 text-slate-400" />
+                </div>
+                {isLoadingEvents ? (
+                  <div className="h-10 w-20 bg-slate-200 animate-pulse rounded-md"></div>
+                ) : (
+                  <p className="text-4xl font-bold text-slate-800">{eventCount}</p>
+                )}
+              </div>
+              <p className="text-xs text-slate-400 mt-4">Eventos y torneos organizados.</p>
             </div>
           </Link>
         </div>

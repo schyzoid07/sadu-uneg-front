@@ -7,7 +7,7 @@ import { Session } from "@/schemas/auth";
 // Debes adaptarla a cómo estés manejando las cookies de sesión en tu backend.
 export async function getSession(): Promise<Session | null> {
     const cookieName = process.env.SESSION_COOKIE_NAME!;
-    const cookie = cookies().get(cookieName)?.value;
+    const cookie = (await cookies()).get(cookieName)?.value;
 
     if (!cookie) return null;
 
