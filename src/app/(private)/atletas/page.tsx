@@ -62,6 +62,7 @@ export default function Atletas() {
 
   const confirmDelete = () => {
     if (!deletingAthlete) return;
+
     deleteMutation.mutate(deletingAthlete.ID, {
       onSuccess: () => {
         setOpenDelete(false);

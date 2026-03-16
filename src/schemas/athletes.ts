@@ -1,7 +1,7 @@
 import * as z from "zod";
 
 export const baseAthletesSchema = z.object({
-    ID: z.number().nullable(),
+    ID: z.number(),
     GovID: z.string(),
     FirstNames: z.string(),
     LastNames: z.string(),
