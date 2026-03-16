@@ -20,14 +20,9 @@ const resSchema = z.object({
 export type Team = z.infer<typeof teamsSchema>;
 
 const fetchTeams = async () => {
-  try {
-    const res = await ky.get("http://localhost:8080/teams").json();
-    const parsed = resSchema.parse(res);
-    return parsed.data;
-  } catch (error: unknown) {
-    console.log(error)
-
-  }
+  const res = await ky.get("http://localhost:8080/teams").json();
+  const parsed = resSchema.parse(res);
+  return parsed.data;
 };
 
 export function useTeams() {
