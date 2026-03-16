@@ -1,34 +1,95 @@
-// hooks/use-teachers.ts
-import { useQuery } from "@tanstack/react-query";
-import ky from "ky";
-import { z } from "zod";
+// src/hooks/teachers/use-teachers.ts
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import * as z from "zod";
 
+// 1. Esquema y Tipos
 const teacherSchema = z.object({
-  id: z.number(),
-  first_names: z.string(),
-  last_names: z.string(),
-  gov_id: z.string(),
-  email: z.string().optional(),
-  phone_num: z.string().optional(),
+  ID: z.number(),
+  FirstNames: z.string(),
+  LastNames: z.string(),
+  GovID: z.string(), // Cédula
+  Email: z.string().email(),
+  PhoneNumber: z.string(),
 });
 
-const resSchema = z.object({
+// Para creación y actualización
+const teacherInputSchema = teacherSchema.omit({ ID: true });
+
+export type Teacher = z.infer<typeof teacherSchema>;
+export type CreateTeacherInput = z.infer<typeof teacherInputSchema>;
+export type UpdateTeacherInput = Partial<CreateTeacherInput>;
+
+const resTeachersSchema = z.object({
   data: z.array(teacherSchema),
   message: z.string(),
 });
 
-export type Teacher = z.infer<typeof teacherSchema>;
+const resTeacherSchema = z.object({
+  data: teacherSchema,
+  message: z.string(),
+});
 
+// 2. Funciones de Fetching
 const fetchTeachers = async () => {
-  // Ajusta la URL según tu API
-  const res = await ky.get("http://localhost:8080/teachers").json();
-  const parsed = resSchema.parse(res);
-  return parsed.data;
+  try {
+    const res = await api.get("teachers").json();
+    const parsed = resTeachersSchema.parse(res);
+    return parsed.data;
+  } catch (error) {
+    console.error("Error fetching teachers:", error);
+    throw error;
+  }
 };
 
+const fetchTeacher = async (id?: string) => {
+  if (!id || id === "undefined") return null;
+  try {
+    const res = await api.get(`teachers/${id}`).json();
+    const parsed = resTeacherSchema.parse(res);
+    return parsed.data;
+  } catch (error) {
+    console.error(`Error fetching teacher with id ${id}:`, error);
+    throw error;
+  }
+};
+
+// 3. Hooks
 export function useTeachers() {
   return useQuery({
     queryKey: ["teachers"],
     queryFn: fetchTeachers,
+  });
+}
+
+export function useTeacher(id?: string) {
+  return useQuery({
+    queryKey: ["teacher", id],
+    queryFn: () => fetchTeacher(id),
+    enabled: !!id,
+  });
+}
+
+export function useCreateTeacher() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (newTeacher: CreateTeacherInput) => {
+      return await api.post("teachers", { json: newTeacher }).json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teachers"] });
+    },
+  });
+}
+
+export function useDeleteTeacher() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      return await api.delete(`teachers/${id}`).json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teachers"] });
+    },
   });
 }
