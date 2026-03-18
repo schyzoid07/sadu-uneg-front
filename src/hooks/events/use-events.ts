@@ -2,20 +2,20 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import * as z from "zod";
+import { eventSchema, Event } from "@/schemas/event";
 
-// 1. Esquema y Tipos
-const eventSchema = z.object({
-  ID: z.number(),
+// 1. Esquema y Tipos (Separamos el de input para no romper el formulario de creación)
+// Este esquema se usa solo para el tipado del input de creación/edición
+const createEventSchema = z.object({
   Name: z.string(),
   Description: z.string().optional(),
-  Date: z.string(), // Asumimos formato ISO 8601
+  Date: z.string(),
   Location: z.string(),
 });
 
-// Para creación y actualización
-const eventInputSchema = eventSchema.omit({ ID: true });
+const eventInputSchema = createEventSchema;
 
-export type Event = z.infer<typeof eventSchema>;
+export type { Event };
 export type CreateEventInput = z.infer<typeof eventInputSchema>;
 export type UpdateEventInput = Partial<CreateEventInput>;
 

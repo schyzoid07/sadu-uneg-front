@@ -2,23 +2,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import * as z from "zod";
+import { teacherSchema, Teacher, CreateTeacherInput } from "@/schemas/teacher";
 
-// 1. Esquema y Tipos
-const teacherSchema = z.object({
-  ID: z.number(),
-  FirstNames: z.string(),
-  LastNames: z.string(),
-  GovID: z.string(), // Cédula
-  Email: z.string().email(),
-  PhoneNumber: z.string(),
-});
-
-// Para creación y actualización
-const teacherInputSchema = teacherSchema.omit({ ID: true });
-
-export type Teacher = z.infer<typeof teacherSchema>;
-export type CreateTeacherInput = z.infer<typeof teacherInputSchema>;
-export type UpdateTeacherInput = Partial<CreateTeacherInput>;
+export type { Teacher, CreateTeacherInput, UpdateTeacherInput } from "@/schemas/teacher";
 
 const resTeachersSchema = z.object({
   data: z.array(teacherSchema),
