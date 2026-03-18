@@ -4,6 +4,7 @@ import { z } from "zod";
 import { redirect } from "next/navigation";
 import { formSchema } from "@/schemas/login-form";
 import { createSession } from "@/lib/session";
+import { api } from "@/lib/api";
 
 export async function loginAction(values: z.infer<typeof formSchema>) {
     // Aquí es donde harías la llamada a tu API de backend para verificar las credenciales.
@@ -15,24 +16,19 @@ export async function loginAction(values: z.infer<typeof formSchema>) {
 
     try {
         // 1. Hacemos la petición REAL a tu backend
-        // Asumo que tu endpoint es /login o /auth/login, ajusta la URL si es distinta.
-        const response = await fetch("http://localhost:8080/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                // Ajusta las claves según lo que espere tu backend (ej: email o username)
-                email: values.email,
+        // El error 404 indica que la ruta no está en la raíz. 
+        // Dado que RegisterUserRoutes usa un RouterGroup, probamos con el prefijo "users/".
+        // Si en tu main.go el grupo es "/api" o "/auth", cambia "users/login" por esa ruta.
+        const data: any = await api.post("users/login", {
+            json: {
+                // El backend reportó error en 'Username', así que enviamos la clave 'username'
+                username: values.email,
                 password: values.password
-            })
-        });
+            }
+        }).json();
 
-        if (!response.ok) {
-            return { error: "Credenciales incorrectas o error en el servidor." };
-        }
-
-        const data = await response.json();
-        // 2. Extraemos el token real. Ajusta 'token' si tu API devuelve 'accessToken' u otro nombre.
-        token = data.token;
+        // Extraemos el token de la respuesta (usualmente en 'data' por el wrapper del backend)
+        token = data.data || data.token;
 
         if (!token) return { error: "El servidor no devolvió un token." };
 

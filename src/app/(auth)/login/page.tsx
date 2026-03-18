@@ -27,7 +27,7 @@ export default function ProfileForm() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            username: "",
+            email: "",
             password: "",
         },
     })
@@ -56,12 +56,12 @@ export default function ProfileForm() {
                         <h1 className="text-2xl font-bold mb-6 text-center text-[#2f34a0]">Iniciar Sesión</h1>
                         <FormField
                             control={form.control}
-                            name="username"
+                            name="email"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Correo Electrónico</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="correo@ejemplo.com" {...field} disabled={isLoading} />
+                                        <Input type="email" placeholder="correo@ejemplo.com" {...field} disabled={isLoading} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

@@ -100,7 +100,7 @@ export default function CrearEquipoForm({ onSuccess }: CrearEquipoFormProps) {
                   >
                     <Checkbox
                       id={`athlete-${athlete.ID}`}
-                      checked={selectedIDs.includes(athlete.ID)}
+                      checked={selectedIds.includes(athlete.ID)}
                       onCheckedChange={() => toggleAtleta(athlete.ID)}
                     />
                     <label
