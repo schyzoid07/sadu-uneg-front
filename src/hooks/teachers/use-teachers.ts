@@ -59,7 +59,7 @@ export const useCreateTeacher = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (json: TeacherInput) => api.post("teachers", { json }).json(),
+    mutationFn: (json: TeacherInput) => api.post("teachers/create", { json }).json(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
     },
@@ -71,7 +71,7 @@ export const useUpdateTeacher = () => {
 
   return useMutation({
     mutationFn: ({ id, json }: { id: number; json: TeacherInput }) =>
-      api.put(`teachers/${id}`, { json }).json(),
+      api.put(`teachers/edit/${id}`, { json }).json(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
     },
