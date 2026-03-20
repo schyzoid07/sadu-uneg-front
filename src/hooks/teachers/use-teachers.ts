@@ -2,17 +2,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import * as z from "zod";
-import { teacherSchema, Teacher, CreateTeacherInput } from "@/schemas/teacher";
+import { TeacherInput, baseTeacherSchema } from "@/schemas/teachers";
 
-export type { Teacher, CreateTeacherInput, UpdateTeacherInput } from "@/schemas/teacher";
 
 const resTeachersSchema = z.object({
-  data: z.array(teacherSchema),
+  data: z.array(baseTeacherSchema),
   message: z.string(),
 });
 
 const resTeacherSchema = z.object({
-  data: teacherSchema,
+  data: baseTeacherSchema,
   message: z.string(),
 });
 
@@ -56,26 +55,36 @@ export function useTeacher(id?: string) {
   });
 }
 
-export function useCreateTeacher() {
+export const useCreateTeacher = () => {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (newTeacher: CreateTeacherInput) => {
-      return await api.post("teachers", { json: newTeacher }).json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["teachers"] });
-    },
-  });
-}
 
-export function useDeleteTeacher() {
-  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (id: number) => {
-      return await api.delete(`teachers/${id}`).json();
-    },
+    mutationFn: (json: TeacherInput) => api.post("teachers", { json }).json(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["teachers"] });
     },
   });
-}
+};
+
+export const useUpdateTeacher = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, json }: { id: number; json: TeacherInput }) =>
+      api.put(`teachers/${id}`, { json }).json(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teachers"] });
+    },
+  });
+};
+
+export const useDeleteTeacher = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => api.delete(`teachers/delete/${id}`).json(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teachers"] });
+    },
+  });
+};
