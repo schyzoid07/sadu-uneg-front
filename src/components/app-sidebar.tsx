@@ -50,10 +50,6 @@ const data = {
           url: "/universidad",
         },
         {
-          title: "Partidos",
-          url: "/partidos",
-        },
-        {
           title: "Carreras",
           url: "/carreras",
         },
