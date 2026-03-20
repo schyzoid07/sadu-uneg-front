@@ -7,6 +7,17 @@ const baseDtoSchema = z.object({
     Name: z.string(),
 }).passthrough();
 
+// Esquema para equipos dentro de un evento, necesita UniversityID
+const teamInEventSchema = z.object({
+    ID: z.number(),
+    Name: z.string(),
+    UniversityID: z.number().optional().nullable(),
+    University: z.object({
+        ID: z.number(),
+        Name: z.string().optional(),
+    }).optional().nullable(),
+}).passthrough();
+
 // Esquema específico para profesores que probablemente usan FirstNames/LastNames en lugar de Name
 const teacherDtoSchema = z.object({
     ID: z.number(),
@@ -15,19 +26,27 @@ const teacherDtoSchema = z.object({
     LastNames: z.string().optional().nullable(),
 }).passthrough();
 
-export const eventSchema = z.object({
+export const eventBareSchema = z.object({
     ID: z.number(),
     Name: z.string(),
     Date: z.string(), // time.Time se recibe como string ISO 8601
     Status: z.string(),
     HomePoints: z.number(),
     OppositePoints: z.number(),
-
-    // Relaciones (Structs anidados en Go)
-    HomeTeam: baseDtoSchema,
-    OppositeTeam: baseDtoSchema,
+    HomeTeam: teamInEventSchema,
+    OppositeTeam: teamInEventSchema,
     ResponsableTeacher: teacherDtoSchema,
     Discipline: baseDtoSchema,
 });
 
-export type Event = z.infer<typeof eventSchema>;
+export const eventDetailSchema = eventBareSchema.extend({
+    Observation: z.string().optional(),
+    Ubication: z.string().optional(),
+    Tourney: baseDtoSchema.optional().nullable(),
+});
+
+export const eventSchema = eventDetailSchema;
+
+export type EventBare = z.infer<typeof eventBareSchema>;
+export type EventDetail = z.infer<typeof eventDetailSchema>;
+export type Event = EventDetail;

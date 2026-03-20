@@ -2,15 +2,23 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import * as z from "zod";
-import { eventSchema, Event } from "@/schemas/event";
+import { eventBareSchema, eventDetailSchema, Event } from "@/schemas/event";
 
 // 1. Esquema y Tipos (Separamos el de input para no romper el formulario de creación)
 // Este esquema se usa solo para el tipado del input de creación/edición
 const createEventSchema = z.object({
   Name: z.string(),
-  Description: z.string().optional(),
   Date: z.string(),
-  Location: z.string(),
+  Status: z.string().optional(),
+  Observation: z.string().optional(),
+  Ubication: z.string().optional(),
+  HomePoints: z.coerce.number().optional(),
+  OppositePoints: z.coerce.number().optional(),
+  HomeTeamID: z.number(),
+  OppositeTeamID: z.number(),
+  ResponsableTeacherID: z.number(),
+  DisciplineID: z.number(),
+  TourneyID: z.number().optional(),
 });
 
 const eventInputSchema = createEventSchema;
@@ -20,12 +28,12 @@ export type CreateEventInput = z.infer<typeof eventInputSchema>;
 export type UpdateEventInput = Partial<CreateEventInput>;
 
 const resEventsSchema = z.object({
-  data: z.array(eventSchema),
+  data: z.array(eventBareSchema),
   message: z.string(),
 });
 
 const resEventSchema = z.object({
-  data: eventSchema,
+  data: eventDetailSchema,
   message: z.string(),
 });
 
@@ -72,11 +80,24 @@ export function useEvent(id?: string) {
 export function useCreateEvent() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (newEvent: CreateEventInput) => {
-      return await api.post("events", { json: newEvent }).json();
+    mutationFn: async (json: CreateEventInput) => {
+      return await api.post("events/create", { json }).json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
+    },
+  });
+}
+
+export function useUpdateEvent() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: UpdateEventInput }) => {
+      return await api.put(`events/edit/${id}`, { json: data }).json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["event"] });
     },
   });
 }
@@ -85,7 +106,7 @@ export function useDeleteEvent() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: number) => {
-      return await api.delete(`events/${id}`).json();
+      return await api.delete(`events/delete/${id}`).json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
