@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -18,45 +19,115 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog";
-import { HammerIcon, Trash2Icon, CheckIcon, X, PlusIcon } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { EyeIcon, Trash2Icon, CheckIcon, X, PlusIcon, SearchIcon, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useTeams } from "@/hooks/teams/use-teams";
-import CrearEquipoForm from "@/components/equipo-form";
+import { useTeams, useDeleteTeam } from "@/hooks/teams/use-teams";
+import { useDisciplines } from "@/hooks/disciplines/use-disciplines";
+import { useUniversities } from "@/hooks/universities/use-universities";
+import { useDebounce } from "@/hooks/use-debounce";
+import EquipoForm from "@/components/equipo-form";
+import Link from "next/link";
 
 export default function Equipos() {
   const { data: teams, isLoading } = useTeams();
+  const { data: disciplines } = useDisciplines();
+  const { data: universities } = useUniversities();
+  const deleteTeam = useDeleteTeam();
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
-  // Estado para controlar la apertura del modal
+  // Estado para controlar la apertura del modal de creación
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Lógica de filtrado
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 400);
+  const [onlyRegular, setOnlyRegular] = useState(false);
+
+  const filteredTeams = useMemo(() => {
+    if (!teams) return [];
+
+    return teams.filter((t) => {
+      const matchesRegular = onlyRegular ? t.Regular : true;
+
+      if (!debouncedSearch) return matchesRegular;
+
+      const lowerSearch = debouncedSearch.toLowerCase();
+      const disciplineName = disciplines?.find((d) => d.ID === t.DisciplineID)?.Name.toLowerCase() || "";
+      const universityName = universities?.find((u) => u.ID === t.UniversityID)?.Nombre.toLowerCase() || "";
+
+      return matchesRegular && (t.Name.toLowerCase().includes(lowerSearch) ||
+        disciplineName.includes(lowerSearch) ||
+        universityName.includes(lowerSearch));
+    });
+  }, [teams, debouncedSearch, disciplines, universities, onlyRegular]);
+
+  const confirmDelete = async () => {
+    if (deleteId) {
+      await deleteTeam.mutateAsync(deleteId);
+      setDeleteId(null);
+    }
+  };
 
   return (
     <div className="space-y-4 p-4">
-      {/* 1. Encabezado con Título y Botón de Creación */}
-      <div className="flex justify-between items-center px-2">
+      {/* 1. Encabezado con Buscador y Botón de Creación */}
+      <div className="flex flex-col sm:flex-row justify-between items-center px-2 gap-4">
         <h1 className="text-xl font-bold text-slate-800">Gestión de Equipos</h1>
 
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-green-700 hover:bg-green-800 text-white shadow-sm">
-              <PlusIcon className="mr-2 h-4 w-4" /> Nuevo Equipo
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Registrar Nuevo Equipo</DialogTitle>
-            </DialogHeader>
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          {/* Checkbox Filtro Titulares */}
+          <div className="flex items-center gap-2 mr-2">
+            <Checkbox
+              id="regular-filter"
+              checked={onlyRegular}
+              onCheckedChange={(checked) => setOnlyRegular(!!checked)}
+            />
+            <label
+              htmlFor="regular-filter"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+            >
+              Solo Titulares
+            </label>
+          </div>
 
-            {/* Formulario que recibe la función para cerrar el modal */}
-            <CrearEquipoForm onSuccess={() => setIsModalOpen(false)} />
+          {/* Input de búsqueda */}
+          <div className="relative w-full sm:w-64">
+            <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Nombre, disciplina, universidad..."
+              className="pl-8 bg-gray-50"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
 
-          </DialogContent>
-        </Dialog>
+          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <PlusIcon size={16} /> Nuevo Equipo
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Registrar Nuevo Equipo</DialogTitle>
+              </DialogHeader>
+              <div className="max-h-[80vh] overflow-y-auto px-1">
+                <EquipoForm onSuccess={() => setIsModalOpen(false)} />
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* 2. Contenedor de la Tabla */}
       <div className="border rounded-lg bg-white shadow-sm overflow-hidden">
         <Table>
-          <TableCaption>Lista de equipos deportivos registrados en el sistema.</TableCaption>
+          <TableCaption>
+            {filteredTeams.length === 0 && !isLoading
+              ? "No se encontraron equipos con ese criterio."
+              : "Lista de equipos deportivos registrados en el sistema."}
+          </TableCaption>
           <TableHeader className="bg-slate-50">
             <TableRow>
               <TableHead>Nombre</TableHead>
@@ -80,11 +151,15 @@ export default function Equipos() {
             }
 
             {/* Renderizado de equipos */}
-            {teams?.map((team) => (
+            {filteredTeams?.map((team) => (
               <TableRow key={team.ID} className="hover:bg-slate-50/50">
                 <TableCell className="font-medium text-slate-700">{team.Name}</TableCell>
-                <TableCell>{team.DisciplineID}</TableCell>
-                <TableCell>{team.UniversityID}</TableCell>
+                <TableCell>
+                  {disciplines?.find(d => d.ID === team.DisciplineID)?.Name || team.DisciplineID}
+                </TableCell>
+                <TableCell>
+                  {universities?.find(u => u.ID === team.UniversityID)?.Nombre || team.UniversityID}
+                </TableCell>
                 <TableCell>{team.Category}</TableCell>
                 <TableCell>
                   <div className="flex justify-center">
@@ -97,17 +172,21 @@ export default function Equipos() {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8 bg-blue-50 hover:bg-blue-200 text-blue-600"
-                    >
-                      <HammerIcon size={16} />
-                    </Button>
+                    <Link href={`/equipos/${team.ID}`}>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 bg-blue-50 hover:bg-blue-200 text-blue-600"
+                      >
+                        <EyeIcon size={16} />
+                      </Button>
+                    </Link>
                     <Button
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8 bg-red-50 hover:bg-red-200 text-red-600"
+                      onClick={() => setDeleteId(team.ID)}
+                      disabled={deleteTeam.isPending}
                     >
                       <Trash2Icon size={16} />
                     </Button>
@@ -117,6 +196,26 @@ export default function Equipos() {
             ))}
           </TableBody>
         </Table>
+
+        {/* Dialog de confirmación de eliminación */}
+        <Dialog open={!!deleteId} onOpenChange={(val) => !val && setDeleteId(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Confirmar eliminación</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-sm text-slate-700">
+                ¿Estás seguro que quieres eliminar este equipo? Esta acción no se puede deshacer.
+              </p>
+            </div>
+            <div className="flex justify-end gap-3 pt-2">
+              <Button variant="outline" onClick={() => setDeleteId(null)}>Cancelar</Button>
+              <Button onClick={confirmDelete} disabled={deleteTeam.isPending} className="bg-red-600 hover:bg-red-700">
+                {deleteTeam.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Eliminar"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

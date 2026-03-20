@@ -5,10 +5,11 @@ import { teamsSchema } from "@/schemas/teams";
 
 // Definimos el tipo de entrada para crear/editar
 export interface TeamInput {
-  Nombre: string;
-  DisciplinaID: number;
-  UniversidadID: number;
-  AtletasIDs: number[];
+  Name: string;
+  DisciplineID: number;
+  UniversityID: number;
+  AthleteIDs: number[];
+  Regular: boolean;
 }
 
 // Esquema de la respuesta completa
@@ -34,6 +35,7 @@ const fetchTeams = async () => {
 const fetchTeam = async (id?: string) => {
   if (!id || id === "undefined") return null;
   const res = await api.get(`teams/${id}`).json();
+  console.log("🔍 [GET] Respuesta cruda del backend para Team:", res);
   const parsed = resTeamSchema.parse(res);
   return parsed.data;
 };
