@@ -19,8 +19,9 @@ export const sessionOptions = {
 export async function getSession() {
   const cookieStore = await cookies();
   const session = await getIronSession<Session>(cookieStore, sessionOptions);
+  const tokenCookie = cookieStore.get("session_token");
   // Si la sesión no tiene un username, la consideramos vacía.
-  if (!session.username) {
+  if (!session.username || !tokenCookie) {
     return null;
   }
   // Devolvemos un objeto nuevo con solo los datos necesarios.
