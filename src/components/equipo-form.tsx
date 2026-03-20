@@ -169,7 +169,7 @@ export default function EquipoForm({ onSuccess, teamId }: EquipoFormProps) {
           <option value="" disabled>Selecciona una universidad</option>
           {universities?.map((u) => (
             <option key={u.ID} value={u.ID}>
-              {u.Nombre}
+              {u.Name}
             </option>
           ))}
         </select>
