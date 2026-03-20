@@ -81,14 +81,14 @@ export default function Equipos() {
 
             {/* Renderizado de equipos */}
             {teams?.map((team) => (
-              <TableRow key={team.id} className="hover:bg-slate-50/50">
-                <TableCell className="font-medium text-slate-700">{team.name}</TableCell>
-                <TableCell>{team.discipline_id}</TableCell>
-                <TableCell>{team.university_id}</TableCell>
-                <TableCell>{team.category}</TableCell>
+              <TableRow key={team.ID} className="hover:bg-slate-50/50">
+                <TableCell className="font-medium text-slate-700">{team.Name}</TableCell>
+                <TableCell>{team.DisciplineID}</TableCell>
+                <TableCell>{team.UniversityID}</TableCell>
+                <TableCell>{team.Category}</TableCell>
                 <TableCell>
                   <div className="flex justify-center">
-                    {team.regular ? (
+                    {team.Regular ? (
                       <CheckIcon className="text-green-500" size={20} strokeWidth={3} />
                     ) : (
                       <X className="text-red-400" size={20} strokeWidth={3} />
