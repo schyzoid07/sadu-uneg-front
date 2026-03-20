@@ -20,6 +20,7 @@ interface TeacherFormProps {
 export default function TeacherForm({ teacherId, onSuccess }: TeacherFormProps) {
     // Hooks
     const { data: teacher, isLoading: isLoadingTeacher } = useTeacher(teacherId);
+    console.log(teacher)
     const { data: disciplines } = useDisciplines();
     const createMutation = useCreateTeacher();
     const updateMutation = useUpdateTeacher();

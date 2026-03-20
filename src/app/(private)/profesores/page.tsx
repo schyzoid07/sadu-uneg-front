@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { useDisciplines } from "@/hooks/disciplines/use-disciplines";
 import { useDebounce } from "@/hooks/use-debounce";
 import Link from "next/link";
 import {
@@ -21,6 +22,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Input
 } from "@/components/ui/input";
 import { EyeIcon, Trash2Icon, PlusIcon, SearchIcon, Loader2 } from "lucide-react";
@@ -33,6 +41,8 @@ import TeacherForm from "@/components/teacher-form";
 
 export default function Profesores() {
   const { data: teachers, isLoading } = useTeachers();
+  const { data: disciplines } = useDisciplines();
+
   const deleteTeacher = useDeleteTeacher();
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
@@ -41,17 +51,18 @@ export default function Profesores() {
   // Lógica de filtrado
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 400);
+  const [disciplineFilter, setDisciplineFilter] = useState("all");
 
   const filteredTeachers = useMemo(() => {
     if (!teachers) return [];
-    if (!debouncedSearch) return teachers;
-    const lowerSearch = debouncedSearch.toLowerCase();
-    return teachers.filter((t) =>
-      t.FirstNames.toLowerCase().includes(lowerSearch) ||
-      t.LastNames.toLowerCase().includes(lowerSearch) ||
-      t.GovID.toLowerCase().includes(lowerSearch)
-    );
-  }, [teachers, debouncedSearch]);
+
+    return teachers.filter((t) => {
+      const lowerSearch = debouncedSearch.toLowerCase();
+      const matchesSearch = t.FirstNames.toLowerCase().includes(lowerSearch) || t.LastNames.toLowerCase().includes(lowerSearch) || t.GovID.toLowerCase().includes(lowerSearch);
+      const matchesDiscipline = disciplineFilter === "all" || (t.Disciplines && Array.isArray(t.Disciplines) && t.Disciplines.some((d) => d.ID.toString() === disciplineFilter));
+      return matchesSearch && matchesDiscipline;
+    });
+  }, [teachers, debouncedSearch, disciplineFilter]);
 
   const confirmDelete = async () => {
     if (deleteId) {
@@ -65,7 +76,23 @@ export default function Profesores() {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Profesores</h2>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row items-end gap-3 w-full sm:w-auto">
+          {/* Filtro Disciplina */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-700">Disciplina</label>
+            <Select value={disciplineFilter} onValueChange={setDisciplineFilter}>
+              <SelectTrigger className="w-[160px] bg-white">
+                <SelectValue placeholder="Disciplina" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas</SelectItem>
+                {disciplines?.map((d) => (
+                  <SelectItem key={d.ID} value={d.ID.toString()}>{d.Name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Input de búsqueda */}
           <div className="relative w-full sm:w-64">
             <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
