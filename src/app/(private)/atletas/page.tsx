@@ -14,6 +14,14 @@ import {
 import { Trash2Icon, PlusIcon, EyeIcon, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAthletes, Athletes } from "@/hooks/athletes/use-athletes"; // Importamos el hook y tipo
+import { useDisciplines } from "@/hooks/disciplines/use-disciplines";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -28,26 +36,33 @@ import { useDebounce } from "@/hooks/use-debounce";
 
 export default function Atletas() {
   const { data: athletes, isLoading, isError } = useAthletes();
+  const { data: disciplines } = useDisciplines();
+  console.log(athletes)
   const [openCreate, setOpenCreate] = useState(false);
 
   //logica de filtrado
   const [searchTerm, setSearchTerm] = useState('')
   const debouncedSearch = useDebounce(searchTerm, 400)
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [disciplineFilter, setDisciplineFilter] = useState("all");
 
   const filteredAthletes = useMemo(() => {
     if (!athletes) return [];
-    if (!debouncedSearch) return athletes;
-
-    const lowerSearch = debouncedSearch.toLowerCase()
 
     return athletes.filter((a) => {
-      return (
-        a.FirstNames.toLowerCase().includes(lowerSearch) ||
+      const lowerSearch = debouncedSearch.toLowerCase();
+      const matchesSearch = a.FirstNames.toLowerCase().includes(lowerSearch) ||
         a.LastNames.toLowerCase().includes(lowerSearch) ||
-        a.GovID.toLowerCase().includes(lowerSearch)
-      )
+        a.GovID.toLowerCase().includes(lowerSearch);
+
+      const matchesCategory = categoryFilter === "all" || a.Gender === categoryFilter;
+
+      const matchesDiscipline = disciplineFilter === "all" ||
+        (a.Teams && Array.isArray(a.Teams) && a.Teams.some(t => t.DisciplineID.toString() === disciplineFilter));
+
+      return matchesSearch && matchesCategory && matchesDiscipline;
     })
-  }, [athletes, debouncedSearch])
+  }, [athletes, debouncedSearch, categoryFilter, disciplineFilter])
 
   // Eliminación
   const [deletingAthlete, setDeletingAthlete] = useState<Athletes | null>(null);
@@ -76,7 +91,41 @@ export default function Atletas() {
       <div className="flex items-center justify-between mb-4 ">
         <h2 className="text-lg font-semibold">Atletas</h2>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3 w-full sm:w-auto">
+
+          {/* Filtro Categoría (Género) */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-700">Categoría</label>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[140px] bg-white">
+                <SelectValue placeholder="Categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas</SelectItem>
+                <SelectItem value="Masculino">Masculino</SelectItem>
+                <SelectItem value="Femenino">Femenino</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Filtro Disciplina */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-700">Disciplina</label>
+            <Select value={disciplineFilter} onValueChange={setDisciplineFilter}>
+              <SelectTrigger className="w-[160px] bg-white">
+                <SelectValue placeholder="Disciplina" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas</SelectItem>
+                {disciplines?.map((d) => (
+                  <SelectItem key={d.ID} value={d.ID.toString()}>
+                    {d.Name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/*input de busqueda */}
           <div className="relative w-full sm:w-64">
             <search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
