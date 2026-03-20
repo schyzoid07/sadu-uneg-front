@@ -10,6 +10,7 @@ export interface TeamInput {
   UniversityID: number;
   AthleteIDs: number[];
   Regular: boolean;
+  Category: string;
 }
 
 // Esquema de la respuesta completa

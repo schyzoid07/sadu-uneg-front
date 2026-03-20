@@ -16,6 +16,7 @@ import { useUniversities } from "@/hooks/universities/use-universities";
 
 export default function Universidad() {
   const { data: universities, isLoading } = useUniversities();
+  console.log(universities)
 
   return (
     <Table>
@@ -43,7 +44,7 @@ export default function Universidad() {
         {universities?.map((uni) => (
           <TableRow key={uni.ID}>
             <TableCell className="font-mono text-muted-foreground">{uni.ID}</TableCell>
-            <TableCell className="font-medium">{uni.Nombre}</TableCell>
+            <TableCell className="font-medium">{uni.Name}</TableCell>
             <TableCell>
               <div className="flex justify-center">
                 {uni.Local ? (

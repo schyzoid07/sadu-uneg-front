@@ -33,6 +33,7 @@ export default function EquipoForm({ onSuccess, teamId }: EquipoFormProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [regular, setRegular] = useState(false);
   const [disciplineId, setDisciplineId] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
   const [universityId, setUniversityId] = useState<string>("");
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [mensaje, setMensaje] = useState<string | null>(null);
@@ -43,6 +44,7 @@ export default function EquipoForm({ onSuccess, teamId }: EquipoFormProps) {
       console.log("📝 [FORM] Datos cargados para editar:", team);
       setTeamName(team.Name || "");
       setRegular(team.Regular || false);
+      setCategory(team.Category || "");
 
       // Buscar ID en la propiedad plana o dentro del objeto anidado
       // Nos aseguramos de manejar el caso donde DisciplineID puede ser 0 o undefined
@@ -68,10 +70,17 @@ export default function EquipoForm({ onSuccess, teamId }: EquipoFormProps) {
   }, [team, teamId]);
 
   // 3. Lógica de filtrado de atletas para la lista
-  const filteredAthletes = athletes?.filter((a) =>
-    `${a.FirstNames} ${a.LastNames}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    a.GovID.includes(searchTerm)
-  );
+  const filteredAthletes = athletes?.filter((a) => {
+    const matchesSearch = `${a.FirstNames} ${a.LastNames}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.GovID.includes(searchTerm);
+
+    const matchesCategory =
+      category === "Masculino" ? (a.Gender === "Masculino" || a.Gender === "M") :
+        category === "Femenino" ? (a.Gender === "Femenino" || a.Gender === "F") :
+          true; // Si es Mixto o no hay selección, mostramos todos
+
+    return matchesSearch && matchesCategory;
+  });
 
   const toggleAtleta = (id: number) => {
     setSelectedIds((prev) =>
@@ -89,6 +98,7 @@ export default function EquipoForm({ onSuccess, teamId }: EquipoFormProps) {
       // Usar ID de universidad existente (plano u objeto) o 1 por defecto
       UniversityID: parseInt(universityId) || 1,
       AthleteIDs: selectedIds,
+      Category: category,
       Regular: regular,
     };
 
@@ -155,6 +165,21 @@ export default function EquipoForm({ onSuccess, teamId }: EquipoFormProps) {
               {d.Name}
             </option>
           ))}
+        </select>
+      </div>
+
+      {/* Campo: Categoría */}
+      <div className="space-y-2">
+        <label className="text-sm font-semibold text-slate-700">Categoría</label>
+        <select
+          className="w-full text-sm p-2 bg-white border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 border-gray-200"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          <option value="" disabled>Selecciona una categoría</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+          <option value="Mixto">Mixto</option>
         </select>
       </div>
 
@@ -258,7 +283,7 @@ export default function EquipoForm({ onSuccess, teamId }: EquipoFormProps) {
           <Button
             type="button"
             variant="outline"
-            onClick={() => { setSelectedIds([]); setTeamName(""); setRegular(false); setDisciplineId(""); setUniversityId(""); }}
+            onClick={() => { setSelectedIds([]); setTeamName(""); setCategory(""); setRegular(false); setDisciplineId(""); setUniversityId(""); }}
             disabled={isSubmitting}
           >
             Limpiar
@@ -267,7 +292,7 @@ export default function EquipoForm({ onSuccess, teamId }: EquipoFormProps) {
 
         <Button
           onClick={handleSave}
-          disabled={!teamName || !disciplineId || !universityId || isSubmitting}
+          disabled={!teamName || !disciplineId || !universityId || !category || isSubmitting}
           className="bg-blue-600 hover:bg-blue-700"
         >
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
