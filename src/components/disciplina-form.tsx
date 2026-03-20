@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { useCreateDiscipline } from "@/hooks/disciplines/use-create-discipline";
-import { useUpdateDiscipline } from "@/hooks/disciplines/use-update-discipline";
+import { useCreateDiscipline } from "@/hooks/disciplines/use-disciplines";
+import { useUpdateDiscipline } from "@/hooks/disciplines/use-disciplines";
 import { Discipline } from "@/hooks/disciplines/use-disciplines";
 
 interface DisciplinaFormProps {
@@ -26,14 +26,14 @@ export default function DisciplinaForm({ onSuccess, discipline }: DisciplinaForm
         }
     }, [discipline]);
 
-    const isSubmitting = createMutation.isLoading || updateMutation.isLoading;
+    const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
     const handleSubmit = (e?: React.FormEvent) => {
         e?.preventDefault?.();
 
         if (discipline && discipline.ID) {
             updateMutation.mutate(
-                { id: discipline.ID, data: { name } },
+                { id: discipline.ID, data: { Name: name } },
                 {
                     onSuccess: () => {
                         if (onSuccess) onSuccess();
@@ -42,7 +42,7 @@ export default function DisciplinaForm({ onSuccess, discipline }: DisciplinaForm
             );
         } else {
             createMutation.mutate(
-                { name },
+                { Name: name },
                 {
                     onSuccess: () => {
                         if (onSuccess) onSuccess();

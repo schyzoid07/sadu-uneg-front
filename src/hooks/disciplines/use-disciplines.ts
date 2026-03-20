@@ -78,6 +78,18 @@ export function useCreateDiscipline() {
   });
 }
 
+export function useUpdateDiscipline() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: UpdateDisciplineInput }) => {
+      return await api.put(`disciplines/${id}`, { json: data }).json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["disciplines"] });
+    },
+  });
+}
+
 export function useDeleteDiscipline() {
   const queryClient = useQueryClient();
   return useMutation({

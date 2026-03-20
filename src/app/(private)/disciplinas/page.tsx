@@ -22,7 +22,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import DisciplinaForm from "@/components/disciplina-form";
-import { useDeleteDiscipline } from "@/hooks/disciplines/use-delete-discipline";
+import { useDeleteDiscipline } from "@/hooks/disciplines/use-disciplines";
 
 export default function DisciplinasPage() {
   const { data: disciplines, isLoading, isError } = useDisciplines();
@@ -181,10 +181,10 @@ export default function DisciplinasPage() {
             </Button>
             <Button
               onClick={confirmDelete}
-              disabled={deleteMutation.isLoading}
+              disabled={deleteMutation.isPending}
               className="bg-red-600 hover:bg-red-700"
             >
-              {deleteMutation.isLoading ? "Eliminando..." : "Eliminar"}
+              {deleteMutation.isPending ? "Eliminando..." : "Eliminar"}
             </Button>
           </div>
         </DialogContent>
