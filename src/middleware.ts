@@ -1,32 +1,40 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-
-// El nombre de la cookie debe coincidir con el definido en `lib/session.ts`
-const SESSION_COOKIE_NAME = process.env.SESSION_COOKIE_NAME || "sadu-uneg-session";
+import { getIronSession } from 'iron-session';
+import { sessionOptions } from './lib/session';
+import { Session } from './schemas/auth';
 
 // Define paths that are always public (e.g., login, static assets)
 const publicPaths = ['/login', '/favicon.ico'];
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const session = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+  const response = NextResponse.next();
+  const session = await getIronSession<Session>(request, response, sessionOptions);
+
+  // Verificamos también la cookie del token que usa el cliente (api.ts)
+  const hasSessionToken = request.cookies.has("session_token");
+
+  // 3. Logic for Redirecting
+  // El usuario está realmente autenticado solo si tiene sesión Y el token para la API
+  const isAuthenticated = session.username && hasSessionToken;
 
   // 3. Logic for Redirecting
 
   // Si el usuario tiene una sesión y está en la página de login, lo redirigimos a la página principal.
-  if (session && pathname === '/login') {
+  if (isAuthenticated && pathname === '/login') {
     return NextResponse.redirect(new URL('/', request.url)); // Redirige a la página principal si ya hay sesión
   }
 
   // Si el usuario no tiene sesión y no está en una ruta pública, lo redirigimos a la página de login.
   const isPublic = publicPaths.some(path => pathname.startsWith(path));
-  if (!session && !isPublic) {
+  if (!isAuthenticated && !isPublic) {
     const loginUrl = new URL('/login', request.url);
     return NextResponse.redirect(loginUrl);
   }
 
   // Otherwise, allow the request to proceed
-  return NextResponse.next();
+  return response;
 }
 
 // See "Matching Paths" below to learn more

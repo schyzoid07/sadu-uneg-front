@@ -4,7 +4,7 @@ import { Session } from "@/schemas/auth";
 
 // Asegúrate de que estas variables de entorno estén en tu archivo .env.local
 // SESSION_PASSWORD debe ser una cadena secreta larga y compleja de al menos 32 caracteres.
-const sessionOptions = {
+export const sessionOptions = {
   password: process.env.SESSION_PASSWORD!,
   cookieName: process.env.SESSION_COOKIE_NAME || "sadu-uneg-session",
   cookieOptions: {

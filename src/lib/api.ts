@@ -23,5 +23,14 @@ export const api = ky.create({
         }
       },
     ],
+    afterResponse: [
+      async (_request, _options, response) => {
+        if (response.status === 401) {
+          // Si el token es rechazado, redirigir al login
+          if (typeof window !== 'undefined') window.location.href = '/login';
+        }
+      }
+    ]
   },
+
 });
