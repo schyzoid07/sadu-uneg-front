@@ -44,12 +44,12 @@ export default function Profesores() {
 
           {/* Mapeo de Datos Reales */}
           {teachers?.map((teacher) => (
-            <TableRow key={teacher.id}>
-              <TableCell>{teacher.gov_id}</TableCell>
-              <TableCell>{teacher.first_names}</TableCell>
-              <TableCell>{teacher.last_names}</TableCell>
-              <TableCell className="text-left">{teacher.email}</TableCell>
-              <TableCell className="text-right">{teacher.phone_num}</TableCell>
+            <TableRow key={teacher.ID}>
+              <TableCell>{teacher.GovID}</TableCell>
+              <TableCell>{teacher.FirstNames}</TableCell>
+              <TableCell>{teacher.LastNames}</TableCell>
+              <TableCell className="text-left">{teacher.Email}</TableCell>
+              <TableCell className="text-right">{teacher.PhoneNumber}</TableCell>
               <TableCell>
                 <div className="flex justify-end gap-2">
                   <Button
