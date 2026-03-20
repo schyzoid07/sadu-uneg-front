@@ -4,6 +4,13 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCaption,
@@ -43,24 +50,24 @@ export default function Equipos() {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 400);
   const [onlyRegular, setOnlyRegular] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [disciplineFilter, setDisciplineFilter] = useState("all");
+  const [universityFilter, setUniversityFilter] = useState("all");
 
   const filteredTeams = useMemo(() => {
     if (!teams) return [];
 
     return teams.filter((t) => {
-      const matchesRegular = onlyRegular ? t.Regular : true;
-
-      if (!debouncedSearch) return matchesRegular;
-
       const lowerSearch = debouncedSearch.toLowerCase();
-      const disciplineName = disciplines?.find((d) => d.ID === t.DisciplineID)?.Name.toLowerCase() || "";
-      const universityName = universities?.find((u) => u.ID === t.UniversityID)?.Nombre.toLowerCase() || "";
+      const matchesSearch = t.Name.toLowerCase().includes(lowerSearch);
+      const matchesRegular = onlyRegular ? t.Regular : true;
+      const matchesCategory = categoryFilter === "all" || t.Category === categoryFilter;
+      const matchesDiscipline = disciplineFilter === "all" || t.DisciplineID?.toString() === disciplineFilter;
+      const matchesUniversity = universityFilter === "all" || t.UniversityID?.toString() === universityFilter;
 
-      return matchesRegular && (t.Name.toLowerCase().includes(lowerSearch) ||
-        disciplineName.includes(lowerSearch) ||
-        universityName.includes(lowerSearch));
+      return matchesSearch && matchesRegular && matchesCategory && matchesDiscipline && matchesUniversity;
     });
-  }, [teams, debouncedSearch, disciplines, universities, onlyRegular]);
+  }, [teams, debouncedSearch, onlyRegular, categoryFilter, disciplineFilter, universityFilter]);
 
   const confirmDelete = async () => {
     if (deleteId) {
@@ -75,9 +82,9 @@ export default function Equipos() {
       <div className="flex flex-col sm:flex-row justify-between items-center px-2 gap-4">
         <h1 className="text-xl font-bold text-slate-800">Gestión de Equipos</h1>
 
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row items-end gap-3 w-full sm:w-auto">
           {/* Checkbox Filtro Titulares */}
-          <div className="flex items-center gap-2 mr-2">
+          <div className="flex items-center gap-2 mr-2 mb-3">
             <Checkbox
               id="regular-filter"
               checked={onlyRegular}
@@ -91,11 +98,59 @@ export default function Equipos() {
             </label>
           </div>
 
+          {/* Filtro Categoría */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-700">Categoría</label>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[130px] bg-white">
+                <SelectValue placeholder="Categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas</SelectItem>
+                <SelectItem value="Masculino">Masculino</SelectItem>
+                <SelectItem value="Femenino">Femenino</SelectItem>
+                <SelectItem value="Mixto">Mixto</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Filtro Disciplina */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-700">Disciplina</label>
+            <Select value={disciplineFilter} onValueChange={setDisciplineFilter}>
+              <SelectTrigger className="w-[140px] bg-white">
+                <SelectValue placeholder="Disciplina" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas</SelectItem>
+                {disciplines?.map((d) => (
+                  <SelectItem key={d.ID} value={d.ID.toString()}>{d.Name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Filtro Universidad */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-700">Universidad</label>
+            <Select value={universityFilter} onValueChange={setUniversityFilter}>
+              <SelectTrigger className="w-[140px] bg-white">
+                <SelectValue placeholder="Universidad" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas</SelectItem>
+                {universities?.map((u) => (
+                  <SelectItem key={u.ID} value={u.ID.toString()}>{u.Name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Input de búsqueda */}
           <div className="relative w-full sm:w-64">
             <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Nombre, disciplina, universidad..."
+              placeholder="Buscar por nombre..."
               className="pl-8 bg-gray-50"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -158,7 +213,7 @@ export default function Equipos() {
                   {disciplines?.find(d => d.ID === team.DisciplineID)?.Name || team.DisciplineID}
                 </TableCell>
                 <TableCell>
-                  {universities?.find(u => u.ID === team.UniversityID)?.Nombre || team.UniversityID}
+                  {universities?.find(u => u.ID === team.UniversityID)?.Name || team.UniversityID}
                 </TableCell>
                 <TableCell>{team.Category}</TableCell>
                 <TableCell>
