@@ -70,7 +70,7 @@ export function useCreateDiscipline() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (newDiscipline: CreateDisciplineInput) => {
-      return await api.post("disciplines", { json: newDiscipline }).json();
+      return await api.post("disciplines/create", { json: newDiscipline }).json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["disciplines"] });
@@ -82,7 +82,7 @@ export function useUpdateDiscipline() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, data }: { id: number; data: UpdateDisciplineInput }) => {
-      return await api.put(`disciplines/${id}`, { json: data }).json();
+      return await api.put(`disciplines/edit/${id}`, { json: data }).json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["disciplines"] });
@@ -94,7 +94,7 @@ export function useDeleteDiscipline() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: number) => {
-      return await api.delete(`disciplines/${id}`).json();
+      return await api.delete(`disciplines/delete/${id}`).json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["disciplines"] });
