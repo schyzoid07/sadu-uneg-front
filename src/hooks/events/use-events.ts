@@ -27,22 +27,16 @@ export type { Event };
 export type CreateEventInput = z.infer<typeof eventInputSchema>;
 export type UpdateEventInput = Partial<CreateEventInput>;
 
-const resEventsSchema = z.object({
-  data: z.array(eventBareSchema),
-  message: z.string(),
-});
-
-const resEventSchema = z.object({
-  data: eventDetailSchema,
-  message: z.string(),
-});
-
 // 2. Funciones de Fetching
 const fetchEvents = async () => {
   try {
-    const res = await api.get("events").json();
-    const parsed = resEventsSchema.parse(res);
-    return parsed.data;
+    // El backend devuelve []EventGetBareDTO directamente
+    const res: any = await api.get("events").json();
+
+    // Si viene envuelto en { data: [...] }, extraemos data, sino usamos res directo
+    const data = (res && typeof res === 'object' && 'data' in res) ? res.data : res;
+
+    return z.array(eventBareSchema).parse(data);
   } catch (error) {
     console.error("Error fetching events:", error);
     throw error;
@@ -52,9 +46,22 @@ const fetchEvents = async () => {
 const fetchEvent = async (id?: string) => {
   if (!id || id === "undefined") return null;
   try {
-    const res = await api.get(`events/${id}`).json();
-    const parsed = resEventSchema.parse(res);
-    return parsed.data;
+    // El backend devuelve []EventGetDTO (array de 1 elemento)
+    const res: any = await api.get(`events/${id}`).json();
+
+    // Manejo flexible: si es array tomamos el primero, si es {data: [obj]} tomamos el primero de data
+    let data = res;
+
+    if (res && typeof res === 'object' && 'data' in res) {
+      data = res.data;
+    }
+
+    // Como tu servicio GetEventByID retorna un slice ([]), extraemos el primer elemento
+    if (Array.isArray(data)) {
+      data = data[0];
+    }
+
+    return eventDetailSchema.parse(data);
   } catch (error) {
     console.error(`Error fetching event with id ${id}:`, error);
     throw error;

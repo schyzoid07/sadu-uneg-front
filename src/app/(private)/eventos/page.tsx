@@ -25,6 +25,7 @@ import {
 import EventCalendar from "@/components/event-calendar";
 import EventCard from "@/components/event-card";
 import { useUniversities } from "@/hooks/universities/use-universities";
+import { EventoForm } from "@/components/evento-form";
 
 export default function Eventos() {
   const searchParams = useSearchParams();
@@ -35,6 +36,7 @@ export default function Eventos() {
   // Lógica de borrado
   const deleteMutation = useDeleteEvent();
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [openCreate, setOpenCreate] = useState(false);
 
   // Lógica de navegación (URL)
   const handleSearch = useDebouncedCallback((term: string) => {
@@ -129,10 +131,20 @@ export default function Eventos() {
               className="pl-8 bg-white"
             />
           </div>
-          <Button className="bg-green-900 hover:bg-green-800 text-white font-bold transition duration-200 flex items-center gap-2">
-            <PlusIcon className="h-4 w-4" />
-            Añadir Evento
-          </Button>
+          <Dialog open={openCreate} onOpenChange={setOpenCreate}>
+            <DialogTrigger asChild>
+              <Button className="bg-green-900 hover:bg-green-800 text-white font-bold transition duration-200 flex items-center gap-2">
+                <PlusIcon className="h-4 w-4" />
+                Añadir Evento
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Añadir Nuevo Evento</DialogTitle>
+              </DialogHeader>
+              <EventoForm onSuccess={() => setOpenCreate(false)} />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 

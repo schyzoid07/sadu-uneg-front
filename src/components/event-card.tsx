@@ -1,18 +1,23 @@
 "use client";
 
-import { Event } from "@/schemas/event";
+import { Event, EventBare } from "@/schemas/event"; // Importamos EventBare
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon, HammerIcon, Trash2Icon, MapPinIcon } from "lucide-react";
 import Link from "next/link";
 
 interface EventCardProps {
-    event: Event;
+    // Aceptamos Event (que es el detallado) o EventBare (el de la lista)
+    event: Event | EventBare;
     onDelete: (id: number) => void;
 }
 
 export default function EventCard({ event, onDelete }: EventCardProps) {
     const eventDate = new Date(event.Date);
+
+    // Hacemos un cast a 'any' o 'Event' para acceder a propiedades que podrían no estar en el Bare (como Ubication)
+    // De esta forma, si 'Ubication' viene undefined (como en la lista), simplemente no se renderiza.
+    const fullEvent = event as Event;
 
     return (
         <div className="bg-white border rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden flex flex-col">
@@ -20,8 +25,9 @@ export default function EventCard({ event, onDelete }: EventCardProps) {
             <div className="bg-slate-50 p-3 border-b flex justify-between items-center text-xs text-slate-500">
                 <div className="flex items-center gap-2">
                     <span className="font-semibold text-slate-700 uppercase tracking-wider">{event.Discipline?.Name || "General"}</span>
-                    {event.Ubication && (
-                        <span className="flex items-center gap-1 text-slate-400"><MapPinIcon size={12} /> {event.Ubication}</span>
+                    {/* Solo mostramos Ubicación si existe en el objeto (en la lista Bare no saldrá, en detalle sí) */}
+                    {fullEvent.Ubication && (
+                        <span className="flex items-center gap-1 text-slate-400"><MapPinIcon size={12} /> {fullEvent.Ubication}</span>
                     )}
                 </div>
                 <div className="flex items-center gap-1">
