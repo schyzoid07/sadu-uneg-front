@@ -42,7 +42,8 @@ export default function EventCard({ event, onDelete }: EventCardProps) {
             <div className="p-4 flex-1 flex items-center justify-between gap-2">
                 {/* Local */}
                 <div className="flex-1 text-center flex flex-col items-center gap-1">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 font-bold text-lg mb-1">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg mb-1 ${event.HomeTeam?.Regular ? "bg-yellow-100 text-yellow-700" : "bg-blue-100 text-blue-700"
+                        }`}>
                         {(event.HomeTeam?.Name || "L").charAt(0)}
                     </div>
                     <span className="text-sm font-semibold text-slate-800 leading-tight line-clamp-2">{event.HomeTeam?.Name || "Local"}</span>
@@ -60,7 +61,8 @@ export default function EventCard({ event, onDelete }: EventCardProps) {
 
                 {/* Visitante */}
                 <div className="flex-1 text-center flex flex-col items-center gap-1">
-                    <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center text-red-700 font-bold text-lg mb-1">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg mb-1 ${event.OppositeTeam?.Regular ? "bg-yellow-100 text-yellow-700" : "bg-red-100 text-red-700"
+                        }`}>
                         {(event.OppositeTeam?.Name || "V").charAt(0)}
                     </div>
                     <span className="text-sm font-semibold text-slate-800 leading-tight line-clamp-2">{event.OppositeTeam?.Name || "Visitante"}</span>

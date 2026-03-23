@@ -54,13 +54,16 @@ export default function Eventos() {
   const { data: universities } = useUniversities();
   const [disciplineFilter, setDisciplineFilter] = useState("all");
   const [universityFilter, setUniversityFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const filteredEvents = useMemo(() => {
     if (!events) return [];
 
     return events.filter((e) => {
       const lowerSearch = searchTerm.toLowerCase();
-      const matchesSearch = e.Name.toLowerCase().includes(lowerSearch);
+      const matchesSearch = e.Name?.toLowerCase().includes(lowerSearch);
       const matchesDiscipline =
         disciplineFilter === "all" ||
         e.Discipline?.ID.toString() === disciplineFilter;
@@ -71,10 +74,32 @@ export default function Eventos() {
         universityFilter === "all" ||
         homeTeamUniversityId?.toString() === universityFilter ||
         oppositeTeamUniversityId?.toString() === universityFilter;
+      const matchesStatus =
+        statusFilter === "all" ||
+        e.Status?.toLowerCase() === statusFilter.toLowerCase();
 
-      return matchesSearch && matchesDiscipline && matchesUniversity;
+      let matchesDate = true;
+      if (startDate || endDate) {
+        if (!e.Date) {
+          matchesDate = false;
+        } else {
+          const eventDate = new Date(e.Date);
+          if (startDate) {
+            const start = new Date(startDate + "T00:00:00");
+            if (eventDate < start) matchesDate = false;
+          }
+          if (endDate) {
+            const end = new Date(endDate + "T23:59:59");
+            if (eventDate > end) matchesDate = false;
+          }
+        }
+      }
+
+      return matchesSearch && matchesDiscipline && matchesUniversity && matchesStatus && matchesDate;
     });
-  }, [events, searchTerm, disciplineFilter, universityFilter]);
+  }, [events, searchTerm, disciplineFilter, universityFilter, statusFilter, startDate, endDate]);
+
+
 
   const confirmDelete = async () => {
     if (deleteId) {
@@ -85,10 +110,10 @@ export default function Eventos() {
 
   return (
     <div className="space-y-6 p-4">
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 px-4">
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 px-4">
         <h1 className="text-xl font-bold">Gestión de Eventos</h1>
 
-        <div className="flex flex-col sm:flex-row items-end gap-3 w-full sm:w-auto">
+        <div className="flex flex-wrap items-end gap-3 w-full xl:justify-end">
 
           {/*filtro de disciplinas*/}
           <div className="space-y-1">
@@ -104,6 +129,43 @@ export default function Eventos() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          {/*filtro de estatus*/}
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-700">Estatus</label>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[160px] bg-white">
+                <SelectValue placeholder="Estatus" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="Programado">Programado</SelectItem>
+                <SelectItem value="En curso">En curso</SelectItem>
+                <SelectItem value="Finalizado">Finalizado</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/*filtro de fechas*/}
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-700">Desde</label>
+            <Input
+              type="date"
+              className="bg-white w-[150px]"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-700">Hasta</label>
+            <Input
+              type="date"
+              className="bg-white w-[150px]"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
           </div>
 
           {/*filtro de universidades */}
