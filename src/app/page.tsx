@@ -1,5 +1,6 @@
 'use client';
 
+import EventCalendar from "@/components/event-calendar";
 import { SportsCarousel } from "@/components/sportsCarousel";
 import { useAthletes } from "@/hooks/athletes/use-athletes";
 import { useEvents } from "@/hooks/events/use-events";
@@ -8,6 +9,7 @@ import { useTeachers } from "@/hooks/teachers/use-teachers";
 import { useTeams } from "@/hooks/teams/use-teams";
 import { CalendarDays, GraduationCap, Shield, UserCheck, Users } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function Home() {
   const { data: athletes, isLoading: isLoadingAthletes } = useAthletes();
@@ -21,6 +23,7 @@ export default function Home() {
   const teamCount = teams?.length ?? 0;
   const eventCount = events?.length ?? 0;
   const majorCount = majors?.length ?? 0;
+  const router = useRouter();
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50/50">
@@ -142,6 +145,19 @@ export default function Home() {
 
         <h2 className="text-3xl font-bold text-center text-slate-700 mb-8">Disciplinas Deportivas</h2>
         <SportsCarousel />
+
+        <div className="mt-16">
+          <h2 className="text-3xl font-bold text-center text-slate-700 mb-8">Calendario de Eventos</h2>
+          <div
+            className="cursor-pointer transition-transform hover:scale-[1.01] duration-200"
+            onClick={() => router.push('/eventos')}
+            title="Ir al calendario de eventos"
+          >
+            <div className="pointer-events-none">
+              <EventCalendar events={events || []} />
+            </div>
+          </div>
+        </div>
       </main>
       <footer className="flex flex-col items-center py-6 border-t bg-white">
         <p>© 2025 SADUNEG. Todos los derechos reservados.</p>
