@@ -9,7 +9,7 @@ import { useTeachers } from "@/hooks/teachers/use-teachers";
 import { useTeams } from "@/hooks/teams/use-teams";
 import { CalendarDays, GraduationCap, Shield, UserCheck, Users } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const { data: athletes, isLoading: isLoadingAthletes } = useAthletes();
