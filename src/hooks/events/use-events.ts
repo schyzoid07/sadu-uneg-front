@@ -16,7 +16,7 @@ const createEventSchema = z.object({
   OppositePoints: z.coerce.number().optional(),
   HomeTeamID: z.number(),
   OppositeTeamID: z.number(),
-  ResponsableTeacherID: z.number(),
+  ResponsableTeacherID: z.number().nullable(),
   DisciplineID: z.number(),
   TourneyID: z.number().optional(),
 });

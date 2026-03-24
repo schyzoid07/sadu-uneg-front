@@ -53,6 +53,10 @@ const data = {
           title: "Carreras",
           url: "/carreras",
         },
+        {
+          title: "Torneos",
+          url: "/torneos",
+        },
       ],
     },
   ],

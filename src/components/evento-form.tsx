@@ -18,6 +18,7 @@ import { useTeams } from "@/hooks/teams/use-teams";
 import { useTeachers } from "@/hooks/teachers/use-teachers";
 import Link from "next/link";
 
+
 interface EventFormProps {
     onSuccess?: () => void;
     eventId?: string;
@@ -29,6 +30,7 @@ export function EventoForm({ eventId, onSuccess }: EventFormProps) {
     // Hooks de datos
     // Convertimos eventId a número si es necesario, dependiendo de la implementación de tu hook useEvent
     const { data: event, isLoading: isLoadingEvent } = useEvent(eventId);
+
 
     const { data: disciplines } = useDisciplines();
     const { data: teams } = useTeams();
@@ -54,6 +56,7 @@ export function EventoForm({ eventId, onSuccess }: EventFormProps) {
     // Cargar datos al editar
     useEffect(() => {
         if (event) {
+            console.log(event);
             setName(event.Name || "");
 
             // Formatear fecha para el input datetime-local (YYYY-MM-DDThh:mm)
@@ -68,31 +71,40 @@ export function EventoForm({ eventId, onSuccess }: EventFormProps) {
             }
 
             setStatus(event.Status || "Pendiente");
-            // Manejo de IDs que pueden venir planos o dentro de objetos anidados
-            setDisciplineId(event.DisciplineID?.toString() || event.Discipline?.ID?.toString() || "");
-            setHomeTeamId(event.HomeTeamID?.toString() || event.HomeTeam?.ID?.toString() || "");
-            setOppositeTeamId(event.OppositeTeamID?.toString() || event.OppositeTeam?.ID?.toString() || "");
-            setTeacherId(event.ResponsableTeacherID?.toString() || event.ResponsableTeacher?.ID?.toString() || "");
+            console.log(event.Status)
+
+            const dId = event.Discipline?.ID ?? event.DisciplineID;
+            setDisciplineId(dId ? dId.toString() : "");
+            const hId = event.HomeTeam?.ID;
+
+            console.log(event.HomeTeam?.ID)
+            setHomeTeamId(hId ? hId.toString() : "");
+            const oId = event.OppositeTeam?.ID;
+
+            console.log(event.OppositeTeam?.ID)
+            setOppositeTeamId(oId ? oId.toString() : "");
+            const tId = event.ResponsableTeacher?.ID;
+            setTeacherId(tId ? tId.toString() : "");
+
 
             setUbication(event.Ubication || "");
             setObservation(event.Observation || "");
-            setHomePoints(event.HomePoints || 0);
-            setOppositePoints(event.OppositePoints || 0);
+            setHomePoints(event.HomePoints ?? 0);
+            setOppositePoints(event.OppositePoints ?? 0);
         }
     }, [event]);
 
     // Filtrar equipos por disciplina seleccionada
     const filteredTeams = useMemo(() => {
         if (!teams) return [];
-        if (!disciplineId) return teams;
-        // Filtramos equipos que coincidan con la disciplina seleccionada
+        if (!disciplineId) return []; // No mostrar equipos hasta que se elija disciplina
         return teams.filter(t =>
             t.DisciplineID?.toString() === disciplineId ||
             t.Discipline?.ID?.toString() === disciplineId
         );
     }, [teams, disciplineId]);
 
-    // Filtrar equipos visitantes para que no sean el mismo que el local
+    // Filtrar equipos visitantes para que no sean el mismo que el local.
     const availableOppositeTeams = useMemo(() => {
         return filteredTeams.filter(t => t.ID.toString() !== homeTeamId);
     }, [filteredTeams, homeTeamId]);
@@ -111,19 +123,19 @@ export function EventoForm({ eventId, onSuccess }: EventFormProps) {
             Date: new Date(date).toISOString(), // Enviar como ISO string
             Status: status,
             DisciplineID: parseInt(disciplineId),
-            HomeTeamID: parseInt(homeTeamId),
-            OppositeTeamID: parseInt(oppositeTeamId),
-            ResponsableTeacherID: teacherId ? parseInt(teacherId) : null,
             Ubication: ubication,
             Observation: observation,
             HomePoints: homePoints,
             OppositePoints: oppositePoints,
+            HomeTeamID: parseInt(homeTeamId),
+            OppositeTeamID: parseInt(oppositeTeamId),
+            ResponsableTeacherID: teacherId ? parseInt(teacherId) : null,
         };
 
         try {
             if (isEditMode && event) {
                 // Usamos 'json' o 'data' según la convención de tus hooks (TeacherForm usaba json)
-                await updateMutation.mutateAsync({ id: event.ID, json: payload });
+                await updateMutation.mutateAsync({ id: event.ID, data: payload });
                 setMessage("Evento actualizado correctamente.");
             } else {
                 await createMutation.mutateAsync(payload);
@@ -177,7 +189,7 @@ export function EventoForm({ eventId, onSuccess }: EventFormProps) {
                 {/* Estado */}
                 <div className="space-y-2">
                     <Label>Estado</Label>
-                    <Select value={status} onValueChange={setStatus}>
+                    <Select defaultValue={event?.Status || "Pendiente"} onValueChange={setStatus}>
                         <SelectTrigger>
                             <SelectValue placeholder="Seleccionar estado" />
                         </SelectTrigger>
@@ -193,7 +205,7 @@ export function EventoForm({ eventId, onSuccess }: EventFormProps) {
                 {/* Disciplina */}
                 <div className="space-y-2 md:col-span-2">
                     <Label>Disciplina</Label>
-                    <Select value={disciplineId} onValueChange={(val) => {
+                    <Select defaultValue={(event?.Discipline?.ID ?? event?.DisciplineID)?.toString() || ""} onValueChange={(val) => {
                         setDisciplineId(val);
                         // Resetear equipos si cambia la disciplina para evitar inconsistencias
                         setHomeTeamId("");
@@ -215,7 +227,7 @@ export function EventoForm({ eventId, onSuccess }: EventFormProps) {
                 {/* Equipos */}
                 <div className="space-y-2">
                     <Label>Equipo Local</Label>
-                    <Select value={homeTeamId} onValueChange={setHomeTeamId} disabled={!disciplineId}>
+                    <Select defaultValue={(event?.HomeTeam?.ID)?.toString() || ""} onValueChange={setHomeTeamId} disabled={!disciplineId}>
                         <SelectTrigger>
                             <SelectValue placeholder={disciplineId ? "Seleccionar equipo local" : "Seleccione disciplina primero"} />
                         </SelectTrigger>
@@ -231,7 +243,7 @@ export function EventoForm({ eventId, onSuccess }: EventFormProps) {
 
                 <div className="space-y-2">
                     <Label>Equipo Visitante</Label>
-                    <Select value={oppositeTeamId} onValueChange={setOppositeTeamId} disabled={!disciplineId || !homeTeamId}>
+                    <Select defaultValue={(event?.OppositeTeam?.ID)?.toString() || ""} onValueChange={setOppositeTeamId} disabled={!disciplineId || !homeTeamId}>
                         <SelectTrigger>
                             <SelectValue placeholder={homeTeamId ? "Seleccionar equipo visitante" : "Seleccione local primero"} />
                         </SelectTrigger>
@@ -268,7 +280,7 @@ export function EventoForm({ eventId, onSuccess }: EventFormProps) {
                 {/* Profesor Responsable */}
                 <div className="space-y-2 md:col-span-2">
                     <Label>Profesor Responsable</Label>
-                    <Select value={teacherId} onValueChange={setTeacherId}>
+                    <Select defaultValue={(event?.ResponsableTeacher?.ID)?.toString() || ""} onValueChange={setTeacherId}>
                         <SelectTrigger>
                             <SelectValue placeholder="Seleccionar profesor (Opcional)" />
                         </SelectTrigger>

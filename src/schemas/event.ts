@@ -36,9 +36,6 @@ export const eventBareSchema = z.object({
     OppositePoints: z.number().optional().nullable(),
     // En el backend son structs, así que siempre vendrán (aunque sea vacíos/ID=0)
     // Agregamos los IDs planos para compatibilidad con el frontend (evento-form)
-    HomeTeamID: z.number().optional().nullable(),
-    OppositeTeamID: z.number().optional().nullable(),
-    ResponsableTeacherID: z.number().optional().nullable(),
     DisciplineID: z.number().optional().nullable(),
     HomeTeam: teamInEventSchema.optional().nullable(),
     OppositeTeam: teamInEventSchema.optional().nullable(),
