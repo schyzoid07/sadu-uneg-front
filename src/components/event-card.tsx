@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Event, EventBare } from "@/schemas/event"; // Importamos EventBare
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ interface EventCardProps {
     onDelete: (id: number) => void;
 }
 
-export default function EventCard({ event, onDelete }: EventCardProps) {
+export const EventCard = memo(function EventCard({ event, onDelete }: EventCardProps) {
     const eventDate = new Date(event.Date || "");
 
     // Hacemos un cast a 'any' o 'Event' para acceder a propiedades que podrían no estar en el Bare (como Ubication)
@@ -87,4 +88,6 @@ export default function EventCard({ event, onDelete }: EventCardProps) {
             </div>
         </div>
     );
-}
+});
+
+export default EventCard;

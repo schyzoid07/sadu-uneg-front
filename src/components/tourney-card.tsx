@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, memo } from "react";
+import { memo } from "react";
 import { Tourney } from "@/schemas/tourney";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Trophy, ChevronDown, ChevronUp } from "lucide-react";
-import EventCard from "@/components/event-card";
+import { CalendarDays, Trophy, Trash2 } from "lucide-react";
 // Nota: Si 'date-fns' no se reconoce, asegúrate de haberlo instalado con: npm install date-fns
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -15,11 +14,17 @@ interface TourneyCardProps {
     totalEvents?: number;
     startDate?: Date;
     endDate?: Date;
+    onDelete?: (id: number) => void;
 }
 
-export const TourneyCard = memo(function TourneyCard({ tourney, totalEvents, startDate, endDate }: TourneyCardProps) {
+export const TourneyCard = memo(function TourneyCard({ tourney, totalEvents, startDate, endDate, onDelete }: TourneyCardProps) {
     console.log("no se quejesto " + tourney)
-    const [showMatches, setShowMatches] = useState(false);
+
+    const handleDeleteClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (onDelete) onDelete(tourney.ID);
+    };
 
     // Colores según estado
     const getStatusColor = (status: string) => {
@@ -33,13 +38,8 @@ export const TourneyCard = memo(function TourneyCard({ tourney, totalEvents, sta
 
     const eventsCount = totalEvents || 0;
 
-    // Función placeholder para onDelete, ya que EventCard la requiere
-    const handleDelete = (id: number) => {
-        console.log("Intento de eliminar evento con ID:", id);
-    };
-
     return (
-        <div className="bg-white border rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden flex flex-col">
+        <div className="bg-white border rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden flex flex-col group relative">
             {/* Header y Contenido */}
             <div className="p-4 border-b">
                 <div className="flex flex-row items-start justify-between space-y-0 pb-2">
@@ -59,47 +59,27 @@ export const TourneyCard = memo(function TourneyCard({ tourney, totalEvents, sta
                             )}
                         </div>
                     </div>
-                    <Badge className={`${getStatusColor(tourney.Status)} text-white`}>
-                        {tourney.Status}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                        <Badge className={`${getStatusColor(tourney.Status)} text-white`}>
+                            {tourney.Status}
+                        </Badge>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            onClick={handleDeleteClick}
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    </div>
                 </div>
                 <div className="mt-2 text-sm text-gray-600">
                     <span className="font-semibold">{eventsCount}</span> {eventsCount === 1 ? "Partido" : "Partidos"} programados
                 </div>
             </div>
 
-            {/* Footer desplegable */}
-            <div className="flex flex-col items-stretch gap-2 border-t bg-slate-50/50 p-4">
-                <Button
-                    variant="ghost"
-                    className="w-full justify-between"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setShowMatches(!showMatches);
-                    }}
-                    disabled={eventsCount === 0}
-                >
-                    {showMatches ? "Ocultar Partidos" : "Ver Partidos del Torneo"}
-                    {showMatches ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </Button>
 
-                {showMatches && tourney.Events && (
-                    <div className="grid gap-4 mt-2 animate-in fade-in slide-in-from-top-2 pt-2">
-                        {tourney.Events.length > 0 ? (
-                            tourney.Events.map((event) => (
-                                <div key={event.ID} className="scale-95 origin-top">
-                                    <EventCard event={event} onDelete={handleDelete} />
-                                </div>
-                            ))
-                        ) : (
-                            <p className="text-center text-sm text-muted-foreground py-4">
-                                No hay partidos registrados en este torneo.
-                            </p>
-                        )}
-                    </div>
-                )}
-            </div>
+
         </div>
     );
 });

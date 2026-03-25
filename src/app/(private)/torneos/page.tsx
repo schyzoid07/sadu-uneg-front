@@ -15,27 +15,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDisciplines } from "@/hooks/disciplines/use-disciplines";
-import { useTeams } from "@/hooks/teams/use-teams";
 import { useDebounce } from "@/hooks/use-debounce";
 
 export default function TorneosPage() {
     const [open, setOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedDiscipline, setSelectedDiscipline] = useState("");
-    const [selectedTeam, setSelectedTeam] = useState("");
 
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
     const { data: disciplines } = useDisciplines();
-    const { data: teams } = useTeams();
 
     const handleClearFilters = () => {
         setSearchTerm("");
         setSelectedDiscipline("");
-        setSelectedTeam("");
     };
 
-    const hasFilters = searchTerm || selectedDiscipline || selectedTeam;
+    const hasFilters = searchTerm || selectedDiscipline;
 
     return (
         <div className="container mx-auto py-8 px-4 space-y-6">
@@ -47,14 +43,14 @@ export default function TorneosPage() {
                     </p>
                 </div>
 
-                <Dialog open={open} onOpenChange={setOpen}>
+                <Dialog open={open} onOpenChange={setOpen} >
                     <DialogTrigger asChild>
                         <Button className="bg-blue-600 hover:bg-blue-700">
                             <Plus className="mr-2 h-4 w-4" />
                             Nuevo Torneo
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogContent className="w-full sm:max-w-[95vw] lg:max-w-6xl max-h-[90vh] overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle>Crear Nuevo Torneo</DialogTitle>
                         </DialogHeader>
@@ -86,17 +82,6 @@ export default function TorneosPage() {
                             ))}
                         </SelectContent>
                     </Select>
-                    <Select value={selectedTeam} onValueChange={(val) => setSelectedTeam(val === "all" ? "" : val)}>
-                        <SelectTrigger className="bg-white">
-                            <SelectValue placeholder="Filtrar por equipo" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">Todos los equipos</SelectItem>
-                            {teams?.map(t => (
-                                <SelectItem key={t.ID} value={t.ID.toString()}>{t.Name}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
                 </div>
                 {hasFilters && (
                     <Button variant="ghost" onClick={handleClearFilters} className="h-8 px-2 text-sm text-blue-600 hover:bg-blue-50">
@@ -109,7 +94,7 @@ export default function TorneosPage() {
             <TourneyList
                 searchTerm={debouncedSearchTerm}
                 selectedDiscipline={selectedDiscipline}
-                selectedTeam={selectedTeam}
+
             />
         </div >
 
