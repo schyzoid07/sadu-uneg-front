@@ -13,7 +13,7 @@ interface EventCardProps {
 }
 
 export default function EventCard({ event, onDelete }: EventCardProps) {
-    const eventDate = new Date(event.Date);
+    const eventDate = new Date(event.Date || "");
 
     // Hacemos un cast a 'any' o 'Event' para acceder a propiedades que podrían no estar en el Bare (como Ubication)
     // De esta forma, si 'Ubication' viene undefined (como en la lista), simplemente no se renderiza.
