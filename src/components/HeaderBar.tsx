@@ -44,11 +44,6 @@ export default function HeaderBar() {
       <div className="flex items-center gap-4">
         {session ? (
           <>
-            <Link href="/perfil" title="Ir al perfil">
-              <Button variant="ghost" size="icon" className="text-black hover:bg-gray-100 rounded-full">
-                <UserCircle className="h-8 w-8" />
-              </Button>
-            </Link>
             <form action={logoutAction}>
               <Button
                 type="submit"

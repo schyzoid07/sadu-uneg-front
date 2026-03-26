@@ -39,8 +39,15 @@ export const EventCard = memo(function EventCard({ event, onDelete }: EventCardP
                 </div>
             </div>
 
+            {/* Nombre del Evento */}
+            {event.Name && (
+                <div className="px-4 pt-2 text-center">
+                    <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider line-clamp-1">{event.Name}</span>
+                </div>
+            )}
+
             {/* Body: El Enfrentamiento */}
-            <div className="p-4 flex-1 flex items-center justify-between gap-2">
+            <div className="p-4 pt-2 flex-1 flex items-center justify-between gap-2">
                 {/* Local */}
                 <div className="flex-1 text-center flex flex-col items-center gap-1">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg mb-1 ${event.HomeTeam?.Regular ? "bg-yellow-100 text-yellow-700" : "bg-blue-100 text-blue-700"

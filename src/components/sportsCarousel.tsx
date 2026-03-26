@@ -1,6 +1,6 @@
 'use client'
+import { useState } from "react";
 import Image from "next/image";
-import LOGO_UNEG from "@/../public/LOGO_UNEG.webp";
 
 import {
   Carousel,
@@ -9,11 +9,47 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import Link from "next/link";
 import { useDisciplines } from "@/hooks/disciplines/use-disciplines";
+
+// Componente para intentar cargar la imagen en múltiples formatos
+function DisciplineImage({ name }: { name: string }) {
+  const extensions = ["webp", "jpg", "png", "jpeg", "svg", "jfif", "tiff", "bmp"];
+  const [extIndex, setExtIndex] = useState(0);
+  const [useFallback, setUseFallback] = useState(false);
+
+  // Normalización del nombre: "Fútbol Campo" -> "futbol-campo"
+  const normalizedName = name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "-");
+
+  // Intentamos la extensión actual o usamos el logo si ya agotamos todas
+  const currentSrc = useFallback
+    ? "/LOGO_UNEG.webp"
+    : `/images/disciplines/${normalizedName}.${extensions[extIndex]}`;
+
+  return (
+    <Image
+      src={currentSrc}
+      alt={name}
+      width={200}
+      height={200}
+      className="w-full h-auto rounded-lg"
+      onError={() => {
+        if (extIndex < extensions.length - 1) {
+          setExtIndex(extIndex + 1); // Prueba la siguiente extensión
+        } else {
+          setUseFallback(true); // Agotó opciones, usa el logo
+        }
+      }}
+    />
+  );
+}
 
 export function SportsCarousel() {
   const { data: disciplines, isLoading } = useDisciplines();
+
   return (
     <Carousel className="mx-10">
       <CarouselContent>
@@ -28,11 +64,7 @@ export function SportsCarousel() {
           >
             <div className="flex flex-col items-center bg-white rounded-t-full">
 
-              <Image
-                src={LOGO_UNEG}
-                alt={disciplina.Name}
-                className="w-full h-auto rounded-lg"
-              />
+              <DisciplineImage name={disciplina.Name} />
 
               <h3 className="text-lg font-semibold pt-4">{disciplina.Name}</h3>
             </div>

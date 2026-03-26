@@ -73,7 +73,7 @@ export function EventoForm({ eventId, onSuccess }: EventFormProps) {
             setStatus(event.Status || "Pendiente");
             console.log(event.Status)
 
-            const dId = event.Discipline?.ID ?? event.DisciplineID;
+            const dId = event.Discipline?.ID;
             setDisciplineId(dId ? dId.toString() : "");
             const hId = event.HomeTeam?.ID;
 
@@ -205,7 +205,7 @@ export function EventoForm({ eventId, onSuccess }: EventFormProps) {
                 {/* Disciplina */}
                 <div className="space-y-2 md:col-span-2">
                     <Label>Disciplina</Label>
-                    <Select defaultValue={(event?.Discipline?.ID ?? event?.DisciplineID)?.toString() || ""} onValueChange={(val) => {
+                    <Select defaultValue={(event?.Discipline?.ID)?.toString() || ""} onValueChange={(val) => {
                         setDisciplineId(val);
                         // Resetear equipos si cambia la disciplina para evitar inconsistencias
                         setHomeTeamId("");

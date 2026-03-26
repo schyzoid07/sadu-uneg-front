@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2, CheckCircle2 } from "lucide-react";
 import { useTourney, useCreateTourney, useUpdateTourney } from "@/hooks/tourneys/use-tourneys";
+import { useDisciplines } from "@/hooks/disciplines/use-disciplines";
 import { useEvents } from "@/hooks/events/use-events";
 import Link from "next/link";
 import EventCard from "@/components/event-card";
@@ -33,7 +34,7 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
     // Hooks de datos
     const { data: tourney, isLoading: isLoadingTourney } = useTourney(tourneyId);
     const { data: events, isLoading: isLoadingEvents } = useEvents(); // Obtenemos todos los eventos disponibles
-    console.log(tourneyId)
+    const { data: disciplines } = useDisciplines();
     const createMutation = useCreateTourney();
     const updateMutation = useUpdateTourney();
 
@@ -41,6 +42,7 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
     const [name, setName] = useState("");
     const [status, setStatus] = useState("Pendiente");
     const [selectedEventIds, setSelectedEventIds] = useState<number[]>([]);
+    const [filterDisciplineId, setFilterDisciplineId] = useState<string>("all");
     const [message, setMessage] = useState<string | null>(null);
 
     // Cargar datos al editar
@@ -70,44 +72,6 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
         });
     }, []);
 
-    // Creamos un Set para búsquedas O(1) dentro del render
-    const selectedIdsSet = useMemo(() => new Set(selectedEventIds), [selectedEventIds]);
-
-    // Memoizamos la lista renderizada para que solo se recalcule si cambian los eventos o la selección
-    const renderedEvents = useMemo(() => {
-        if (!events) return null;
-        if (events.length === 0) {
-            return (
-                <p className="col-span-full text-center text-muted-foreground py-8">
-                    No hay eventos disponibles para agregar. Crea eventos primero.
-                </p>
-            );
-        }
-
-        return events.map((event) => {
-            const isSelected = selectedIdsSet.has(event.ID);
-            return (
-                <div
-                    key={event.ID}
-                    onClick={() => toggleEventSelection(event.ID)}
-                    className={`relative cursor-pointer transition-all duration-200 rounded-xl border-2 ${isSelected ? "border-blue-500 ring-2 ring-blue-100 bg-blue-50/10" : "border-transparent opacity-90 hover:opacity-100"}`}
-                >
-                    {/* Indicador de Selección */}
-                    {isSelected && (
-                        <div className="absolute -top-2 -right-2 z-10 bg-blue-600 text-white rounded-full p-0.5 shadow-sm">
-                            <CheckCircle2 className="h-5 w-5" />
-                        </div>
-                    )}
-
-                    {/* Bloqueamos la interacción interna de la card para que el click cuente como selección */}
-                    <div className="pointer-events-none select-none">
-                        <EventCard event={event} onDelete={noop} />
-                    </div>
-                </div>
-            );
-        });
-    }, [events, selectedIdsSet, toggleEventSelection]);
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!isFormValid) return;
@@ -115,8 +79,8 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
         // Construir payload
         const payload = {
             Name: name,
-            Status: status as "Pendiente" | "En Progreso" | "Finalizado" | "Cancelado", // Tipado forzado seguro por el Select
-            EventIDs: selectedEventIds,
+            Status: status as "Activo" | "Finalizado" | "Pendiente",
+            Events: selectedEventIds,
         };
 
         try {
@@ -181,18 +145,62 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
 
             {/* Selección de Eventos */}
             <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                    <Label className="text-base">Seleccionar Partidos del Torneo ({selectedEventIds.length})</Label>
-                    <Badge variant="outline" className="font-normal">
-                        Click en una tarjeta para seleccionar
-                    </Badge>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-2">
+                        <Label className="text-base">Seleccionar Partidos ({selectedEventIds.length})</Label>
+                        <Badge variant="outline" className="font-normal hidden sm:inline-flex">
+                            Click para seleccionar
+                        </Badge>
+                    </div>
+
+                    {/* Filtro de Disciplina */}
+                    <div className="w-full md:w-64">
+                        <Select value={filterDisciplineId} onValueChange={setFilterDisciplineId}>
+                            <SelectTrigger className="bg-white">
+                                <SelectValue placeholder="Filtrar por disciplina" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Todas las disciplinas</SelectItem>
+                                {disciplines?.map(d => (
+                                    <SelectItem key={d.ID} value={d.ID.toString()}>{d.Name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
 
                 {isLoadingEvents ? (
                     <div className="flex justify-center p-8"><Loader2 className="animate-spin text-slate-400" /></div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto p-2 border rounded-lg bg-slate-50/50">
-                        {renderedEvents}
+                        {events?.filter(event => {
+                            if (filterDisciplineId === "all") return true;
+                            const dId = event.Discipline?.ID ?? event.DisciplineID;
+                            return dId?.toString() === filterDisciplineId;
+                        }).map((event) => {
+                            const isSelected = selectedEventIds.includes(event.ID);
+                            return (
+                                <div
+                                    key={event.ID}
+                                    onClick={() => toggleEventSelection(event.ID)}
+                                    className={`relative cursor-pointer transition-all duration-200 rounded-xl border-2 ${isSelected ? "border-blue-500 ring-2 ring-blue-100 bg-blue-50/10" : "border-transparent opacity-90 hover:opacity-100"}`}
+                                >
+                                    {isSelected && (
+                                        <div className="absolute -top-2 -right-2 z-10 bg-blue-600 text-white rounded-full p-0.5 shadow-sm">
+                                            <CheckCircle2 className="h-5 w-5" />
+                                        </div>
+                                    )}
+                                    <div className="pointer-events-none select-none">
+                                        <EventCard event={event} onDelete={noop} />
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        {events?.length === 0 && (
+                            <p className="col-span-full text-center text-muted-foreground py-8">
+                                No hay partidos disponibles.
+                            </p>
+                        )}
                     </div>
                 )}
             </div>

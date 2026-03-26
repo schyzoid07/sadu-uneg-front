@@ -15,9 +15,9 @@ export default function EditTeamPage({ params }: { params: Promise<{ teamId: str
                 <p className="text-slate-500 text-sm">Actualiza la información del equipo y sus integrantes.</p>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6 border border-slate-100 max-w-3xl">
-                <EquipoForm teamId={teamId} />
-            </div>
+
+            <EquipoForm teamId={teamId} />
+
         </div>
     );
 }
