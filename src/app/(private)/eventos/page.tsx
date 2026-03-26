@@ -56,6 +56,7 @@ export default function Eventos() {
   const [universityFilter, setUniversityFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [startDate, setStartDate] = useState("");
+  const [teamFilter, setTeamFilter] = useState(""); // Nuevo estado para el filtro de equipo
   const [endDate, setEndDate] = useState("");
 
   const filteredEvents = useMemo(() => {
@@ -95,9 +96,16 @@ export default function Eventos() {
         }
       }
 
-      return matchesSearch && matchesDiscipline && matchesUniversity && matchesStatus && matchesDate;
+      // Nuevo filtro para el nombre del equipo
+      const matchesTeam =
+        teamFilter === "" ||
+        e.HomeTeam?.Name?.toLowerCase().includes(teamFilter.toLowerCase()) ||
+        e.OppositeTeam?.Name?.toLowerCase().includes(teamFilter.toLowerCase());
+
+      return matchesSearch && matchesDiscipline && matchesUniversity && matchesStatus && matchesDate && matchesTeam;
     });
-  }, [events, searchTerm, disciplineFilter, universityFilter, statusFilter, startDate, endDate]);
+  }, [events, searchTerm, disciplineFilter, universityFilter, statusFilter, startDate, endDate, teamFilter]);
+
 
 
 
@@ -182,6 +190,18 @@ export default function Eventos() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Nuevo filtro de equipo */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-slate-700">Equipo</label>
+            <Input
+              type="text"
+              placeholder="Buscar equipo..."
+              className="bg-white w-[160px]"
+              value={teamFilter}
+              onChange={(e) => setTeamFilter(e.target.value)}
+            />
           </div>
 
           <div className="relative w-full sm:w-64">
