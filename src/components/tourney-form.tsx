@@ -42,7 +42,7 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
     const [name, setName] = useState("");
     const [status, setStatus] = useState("Pendiente");
     const [selectedEventIds, setSelectedEventIds] = useState<number[]>([]);
-    const [filterDisciplineId, setFilterDisciplineId] = useState<string>("all");
+    const [filterDisciplineId, setFilterDisciplineId] = useState<string>("");
     const [message, setMessage] = useState<string | null>(null);
 
     // Cargar datos al editar
@@ -57,6 +57,13 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
             }
         }
     }, [tourney]);
+
+    // Seleccionar la primera disciplina por defecto cuando se carguen
+    useEffect(() => {
+        if (disciplines && disciplines.length > 0 && !filterDisciplineId) {
+            setFilterDisciplineId(disciplines[0].ID.toString());
+        }
+    }, [disciplines, filterDisciplineId]);
 
     const isSubmitting = createMutation.isPending || updateMutation.isPending;
     const isFormValid = name.length > 0;
@@ -160,7 +167,6 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
                                 <SelectValue placeholder="Filtrar por disciplina" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">Todas las disciplinas</SelectItem>
                                 {disciplines?.map(d => (
                                     <SelectItem key={d.ID} value={d.ID.toString()}>{d.Name}</SelectItem>
                                 ))}
@@ -174,8 +180,7 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto p-2 border rounded-lg bg-slate-50/50">
                         {events?.filter(event => {
-                            if (filterDisciplineId === "all") return true;
-                            const dId = event.Discipline?.ID ?? event.DisciplineID;
+                            const dId = event.Discipline?.ID;
                             return dId?.toString() === filterDisciplineId;
                         }).map((event) => {
                             const isSelected = selectedEventIds.includes(event.ID);

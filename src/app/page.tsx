@@ -1,13 +1,15 @@
 'use client';
 
 import EventCalendar from "@/components/event-calendar";
+import TourneyCalendar from "@/components/tourney-calendar";
 import { SportsCarousel } from "@/components/sportsCarousel";
 import { useAthletes } from "@/hooks/athletes/use-athletes";
 import { useEvents } from "@/hooks/events/use-events";
 import { useMajors } from "@/hooks/majors/use-major";
 import { useTeachers } from "@/hooks/teachers/use-teachers";
 import { useTeams } from "@/hooks/teams/use-teams";
-import { CalendarDays, GraduationCap, Shield, UserCheck, Users } from "lucide-react";
+import { useTourneys } from "@/hooks/tourneys/use-tourneys";
+import { CalendarDays, GraduationCap, Shield, Trophy, UserCheck, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -17,12 +19,14 @@ export default function Home() {
   const { data: teams, isLoading: isLoadingTeams } = useTeams();
   const { data: events, isLoading: isLoadingEvents } = useEvents();
   const { data: majors, isLoading: isLoadingMajors } = useMajors();
+  const { data: tourneys, isLoading: isLoadingTourneys } = useTourneys();
 
   const athleteCount = athletes?.length ?? 0;
   const teacherCount = teachers?.length ?? 0;
   const teamCount = teams?.length ?? 0;
   const eventCount = events?.length ?? 0;
   const majorCount = majors?.length ?? 0;
+  const tourneyCount = tourneys?.length ?? 0;
   const router = useRouter();
 
   return (
@@ -138,7 +142,27 @@ export default function Home() {
                   <p className="text-4xl font-bold text-slate-800">{eventCount}</p>
                 )}
               </div>
-              <p className="text-xs text-slate-400 mt-4">Eventos y torneos organizados.</p>
+              <p className="text-xs text-slate-400 mt-4">Actividades individuales registradas.</p>
+            </div>
+          </Link>
+
+          {/* Tarjeta de Conteo de Torneos */}
+          <Link href='/torneos' className="block group">
+            <div className="p-6 bg-white border rounded-xl shadow-sm flex flex-col justify-between h-full transition-all duration-200 ease-in-out group-hover:scale-105 group-hover:shadow-lg">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-slate-500">
+                    Torneos
+                  </p>
+                  <Trophy className="h-5 w-5 text-slate-400" />
+                </div>
+                {isLoadingTourneys ? (
+                  <div className="h-10 w-20 bg-slate-200 animate-pulse rounded-md"></div>
+                ) : (
+                  <p className="text-4xl font-bold text-slate-800">{tourneyCount}</p>
+                )}
+              </div>
+              <p className="text-xs text-slate-400 mt-4">Torneos y ligas universitarias.</p>
             </div>
           </Link>
         </div>
@@ -146,15 +170,30 @@ export default function Home() {
         <h2 className="text-3xl font-bold text-center text-slate-700 mb-8">Disciplinas Deportivas</h2>
         <SportsCarousel />
 
-        <div className="mt-16">
-          <h2 className="text-3xl font-bold text-center text-slate-700 mb-8">Calendario de Eventos</h2>
-          <div
-            className="cursor-pointer transition-transform hover:scale-[1.01] duration-200"
-            onClick={() => router.push('/eventos')}
-            title="Ir al calendario de eventos"
-          >
-            <div className="pointer-events-none">
-              <EventCalendar events={events || []} />
+        <div className="mt-16 space-y-16">
+          <div>
+            <h2 className="text-3xl font-bold text-center text-slate-700 mb-8">Calendario de Eventos</h2>
+            <div
+              className="cursor-pointer transition-transform hover:scale-[1.01] duration-200"
+              onClick={() => router.push('/eventos')}
+              title="Ir al calendario de eventos"
+            >
+              <div className="pointer-events-none">
+                <EventCalendar events={events || []} />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-3xl font-bold text-center text-slate-700 mb-8">Calendario de Torneos</h2>
+            <div
+              className="cursor-pointer transition-transform hover:scale-[1.01] duration-200"
+              onClick={() => router.push('/torneos')}
+              title="Ver torneos organizados"
+            >
+              <div className="pointer-events-none">
+                <TourneyCalendar tourneys={tourneys || []} />
+              </div>
             </div>
           </div>
         </div>
