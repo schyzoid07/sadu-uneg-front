@@ -7,13 +7,18 @@ import { Session } from "@/schemas/auth";
 // Debes adaptarla a cómo estés manejando las cookies de sesión en tu backend.
 export async function getSession(): Promise<Session | null> {
     const cookieName = process.env.SESSION_COOKIE_NAME!;
+    const password = process.env.SESSION_PASSWORD;
+
+    if (!password) {
+        console.error("Error: SESSION_PASSWORD no definida.");
+        return null;
+    }
+
     const cookie = (await cookies()).get(cookieName)?.value;
-
     if (!cookie) return null;
-
     try {
         const session = await unsealData<Session>(cookie, {
-            password: process.env.SESSION_PASSWORD!,
+            password: password,
         });
         return session;
     } catch (error) {

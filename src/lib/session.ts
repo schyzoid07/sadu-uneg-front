@@ -4,8 +4,14 @@ import { Session } from "@/schemas/auth";
 
 // Asegúrate de que estas variables de entorno estén en tu archivo .env.local
 // SESSION_PASSWORD debe ser una cadena secreta larga y compleja de al menos 32 caracteres.
+const password = process.env.SESSION_PASSWORD;
+
+if (!password || password.length < 32) {
+  throw new Error("SESSION_PASSWORD debe estar configurada en .env.local y tener al menos 32 caracteres.");
+}
+
 export const sessionOptions = {
-  password: process.env.SESSION_PASSWORD!,
+  password: password,
   cookieName: process.env.SESSION_COOKIE_NAME || "sadu-uneg-session",
   cookieOptions: {
     secure: process.env.NODE_ENV === "production",
