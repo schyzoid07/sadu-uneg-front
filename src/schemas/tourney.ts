@@ -21,7 +21,9 @@ export const tourneySchema = z.object({
     Events: z.array(eventBareSchema).optional().nullable(),
     StartDate: z.coerce.date().optional(),
     EndDate: z.coerce.date().optional(),
-    TotalEvents: z.number().optional()
+    TotalEvents: z.number().optional(),
+    DisciplineID: z.number().optional(),
+    DisciplineName: z.string().optional(),
 });
 
 /**
