@@ -147,6 +147,7 @@ export default function Home() {
           </Link>
 
           {/* Tarjeta de Conteo de Torneos */}
+          {/* 
           <Link href='/torneos' className="block group">
             <div className="p-6 bg-white border rounded-xl shadow-sm flex flex-col justify-between h-full transition-all duration-200 ease-in-out group-hover:scale-105 group-hover:shadow-lg">
               <div>
@@ -165,6 +166,7 @@ export default function Home() {
               <p className="text-xs text-slate-400 mt-4">Torneos y ligas universitarias.</p>
             </div>
           </Link>
+          */}
         </div>
 
         <h2 className="text-3xl font-bold text-center text-slate-700 mb-8">Disciplinas Deportivas</h2>
@@ -191,9 +193,9 @@ export default function Home() {
               onClick={() => router.push('/torneos')}
               title="Ver torneos organizados"
             >
-              <div className="pointer-events-none">
+              {/* <div className="pointer-events-none">
                 <TourneyCalendar tourneys={tourneys || []} />
-              </div>
+              </div>*/}
             </div>
           </div>
         </div>
