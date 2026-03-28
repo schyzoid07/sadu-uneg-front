@@ -33,6 +33,7 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
 
     // Hooks de datos
     const { data: tourney, isLoading: isLoadingTourney } = useTourney(tourneyId);
+    console.log(tourney)
     const { data: events, isLoading: isLoadingEvents } = useEvents(); // Obtenemos todos los eventos disponibles
     const { data: disciplines } = useDisciplines();
     const createMutation = useCreateTourney();
@@ -42,14 +43,14 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
     const [name, setName] = useState("");
     const [status, setStatus] = useState("Pendiente");
     const [selectedEventIds, setSelectedEventIds] = useState<number[]>([]);
-    const [filterDisciplineId, setFilterDisciplineId] = useState<string>("");
+    const [filterDisciplineId, setFilterDisciplineId] = useState<string>("all");
     const [message, setMessage] = useState<string | null>(null);
 
     // Cargar datos al editar
     useEffect(() => {
         if (tourney) {
-            setName(tourney.Name || "");
-            setStatus(tourney.Status || "Pendiente");
+            setName(tourney.Name);
+            setStatus(tourney.Status);
 
             // Si el torneo ya tiene eventos asociados, extraemos sus IDs para marcarlos como seleccionados
             if (tourney.Events && Array.isArray(tourney.Events)) {
@@ -57,13 +58,6 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
             }
         }
     }, [tourney]);
-
-    // Seleccionar la primera disciplina por defecto cuando se carguen
-    useEffect(() => {
-        if (disciplines && disciplines.length > 0 && !filterDisciplineId) {
-            setFilterDisciplineId(disciplines[0].ID.toString());
-        }
-    }, [disciplines, filterDisciplineId]);
 
     const isSubmitting = createMutation.isPending || updateMutation.isPending;
     const isFormValid = name.length > 0;
@@ -87,7 +81,10 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
         const payload = {
             Name: name,
             Status: status as "Activo" | "Finalizado" | "Pendiente",
-            Events: selectedEventIds,
+            EventIDs: selectedEventIds,
+            StartDate: tourney?.StartDate,
+            EndDate: tourney?.EndDate,
+
         };
 
         try {
@@ -142,9 +139,8 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="Pendiente">Pendiente</SelectItem>
-                            <SelectItem value="En Progreso">En Progreso</SelectItem>
+                            <SelectItem value="Activo">Activo</SelectItem>
                             <SelectItem value="Finalizado">Finalizado</SelectItem>
-                            <SelectItem value="Cancelado">Cancelado</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -167,6 +163,7 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
                                 <SelectValue placeholder="Filtrar por disciplina" />
                             </SelectTrigger>
                             <SelectContent>
+                                <SelectItem value="all">Todas las disciplinas</SelectItem>
                                 {disciplines?.map(d => (
                                     <SelectItem key={d.ID} value={d.ID.toString()}>{d.Name}</SelectItem>
                                 ))}
@@ -181,7 +178,7 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto p-2 border rounded-lg bg-slate-50/50">
                         {events?.filter(event => {
                             const dId = event.Discipline?.ID;
-                            return dId?.toString() === filterDisciplineId;
+                            return filterDisciplineId === "all" || dId?.toString() === filterDisciplineId;
                         }).map((event) => {
                             const isSelected = selectedEventIds.includes(event.ID);
                             return (
