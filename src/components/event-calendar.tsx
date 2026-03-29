@@ -63,7 +63,7 @@ export default function EventCalendar({ events = [] }: EventCalendarProps) {
             {/* Cabecera del Calendario */}
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                    <CalendarIcon className="h-5 w-5" />
+                    <CalendarIcon className="h-8 w-8 text-blue-600" />
                     {capitalizedMonthName}
                 </h2>
                 <div className="flex gap-2">
@@ -77,10 +77,10 @@ export default function EventCalendar({ events = [] }: EventCalendarProps) {
             </div>
 
             {/* Grilla del Calendario */}
-            <div className="grid grid-cols-7 gap-px bg-slate-200 border border-slate-200 rounded-lg overflow-hidden">
+            <div className="grid grid-cols-7 gap-px bg-slate-600 border border-slate-800 rounded-lg overflow-hidden">
                 {/* Días de la semana */}
                 {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map((day) => (
-                    <div key={day} className="bg-slate-50 p-2 text-center text-sm font-semibold text-slate-600">
+                    <div key={day} className="bg-slate-50 p-2 text-center text-sm font-bold text-slate-800">
                         {day}
                     </div>
                 ))}
@@ -106,7 +106,7 @@ export default function EventCalendar({ events = [] }: EventCalendarProps) {
                                 {dayEvents.map((event) => (
                                     <Dialog key={event.ID}>
                                         <DialogTrigger asChild>
-                                            <div className="text-[10px] sm:text-xs px-1.5 py-1 rounded bg-blue-100 text-blue-700 truncate cursor-pointer hover:bg-blue-200 transition-colors">
+                                            <div className="text-[10px] sm:text-xs px-2.5 py-1 rounded bg-blue-100 text-blue-800 truncate cursor-pointer hover:bg-blue-200 transition-colors">
                                                 {event.Name}
                                             </div>
                                         </DialogTrigger>

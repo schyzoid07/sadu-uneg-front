@@ -13,7 +13,7 @@ import { useDisciplines } from "@/hooks/disciplines/use-disciplines";
 
 // Componente para intentar cargar la imagen en múltiples formatos
 function DisciplineImage({ name }: { name: string }) {
-  const extensions = ["webp", "jpg", "png", "jpeg", "svg", "jfif", "tiff", "bmp"];
+  const extensions = ["webp", "jpg", "png", "jpeg", "svg", "jfif", "tiff", "bmp", "avif"];
   const [extIndex, setExtIndex] = useState(0);
   const [useFallback, setUseFallback] = useState(false);
 
@@ -26,7 +26,7 @@ function DisciplineImage({ name }: { name: string }) {
 
   // Intentamos la extensión actual o usamos el logo si ya agotamos todas
   const currentSrc = useFallback
-    ? "/LOGO_UNEG.webp"
+    ? "/loading.avif"
     : `/images/disciplines/${normalizedName}.${extensions[extIndex]}`;
 
   return (
