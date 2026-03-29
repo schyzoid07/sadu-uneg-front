@@ -87,8 +87,8 @@ export function useEvent(id?: string) {
 export function useCreateEvent() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (json: CreateEventInput) => {
-      return await api.post("events/create", { json }).json();
+    mutationFn: async (data: CreateEventInput) => {
+      return await api.post("events/create", { json: data }).json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
@@ -100,11 +100,12 @@ export function useUpdateEvent() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, data }: { id: number; data: UpdateEventInput }) => {
+      if (!data) throw new Error("No se proporcionaron datos para actualizar");
       return await api.put(`events/edit/${id}`, { json: data }).json();
     },
-    onSuccess: () => {
+    onSuccess: (_,variables) => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
-      queryClient.invalidateQueries({ queryKey: ["event"] });
+      queryClient.invalidateQueries({ queryKey: ["event", String(variables.id)] });
     },
   });
 }

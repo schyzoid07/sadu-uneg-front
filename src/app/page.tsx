@@ -30,139 +30,126 @@ export default function Home() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50/50">
+    <div className="flex flex-col min-h-screen bg-slate-50/50 ">
       <main className="flex-grow container mx-auto px-4 py-10">
         {/* Título */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold text-slate-800 tracking-tight">
+          <h1 className=" p-6 bg-white border rounded-2xl shadow-sm flex-col flex-1 flex items-center group text-4xl sm:text-5xl font-bold text-slate-800 tracking-tight">
             Centro Administrativo SADUNEG
-          </h1>
-          <p className="text-lg text-slate-500 mt-2 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-500 mt-2 max-w-2xl mx-auto">
             Panel de control y estadísticas generales del sistema.
           </p>
+          </h1>
+          
         </div>
 
         {/* Sección de Estadísticas */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-16">
           {/* Tarjeta de Conteo de Atletas */}
-          <Link href='/atletas' className="block group">
-            <div className="p-6 bg-white border rounded-xl shadow-sm flex flex-col justify-between h-full transition-all duration-200 ease-in-out group-hover:scale-105 group-hover:shadow-lg">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-slate-500">
-                    Atletas Inscritos
-                  </p>
-                  <Users className="h-5 w-5 text-slate-400" />
-                </div>
-                {isLoadingAthletes ? (
-                  <div className="h-10 w-20 bg-slate-200 animate-pulse rounded-md"></div>
-                ) : (
-                  <p className="text-4xl font-bold text-slate-800">{athleteCount}</p>
-                )}
+         <Link href='/atletas' className="block group">
+            <div className="p-6 bg-white border rounded-2xl shadow-sm flex items-center gap-5 h-full transition-all duration-200 group-hover:shadow-md group-hover:border-blue-200">
+              <div className="p-4 bg-[#2b50aa] rounded-xl shadow-inner">
+                <Users className="h-8 w-8 text-white" />
               </div>
-              <p className="text-xs text-slate-400 mt-4">Total de atletas registrados en el sistema.</p>
+              <div>
+                <p className="text-sm font-semibold text-slate-600">Atletas Inscritos</p>
+                {isLoadingAthletes ? (
+                  <div className="h-8 w-16 bg-slate-200 animate-pulse rounded-md mt-1"></div>
+                ) : (
+                  <p className="text-3xl font-extrabold text-slate-900">{athleteCount}</p>
+                )}
+                <p className="text-[10px] text-slate-400 mt-1 uppercase font-medium">Registrados en sistema</p>
+              </div>
             </div>
           </Link>
 
           {/* Tarjeta de Conteo de Profesores */}
-          <Link href='/profesores' className="block group">
-            <div className="p-6 bg-white border rounded-xl shadow-sm flex flex-col justify-between h-full transition-all duration-200 ease-in-out group-hover:scale-105 group-hover:shadow-lg">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-slate-500">
-                    Profesores
-                  </p>
-                  <UserCheck className="h-5 w-5 text-slate-400" />
-                </div>
-                {isLoadingTeachers ? (
-                  <div className="h-10 w-20 bg-slate-200 animate-pulse rounded-md"></div>
-                ) : (
-                  <p className="text-4xl font-bold text-slate-800">{teacherCount}</p>
-                )}
+         <Link href='/profesores' className="block group">
+            <div className="p-6 bg-white border rounded-2xl shadow-sm flex items-center gap-5 h-full transition-all duration-200 group-hover:shadow-md group-hover:border-blue-200">
+              <div className="p-4 bg-[#2b50aa] rounded-xl shadow-inner">
+                <UserCheck className="h-8 w-8 text-white" />
               </div>
-              <p className="text-xs text-slate-400 mt-4">Entrenadores y profesores activos.</p>
+              <div>
+                <p className="text-sm font-semibold text-slate-600">Profesores</p>
+                {isLoadingTeachers ? (
+                  <div className="h-8 w-16 bg-slate-200 animate-pulse rounded-md mt-1"></div>
+                ) : (
+                  <p className="text-3xl font-extrabold text-slate-900">{teacherCount}</p>
+                )}
+                <p className="text-[10px] text-slate-400 mt-1 uppercase font-medium">Entrenadores activos</p>
+              </div>
             </div>
           </Link>
 
           {/* Tarjeta de Conteo de Carreras */}
           <Link href='/carreras' className="block group">
-            <div className="p-6 bg-white border rounded-xl shadow-sm flex flex-col justify-between h-full transition-all duration-200 ease-in-out group-hover:scale-105 group-hover:shadow-lg">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-slate-500">
-                    Carreras
-                  </p>
-                  <GraduationCap className="h-5 w-5 text-slate-400" />
-                </div>
-                {isLoadingMajors ? (
-                  <div className="h-10 w-20 bg-slate-200 animate-pulse rounded-md"></div>
-                ) : (
-                  <p className="text-4xl font-bold text-slate-800">{majorCount}</p>
-                )}
+            <div className="p-6 bg-white border rounded-2xl shadow-sm flex items-center gap-5 h-full transition-all duration-200 group-hover:shadow-md group-hover:border-blue-200">
+              <div className="p-4 bg-[#2b50aa] rounded-xl shadow-inner">
+                <GraduationCap className="h-8 w-8 text-white" />
               </div>
-              <p className="text-xs text-slate-400 mt-4">
-                Carreras universitarias disponibles.
-              </p>
+              <div>
+                <p className="text-sm font-semibold text-slate-600">Carreras</p>
+                {isLoadingMajors ? (
+                  <div className="h-8 w-16 bg-slate-200 animate-pulse rounded-md mt-1"></div>
+                ) : (
+                  <p className="text-3xl font-extrabold text-slate-900">{majorCount}</p>
+                )}
+                <p className="text-[10px] text-slate-400 mt-1 uppercase font-medium">Oferta académica</p>
+              </div>
             </div>
           </Link>
 
           {/* Tarjeta de Conteo de Equipos */}
           <Link href='/equipos' className="block group">
-            <div className="p-6 bg-white border rounded-xl shadow-sm flex flex-col justify-between h-full transition-all duration-200 ease-in-out group-hover:scale-105 group-hover:shadow-lg">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-slate-500">
-                    Equipos
-                  </p>
-                  <Shield className="h-5 w-5 text-slate-400" />
-                </div>
-                {isLoadingTeams ? (
-                  <div className="h-10 w-20 bg-slate-200 animate-pulse rounded-md"></div>
-                ) : (
-                  <p className="text-4xl font-bold text-slate-800">{teamCount}</p>
-                )}
+            <div className="p-6 bg-white border rounded-2xl shadow-sm flex items-center gap-5 h-full transition-all duration-200 group-hover:shadow-md group-hover:border-blue-200">
+              <div className="p-4 bg-[#2b50aa] rounded-xl shadow-inner">
+                <Shield className="h-8 w-8 text-white" />
               </div>
-              <p className="text-xs text-slate-400 mt-4">Equipos formados por disciplina.</p>
+              <div>
+                <p className="text-sm font-semibold text-slate-600">Equipos</p>
+                {isLoadingTeams ? (
+                  <div className="h-8 w-16 bg-slate-200 animate-pulse rounded-md mt-1"></div>
+                ) : (
+                  <p className="text-3xl font-extrabold text-slate-900">{teamCount}</p>
+                )}
+                <p className="text-[10px] text-slate-400 mt-1 uppercase font-medium">Por disciplina</p>
+              </div>
             </div>
           </Link>
 
           {/* Tarjeta de Conteo de Eventos */}
           <Link href='/eventos' className="block group">
-            <div className="p-6 bg-white border rounded-xl shadow-sm flex flex-col justify-between h-full transition-all duration-200 ease-in-out group-hover:scale-105 group-hover:shadow-lg">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-slate-500">
-                    Eventos
-                  </p>
-                  <CalendarDays className="h-5 w-5 text-slate-400" />
-                </div>
-                {isLoadingEvents ? (
-                  <div className="h-10 w-20 bg-slate-200 animate-pulse rounded-md"></div>
-                ) : (
-                  <p className="text-4xl font-bold text-slate-800">{eventCount}</p>
-                )}
+            <div className="p-6 bg-white border rounded-2xl shadow-sm flex items-center gap-5 h-full transition-all duration-200 group-hover:shadow-md group-hover:border-blue-200">
+              <div className="p-4 bg-[#2b50aa] rounded-xl shadow-inner">
+                <CalendarDays className="h-8 w-8 text-white" />
               </div>
-              <p className="text-xs text-slate-400 mt-4">Actividades individuales registradas.</p>
+              <div>
+                <p className="text-sm font-semibold text-slate-600">Eventos</p>
+                {isLoadingEvents ? (
+                  <div className="h-8 w-16 bg-slate-200 animate-pulse rounded-md mt-1"></div>
+                ) : (
+                  <p className="text-3xl font-extrabold text-slate-900">{eventCount}</p>
+                )}
+                <p className="text-[10px] text-slate-400 mt-1 uppercase font-medium">Actividades registradas</p>
+              </div>
             </div>
           </Link>
 
           {/* Tarjeta de Conteo de Torneos */}
-          <Link href='/torneos' className="block group">
-            <div className="p-6 bg-white border rounded-xl shadow-sm flex flex-col justify-between h-full transition-all duration-200 ease-in-out group-hover:scale-105 group-hover:shadow-lg">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-slate-500">
-                    Torneos
-                  </p>
-                  <Trophy className="h-5 w-5 text-slate-400" />
-                </div>
-                {isLoadingTourneys ? (
-                  <div className="h-10 w-20 bg-slate-200 animate-pulse rounded-md"></div>
-                ) : (
-                  <p className="text-4xl font-bold text-slate-800">{tourneyCount}</p>
-                )}
+         <Link href='/torneos' className="block group">
+            <div className="p-6 bg-white border rounded-2xl shadow-sm flex items-center gap-5 h-full transition-all duration-200 group-hover:shadow-md group-hover:border-blue-200">
+              <div className="p-4 bg-[#2b50aa] rounded-xl shadow-inner">
+                <Trophy className="h-8 w-8 text-white" />
               </div>
-              <p className="text-xs text-slate-400 mt-4">Torneos y ligas universitarias.</p>
+              <div>
+                <p className="text-sm font-semibold text-slate-600">Torneos</p>
+                {isLoadingTourneys ? (
+                  <div className="h-8 w-16 bg-slate-200 animate-pulse rounded-md mt-1"></div>
+                ) : (
+                  <p className="text-3xl font-extrabold text-slate-900">{tourneyCount}</p>
+                )}
+                <p className="text-[10px] text-slate-400 mt-1 uppercase font-medium">Ligas universitarias</p>
+              </div>
             </div>
           </Link>
         </div>

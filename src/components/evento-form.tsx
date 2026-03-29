@@ -129,7 +129,7 @@ export function EventoForm({ eventId, onSuccess }: EventFormProps) {
             OppositePoints: oppositePoints,
             HomeTeamID: parseInt(homeTeamId),
             OppositeTeamID: parseInt(oppositeTeamId),
-            ResponsableTeacherID: teacherId ? parseInt(teacherId) : null,
+            ResponsableTeacherID:  parseInt(teacherId),
         };
 
         try {

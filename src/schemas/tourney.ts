@@ -17,8 +17,8 @@ export const tourneyStatusSchema = z.enum([
 export const tourneySchema = z.object({
     ID: z.number(),
     Name: z.string(),
-    Status: tourneyStatusSchema,
-    Events: z.array(eventBareSchema).optional().nullable(),
+    Status:  z.string(),
+   Events: z.array(eventBareSchema).optional().nullable(),
     StartDate: z.coerce.date().optional(),
     EndDate: z.coerce.date().optional(),
     TotalEvents: z.number().optional(),
