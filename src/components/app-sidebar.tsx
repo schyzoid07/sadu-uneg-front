@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { 
-  User, 
+import {
+  User,
   UserRoundCheck, // Profesores
   Medal, // Disciplinas
   Shield, // Equipos
@@ -23,15 +23,15 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-const getIcon = (title: string) => {
-  const t = title.toLowerCase();
-  if (t.includes("atleta")) return <User className="size-5" />;
-  if (t.includes("profesor")) return <UserRoundCheck className="size-5" />;
-  if (t.includes("disciplina")) return <Medal className="size-5" />;
-  if (t.includes("equipo")) return <Shield className="size-5" />;
-  if (t.includes("universidad")) return <Library className="size-5" />;
-  if (t.includes("carrera")) return <GraduationCap className="size-5" />;
-  if (t.includes("torneo")) return <Trophy className="size-5" />;
+const getIcon = (title?: string) => {
+  const t = title?.toLowerCase();
+  if (t?.includes("atleta")) return <User className="size-5" />;
+  if (t?.includes("profesor")) return <UserRoundCheck className="size-5" />;
+  if (t?.includes("disciplina")) return <Medal className="size-5" />;
+  if (t?.includes("equipo")) return <Shield className="size-5" />;
+  if (t?.includes("universidad")) return <Library className="size-5" />;
+  if (t?.includes("carrera")) return <GraduationCap className="size-5" />;
+  if (t?.includes("torneo")) return <Trophy className="size-5" />;
   return <ChevronRight className="size-5" />;
 };
 // This is sample data.
@@ -74,10 +74,10 @@ const data = {
           title: "Carreras",
           url: "/carreras",
         },
-        { /*
+        /*{ 
           title: "Torneos",
           url: "/torneos",
-        */},
+        },*/
       ],
     },
   ],

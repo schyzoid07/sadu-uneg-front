@@ -9,7 +9,7 @@ import { useMajors } from "@/hooks/majors/use-major";
 import { useTeachers } from "@/hooks/teachers/use-teachers";
 import { useTeams } from "@/hooks/teams/use-teams";
 import { useTourneys } from "@/hooks/tourneys/use-tourneys";
-import { CalendarDays, GraduationCap, Shield, Trophy, UserCheck, Users } from "lucide-react";
+import { CalendarDays, GraduationCap, Shield, UserCheck, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
