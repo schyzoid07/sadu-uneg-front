@@ -187,7 +187,7 @@ export default function Home() {
           </div>
 
           <div>
-            <h2 className="text-3xl font-bold text-center text-slate-700 mb-8">Calendario de Torneos</h2>
+            {/* <h2 className="text-3xl font-bold text-center text-slate-700 mb-8">Calendario de Torneos</h2>*/}
             <div
               className="cursor-pointer transition-transform hover:scale-[1.01] duration-200"
               onClick={() => router.push('/torneos')}
