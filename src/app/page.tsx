@@ -35,7 +35,10 @@ export default function Home() {
         {/* Título */}
         <div className="text-center mb-12">
           <h1 className=" p-6 bg-white border rounded-2xl shadow-sm flex-col flex-1 flex items-center group text-4xl sm:text-5xl font-bold text-slate-800 tracking-tight">
-            Centro Administrativo SADUNEG
+            Centro Administrativo de Deporte para la UNEG
+            <br />
+            <p>(SADUNEG)</p>
+            <br />
             <p className="text-lg text-slate-500 mt-2 max-w-2xl mx-auto">
               Panel de control y estadísticas generales del sistema.
             </p>
@@ -172,19 +175,6 @@ export default function Home() {
               <div className="pointer-events-none">
                 <EventCalendar events={events || []} />
               </div>
-            </div>
-          </div>
-
-          <div>
-            {/* <h2 className="text-3xl font-bold text-center text-slate-700 mb-8">Calendario de Torneos</h2>*/}
-            <div
-              className="cursor-pointer transition-transform hover:scale-[1.01] duration-200"
-              onClick={() => router.push('/torneos')}
-              title="Ver torneos organizados"
-            >
-              {/* <div className="pointer-events-none">
-                <TourneyCalendar tourneys={tourneys || []} />
-              </div>*/}
             </div>
           </div>
         </div>

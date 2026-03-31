@@ -91,11 +91,11 @@ export default function ProfileForm() {
                             {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
                         </Button>
 
-                        <div className="text-center pt-2">
+                        {/*<div className="text-center pt-2">
                             <Link href="/register" className="text-sm text-gray-500 hover:text-gray-700 hover:underline transition-colors">
                                 ¿No tienes usuario? Regístrate aquí {'\u2192'}
                             </Link>
-                        </div>
+                        </div>*/}
                     </form>
                 </Form>
             </div>
