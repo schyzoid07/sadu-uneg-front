@@ -3,12 +3,23 @@ import ky from "ky";
 const API_BASE_URL = "http://localhost:8080";
 const SESSION_COOKIE_NAME = "session_token";
 
-// Helper to get a cookie value on the client
-function getCookie(name: string): string | undefined {
-  if (typeof document === 'undefined') return undefined;
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(';').shift();
+// Helper to get a cookie value (client or server)
+async function getSessionToken(): Promise<string | undefined> {
+  // Client side
+  if (typeof document !== 'undefined') {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${SESSION_COOKIE_NAME}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift();
+  } else {
+    // Server side
+    try {
+      const { cookies } = await import("next/headers");
+      const cookieStore = await cookies();
+      return cookieStore.get(SESSION_COOKIE_NAME)?.value;
+    } catch (error) {
+      console.warn("Could not access cookies on server", error);
+    }
+  }
   return undefined;
 }
 
@@ -23,8 +34,8 @@ export const api = ky.create({
   prefixUrl: API_BASE_URL,
   hooks: {
     beforeRequest: [
-      (request) => {
-        const token = getCookie(SESSION_COOKIE_NAME);
+      async (request) => {
+        const token = await getSessionToken();
         if (token) {
           request.headers.set("Authorization", `Bearer ${token}`);
         }
@@ -33,9 +44,11 @@ export const api = ky.create({
     afterResponse: [
       async (_request, _options, response) => {
         if (response.status === 401) {
-          deleteCookie(SESSION_COOKIE_NAME);
-          // Si el token es rechazado, redirigir al login
-          if (typeof window !== 'undefined') window.location.href = '/login';
+          if (typeof document !== 'undefined') {
+            deleteCookie(SESSION_COOKIE_NAME);
+            // Si el token es rechazado, redirigir al login
+            window.location.href = '/login';
+          }
         }
       }
     ]
