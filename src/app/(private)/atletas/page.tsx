@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Trash2Icon, PlusIcon, EyeIcon, Loader2 } from "lucide-react";
+import { Trash2Icon, PlusIcon, EyeIcon, Loader2, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAthletes, Athletes } from "@/hooks/athletes/use-athletes"; // Importamos el hook y tipo
 import { useDisciplines } from "@/hooks/disciplines/use-disciplines";
@@ -51,14 +51,15 @@ export default function Atletas() {
 
     return athletes.filter((a) => {
       const lowerSearch = debouncedSearch.toLowerCase();
-      const matchesSearch = a.FirstNames.toLowerCase().includes(lowerSearch) ||
-        a.LastNames.toLowerCase().includes(lowerSearch) ||
-        a.GovID.toLowerCase().includes(lowerSearch);
+      const matchesSearch =
+        (a.FirstNames?.toLowerCase().includes(lowerSearch) ?? false) ||
+        (a.LastNames?.toLowerCase().includes(lowerSearch) ?? false) ||
+        (a.GovID?.toLowerCase().includes(lowerSearch) ?? false);
 
       const matchesCategory = categoryFilter === "all" || a.Gender === categoryFilter;
 
       const matchesDiscipline = disciplineFilter === "all" ||
-        (a.Teams && Array.isArray(a.Teams) && a.Teams.some(t => t.DisciplineID.toString() === disciplineFilter));
+        (Array.isArray(a.Disciplines) && a.Disciplines.some(d => String(d.ID) === disciplineFilter));
 
       return matchesSearch && matchesCategory && matchesDiscipline;
     })
@@ -128,7 +129,7 @@ export default function Atletas() {
 
           {/*input de busqueda */}
           <div className="relative w-full sm:w-64">
-            <search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <input
               placeholder="Buscar por nombre o cédula..."
               className="block w-64 p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
