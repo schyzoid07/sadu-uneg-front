@@ -10,6 +10,10 @@ export const baseAthletesSchema = z.object({
     Gender: z.string(),
     Enrolled: z.boolean(),
     Regular: z.boolean(),
+    Disciplines: z.array(z.object({
+        ID: z.number(),
+        Name: z.string()
+    })),
     Teams: z.array(z.object({
         ID: z.number(),
         DisciplineID: z.number(),
