@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import ky from "ky";
+import { api } from "@/lib/api";
 
 export function useDeleteAthlete() {
     const qc = useQueryClient();
@@ -7,7 +7,7 @@ export function useDeleteAthlete() {
     return useMutation({
         mutationFn: async (id: number) => {
 
-            const res = await ky.delete(`http://localhost:8080/athletes/delete/${id}`).json();
+            const res = await api.delete(`athletes/delete/${id}`).json();
             return res;
         },
         onSuccess: () => {

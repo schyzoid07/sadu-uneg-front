@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import ky from "ky";
+import { api } from "@/lib/api";
 
 interface UpdateAthleteInput {
     id: number;
@@ -12,7 +12,7 @@ export function useUpdateAthlete() {
     return useMutation({
         mutationFn: async ({ id, data }: UpdateAthleteInput) => {
 
-            const res = await ky.put(`http://localhost:8080/athletes/edit/${id}`, { json: data }).json();
+            const res = await api.put(`athletes/edit/${id}`, { json: data }).json();
             return res;
         },
         onSuccess: () => {

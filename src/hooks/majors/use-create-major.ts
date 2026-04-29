@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import ky from "ky";
+import { api } from "@/lib/api";
 
 interface CreateMajorInput {
     Name: string;
@@ -11,7 +11,7 @@ export function useCreateMajor() {
     return useMutation({
         mutationFn: async (newMajor: CreateMajorInput) => {
 
-            const res = await ky.post("http://localhost:8080/majors/create", { json: newMajor }).json();
+            const res = await api.post("majors/create", { json: newMajor }).json();
             return res;
         },
         onSuccess: () => {

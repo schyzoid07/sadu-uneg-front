@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import ky from "ky";
+import { api } from "@/lib/api";
 
 interface UpdateMajorInput {
     id: number;
@@ -12,7 +12,7 @@ export function useUpdateMajor() {
     return useMutation({
         mutationFn: async ({ id, data }: UpdateMajorInput) => {
 
-            const res = await ky.put(`http://localhost:8080/majors/edit/${id}`, { json: data }).json();
+            const res = await api.put(`majors/edit/${id}`, { json: data }).json();
             return res;
         },
         onSuccess: () => {
