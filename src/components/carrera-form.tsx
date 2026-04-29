@@ -48,7 +48,6 @@ export default function CrearCarreraForm({ majorId, onSuccess }: CrearCarreraFor
             setName("");
 
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [major]);
 
 
