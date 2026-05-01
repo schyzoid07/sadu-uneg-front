@@ -3,14 +3,11 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { } from "@/hooks/majors/use-major";
 import { Loader2 } from "lucide-react";
 import * as z from "zod";
-import { useMajor } from "@/hooks/majors/use-major";
+import { useMajor, useCreateMajor, useUpdateMajor } from "@/hooks/majors/use-major";
 import Link from "next/link";
 import { MajorInputType } from "@/schemas/majors";
-import { useUpdateMajor } from "@/hooks/majors/use-update-major";
-import { useCreateMajor } from "@/hooks/majors/use-create-major";
 
 
 
@@ -59,7 +56,7 @@ export default function CrearCarreraForm({ majorId, onSuccess }: CrearCarreraFor
 
     const canSubmit = !isInvalid && !isUnchanged;
 
-    const isSubmitting = createMutation.isLoading || updateMutation.isLoading;
+    const isSubmitting = createMutation.isPending || updateMutation.isPending;
     // ----------------------------
 
 
@@ -79,7 +76,7 @@ export default function CrearCarreraForm({ majorId, onSuccess }: CrearCarreraFor
         if (major && major.ID) {
             // modo edición
             updateMutation.mutate(
-                { id: major.ID, data: payload },
+                { id: major.ID, ...payload },
                 {
                     onSuccess: () => {
                         setMensaje("Carrera modificada con éxito");

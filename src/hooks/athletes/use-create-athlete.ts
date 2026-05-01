@@ -1,5 +1,5 @@
+import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import ky from "ky";
 
 interface CreateAthleteInput {
     FirstNames: string;
@@ -21,7 +21,7 @@ export function useCreateAthlete() {
     return useMutation({
         mutationFn: async (newAthlete: CreateAthleteInput) => {
 
-            const res = await ky.post("http://localhost:8080/athletes/create", { json: newAthlete }).json();
+            const res = await api.post("athletes/create", { json: newAthlete }).json();
             return res;
         },
         onSuccess: () => {

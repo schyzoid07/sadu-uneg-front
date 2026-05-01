@@ -69,7 +69,7 @@ export function useCreateMajor() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (newMajor: CreateMajorInput) => {
-            return await api.post("majors", { json: newMajor }).json();
+            return await api.post("majors/create", { json: newMajor }).json();
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["majors"] });
@@ -81,7 +81,7 @@ export function useUpdateMajor() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ id, ...data }: { id: number } & UpdateMajorInput) => {
-            return await api.put(`majors/${id}`, { json: data }).json();
+            return await api.put(`majors/edit/${id}`, { json: data }).json();
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["majors"] });
@@ -94,7 +94,7 @@ export function useDeleteMajor() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (id: number) => {
-            return await api.delete(`majors/${id}`).json();
+            return await api.delete(`majors/delete/${id}`).json();
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["majors"] });
