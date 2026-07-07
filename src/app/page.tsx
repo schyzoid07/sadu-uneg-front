@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from "react";
 import EventCalendar from "@/components/event-calendar";
 import TourneyCalendar from "@/components/tourney-calendar";
 import { SportsCarousel } from "@/components/sportsCarousel";
@@ -9,11 +10,19 @@ import { useMajors } from "@/hooks/majors/use-major";
 import { useTeachers } from "@/hooks/teachers/use-teachers";
 import { useTeams } from "@/hooks/teams/use-teams";
 import { useTourneys } from "@/hooks/tourneys/use-tourneys";
-import { CalendarDays, GraduationCap, Shield, UserCheck, Users } from "lucide-react";
+import { CalendarDays, GraduationCap, Shield, UserCheck, Users, UserCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { getCurrentUser } from "./actions";
+import ChangePasswordDialog from "@/components/change-password-dialog";
 
 export default function Home() {
+  const [currentUser, setCurrentUser] = useState<{ username: string } | null>(null);
+
+  useEffect(() => {
+    getCurrentUser().then(setCurrentUser);
+  }, []);
+
   const { data: athletes, isLoading: isLoadingAthletes } = useAthletes();
   const { data: teachers, isLoading: isLoadingTeachers } = useTeachers();
   const { data: teams, isLoading: isLoadingTeams } = useTeams();
@@ -32,6 +41,22 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-slate-50/50 ">
       <main className="flex-grow container mx-auto px-4 py-10">
+        {/* Sección de Usuario */}
+        {currentUser && (
+          <div className="mb-8 p-4 bg-white border rounded-2xl shadow-sm flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-[#2b50aa] rounded-full">
+                <UserCircle className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">Administrador</p>
+                <p className="font-semibold text-slate-800">{currentUser.username}</p>
+              </div>
+            </div>
+            <ChangePasswordDialog />
+          </div>
+        )}
+
         {/* Título */}
         <div className="text-center mb-12">
           <h1 className=" p-6 bg-white border rounded-2xl shadow-sm flex-col flex-1 flex items-center group text-4xl sm:text-5xl font-bold text-slate-800 tracking-tight">

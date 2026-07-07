@@ -7,10 +7,27 @@ import { tourneySchema, tourneyInputSchema, Tourney, TourneyInput } from "@/sche
 export type { Tourney, TourneyInput };
 export type UpdateTourneyInput = Partial<TourneyInput>;
 
+export interface TourneyFilters {
+  name?: string;
+  status?: string;
+  discipline_id?: string;
+}
+
+const buildQueryString = (params?: object): string => {
+  const searchParams = new URLSearchParams();
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== "" && value !== null && value !== false) searchParams.set(key, String(value));
+    });
+  }
+  const qs = searchParams.toString();
+  return qs ? `?${qs}` : "";
+};
+
 // --- Funciones de API ---
 
-const fetchTourneys = async (): Promise<Tourney[]> => {
-    const res: any = await api.get("tourneys").json();
+const fetchTourneys = async (filters?: TourneyFilters): Promise<Tourney[]> => {
+    const res: any = await api.get(`tourneys${buildQueryString(filters)}`).json();
     // Asumimos que la data puede venir en un campo 'data' o directamente
     const data = (res && typeof res === 'object' && 'data' in res) ? res.data : res;
     return z.array(tourneySchema).parse(data);
@@ -41,10 +58,10 @@ const deleteTourney = async (id: number): Promise<any> => {
 
 // --- Hooks de React Query ---
 
-export function useTourneys() {
+export function useTourneys(filters?: TourneyFilters) {
     return useQuery({
-        queryKey: ["tourneys"],
-        queryFn: fetchTourneys,
+        queryKey: ["tourneys", filters],
+        queryFn: () => fetchTourneys(filters),
     });
 }
 

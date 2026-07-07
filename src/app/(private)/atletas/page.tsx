@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Trash2Icon, PlusIcon, EyeIcon, Loader2, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAthletes, Athletes } from "@/hooks/athletes/use-athletes"; // Importamos el hook y tipo
+import { useAthletes, Athletes } from "@/hooks/athletes/use-athletes";
 import { useDisciplines } from "@/hooks/disciplines/use-disciplines";
 import {
   Select,
@@ -35,35 +35,18 @@ import Link from "next/link";
 import { useDebounce } from "@/hooks/use-debounce";
 
 export default function Atletas() {
-  const { data: athletes, isLoading, isError } = useAthletes();
-  const { data: disciplines } = useDisciplines();
-  console.log(athletes)
   const [openCreate, setOpenCreate] = useState(false);
-
-  //logica de filtrado
   const [searchTerm, setSearchTerm] = useState('')
   const debouncedSearch = useDebounce(searchTerm, 400)
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [disciplineFilter, setDisciplineFilter] = useState("all");
 
-  const filteredAthletes = useMemo(() => {
-    if (!athletes) return [];
-
-    return athletes.filter((a) => {
-      const lowerSearch = debouncedSearch.toLowerCase();
-      const matchesSearch =
-        (a.FirstNames?.toLowerCase().includes(lowerSearch) ?? false) ||
-        (a.LastNames?.toLowerCase().includes(lowerSearch) ?? false) ||
-        (a.GovID?.toLowerCase().includes(lowerSearch) ?? false);
-
-      const matchesCategory = categoryFilter === "all" || a.Gender === categoryFilter;
-
-      const matchesDiscipline = disciplineFilter === "all" ||
-        (Array.isArray(a.Disciplines) && a.Disciplines.some(d => String(d.ID) === disciplineFilter));
-
-      return matchesSearch && matchesCategory && matchesDiscipline;
-    })
-  }, [athletes, debouncedSearch, categoryFilter, disciplineFilter])
+  const { data: athletes, isLoading, isError } = useAthletes({
+    name: debouncedSearch || undefined,
+    gender: categoryFilter !== "all" ? categoryFilter : undefined,
+    discipline_id: disciplineFilter !== "all" ? disciplineFilter : undefined,
+  });
+  const { data: disciplines } = useDisciplines();
 
   // Eliminación
   const [deletingAthlete, setDeletingAthlete] = useState<Athletes | null>(null);
@@ -165,7 +148,7 @@ export default function Atletas() {
       <div className="border rounded-lg bg-white shadow-sm overflow-hidden">
         <Table>
           <TableCaption>
-            {filteredAthletes.length === 0 && !isLoading
+            {(athletes?.length === 0 || !athletes) && !isLoading
               ? "No se encontraron atletas con ese criterio."
               : "Lista de atletas registrados."}
           </TableCaption>
@@ -189,7 +172,7 @@ export default function Atletas() {
                 </TableRow>
               ))}
 
-            {filteredAthletes?.map((athlete) => (
+            {athletes?.map((athlete) => (
 
               <TableRow key={athlete.ID}>
 

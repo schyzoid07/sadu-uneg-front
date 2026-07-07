@@ -13,8 +13,23 @@ const resUniversitySchema = z.object({
   message: z.string(),
 });
 
-const fetchUniversities = async () => {
-  const res = await api.get("universities").json();
+export interface UniversityFilters {
+  name?: string;
+}
+
+const buildQueryString = (params?: object): string => {
+  const searchParams = new URLSearchParams();
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== "" && value !== null && value !== false) searchParams.set(key, String(value));
+    });
+  }
+  const qs = searchParams.toString();
+  return qs ? `?${qs}` : "";
+};
+
+const fetchUniversities = async (filters?: UniversityFilters) => {
+  const res = await api.get(`universities${buildQueryString(filters)}`).json();
   const parsed = resUniversitiesSchema.parse(res);
   return parsed.data;
 };
@@ -26,10 +41,10 @@ const fetchUniversity = async (id?: string) => {
   return parsed.data;
 };
 
-export function useUniversities() {
+export function useUniversities(filters?: UniversityFilters) {
   return useQuery({
-    queryKey: ["universities"],
-    queryFn: fetchUniversities,
+    queryKey: ["universities", filters],
+    queryFn: () => fetchUniversities(filters),
   });
 }
 

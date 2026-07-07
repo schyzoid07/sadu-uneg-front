@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useDebounce } from "@/hooks/use-debounce";
 import {
     Table,
@@ -28,25 +28,13 @@ import { useDeleteMajor } from "@/hooks/majors/use-delete-major";
 
 
 export default function Carreras() {
-    const { data: majors, isLoading, isError } = useMajors();
     const [openCreate, setOpenCreate] = useState(false);
-
-    //logica de filtrado
     const [searchTerm, setSearchTerm] = useState('')
     const debouncedSearch = useDebounce(searchTerm, 400)
 
-    const filteredMajors = useMemo(() => {
-        if (!majors) return [];
-        if (!debouncedSearch) return majors;
-
-        const lowerSearch = debouncedSearch.toLowerCase()
-
-        return majors.filter((m) => {
-            return (
-                m.Name.toLowerCase().includes(lowerSearch)
-            )
-        })
-    }, [majors, debouncedSearch])
+    const { data: majors, isLoading, isError } = useMajors({
+        name: debouncedSearch || undefined,
+    });
 
 
 
@@ -113,7 +101,7 @@ export default function Carreras() {
 
             <div className="border rounded-lg bg-white shadow-sm overflow-hidden">
                 <Table>
-                    <TableCaption>{filteredMajors.length === 0 && !isLoading
+                    <TableCaption>{(majors?.length === 0 || !majors) && !isLoading
                         ? "No se encontraron carreras con ese criterio."
                         : "Lista de Carreras disponibles."}</TableCaption>
                     <TableHeader>
@@ -134,7 +122,7 @@ export default function Carreras() {
                             ))
                         }
 
-                        {filteredMajors?.map((major) => (
+                        {majors?.map((major) => (
                             <TableRow key={major.ID}>
                                 <TableCell>{major.ID}</TableCell>
                                 <TableCell>{major.Name}</TableCell>

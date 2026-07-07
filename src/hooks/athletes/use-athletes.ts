@@ -18,9 +18,26 @@ const resAthleteSchema = z.object({
 export type Athletes = z.infer<typeof baseAthletesSchema>;
 export type Athlete = z.infer<typeof detailAthleteSchema>;
 
-const fetchAllAthletes = async () => {
+export interface AthleteFilters {
+  name?: string;
+  gender?: string;
+  discipline_id?: string;
+}
+
+const buildQueryString = (params?: object): string => {
+  const searchParams = new URLSearchParams();
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== "" && value !== null && value !== false) searchParams.set(key, String(value));
+    });
+  }
+  const qs = searchParams.toString();
+  return qs ? `?${qs}` : "";
+};
+
+const fetchAllAthletes = async (filters?: AthleteFilters) => {
   try {
-    const res = await api.get("athletes").json();
+    const res = await api.get(`athletes${buildQueryString(filters)}`).json();
     const parsed = resAthletesSchema.parse(res);
     return parsed.data;
   }
@@ -44,10 +61,10 @@ const fetchAthlete = async (id?: string) => {
 };
 
 
-export function useAthletes() {
+export function useAthletes(filters?: AthleteFilters) {
   return useQuery({
-    queryKey: ["athletes"],
-    queryFn: fetchAllAthletes,
+    queryKey: ["athletes", filters],
+    queryFn: () => fetchAllAthletes(filters),
   });
 }
 

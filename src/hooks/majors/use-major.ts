@@ -27,9 +27,24 @@ const resMajorSchema = z.object({
 // Inferimos el tipo para usarlo en el componente si fuera necesario
 export type Major = z.infer<typeof majorSchema>;
 
-const fetchMajors = async () => {
+export interface MajorFilters {
+  name?: string;
+}
+
+const buildQueryString = (params?: object): string => {
+  const searchParams = new URLSearchParams();
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== "" && value !== null && value !== false) searchParams.set(key, String(value));
+    });
+  }
+  const qs = searchParams.toString();
+  return qs ? `?${qs}` : "";
+};
+
+const fetchMajors = async (filters?: MajorFilters) => {
     try {
-        const res = await api.get("majors").json();
+        const res = await api.get(`majors${buildQueryString(filters)}`).json();
         const parsed = resMajorsSchema.parse(res);
         return parsed.data;
     } catch (error) {
@@ -38,10 +53,10 @@ const fetchMajors = async () => {
     }
 };
 
-export function useMajors() {
+export function useMajors(filters?: MajorFilters) {
     return useQuery({
-        queryKey: ["majors"],
-        queryFn: fetchMajors,
+        queryKey: ["majors", filters],
+        queryFn: () => fetchMajors(filters),
     });
 }
 

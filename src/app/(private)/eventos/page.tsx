@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlusIcon, ListIcon, SearchIcon, Loader2 } from "lucide-react";
@@ -46,65 +46,23 @@ export default function Eventos() {
     replace(`${pathname}?${params.toString()}`);
   }, 300);
 
-  // Hook personalizado
-  // useEvents no acepta argumentos en el hook definido, así que filtramos en cliente
-  const { data: events, isLoading } = useEvents();
-  console.log(events);
-  const { data: disciplines } = useDisciplines();
-  const { data: universities } = useUniversities();
   const [disciplineFilter, setDisciplineFilter] = useState("all");
   const [universityFilter, setUniversityFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [startDate, setStartDate] = useState("");
-  const [teamFilter, setTeamFilter] = useState(""); // Nuevo estado para el filtro de equipo
+  const [teamFilter, setTeamFilter] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  const filteredEvents = useMemo(() => {
-    if (!events) return [];
-
-    return events.filter((e) => {
-      const lowerSearch = searchTerm.toLowerCase();
-      const matchesSearch = e.Name?.toLowerCase().includes(lowerSearch);
-      const matchesDiscipline =
-        disciplineFilter === "all" ||
-        e.Discipline?.ID.toString() === disciplineFilter;
-
-      const homeTeamUniversityId = e.HomeTeam?.University?.ID ?? e.HomeTeam?.UniversityID;
-      const oppositeTeamUniversityId = e.OppositeTeam?.University?.ID ?? e.OppositeTeam?.UniversityID;
-      const matchesUniversity =
-        universityFilter === "all" ||
-        homeTeamUniversityId?.toString() === universityFilter ||
-        oppositeTeamUniversityId?.toString() === universityFilter;
-      const matchesStatus =
-        statusFilter === "all" ||
-        e.Status?.toLowerCase() === statusFilter.toLowerCase();
-
-      let matchesDate = true;
-      if (startDate || endDate) {
-        if (!e.Date) {
-          matchesDate = false;
-        } else {
-          const eventDate = new Date(e.Date);
-          if (startDate) {
-            const start = new Date(startDate + "T00:00:00");
-            if (eventDate < start) matchesDate = false;
-          }
-          if (endDate) {
-            const end = new Date(endDate + "T23:59:59");
-            if (eventDate > end) matchesDate = false;
-          }
-        }
-      }
-
-      // Nuevo filtro para el nombre del equipo
-      const matchesTeam =
-        teamFilter === "" ||
-        e.HomeTeam?.Name?.toLowerCase().includes(teamFilter.toLowerCase()) ||
-        e.OppositeTeam?.Name?.toLowerCase().includes(teamFilter.toLowerCase());
-
-      return matchesSearch && matchesDiscipline && matchesUniversity && matchesStatus && matchesDate && matchesTeam;
-    });
-  }, [events, searchTerm, disciplineFilter, universityFilter, statusFilter, startDate, endDate, teamFilter]);
+  const { data: events, isLoading } = useEvents({
+    name: searchTerm || undefined,
+    status: statusFilter !== "all" ? statusFilter : undefined,
+    discipline_id: disciplineFilter !== "all" ? disciplineFilter : undefined,
+    date_from: startDate || undefined,
+    date_to: endDate || undefined,
+    team_name: teamFilter || undefined,
+  });
+  const { data: disciplines } = useDisciplines();
+  const { data: universities } = useUniversities();
 
 
 
@@ -232,7 +190,7 @@ export default function Eventos() {
 
       {/* Vista de Calendario */}
       <div className="px-4">
-        <EventCalendar events={filteredEvents} />
+        <EventCalendar events={events || []} />
       </div>
 
       <div className="px-4">
@@ -249,10 +207,10 @@ export default function Eventos() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredEvents.map((evento) => (
+            {(events || []).map((evento) => (
               <EventCard key={evento.ID} event={evento} onDelete={setDeleteId} />
             ))}
-            {filteredEvents.length === 0 && (
+            {(events || []).length === 0 && (
               <div className="col-span-full text-center py-10 text-slate-500">
                 No se encontraron eventos con los criterios seleccionados.
               </div>

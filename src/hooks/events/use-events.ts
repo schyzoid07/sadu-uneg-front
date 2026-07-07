@@ -27,11 +27,31 @@ export type { Event };
 export type CreateEventInput = z.infer<typeof eventInputSchema>;
 export type UpdateEventInput = Partial<CreateEventInput>;
 
+export interface EventFilters {
+  name?: string;
+  status?: string;
+  discipline_id?: string;
+  date_from?: string;
+  date_to?: string;
+  team_name?: string;
+}
+
+const buildQueryString = (params?: object): string => {
+  const searchParams = new URLSearchParams();
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== "" && value !== null && value !== false) searchParams.set(key, String(value));
+    });
+  }
+  const qs = searchParams.toString();
+  return qs ? `?${qs}` : "";
+};
+
 // 2. Funciones de Fetching
-const fetchEvents = async () => {
+const fetchEvents = async (filters?: EventFilters) => {
   try {
     // El backend devuelve []EventGetBareDTO directamente
-    const res: any = await api.get("events").json();
+    const res: any = await api.get(`events${buildQueryString(filters)}`).json();
 
     // Si viene envuelto en { data: [...] }, extraemos data, sino usamos res directo
     const data = (res && typeof res === 'object' && 'data' in res) ? res.data : res;
@@ -69,10 +89,10 @@ const fetchEvent = async (id?: string) => {
 };
 
 // 3. Hooks
-export function useEvents() {
+export function useEvents(filters?: EventFilters) {
   return useQuery({
-    queryKey: ["events"],
-    queryFn: fetchEvents,
+    queryKey: ["events", filters],
+    queryFn: () => fetchEvents(filters),
   });
 }
 

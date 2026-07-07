@@ -15,10 +15,28 @@ const resTeacherSchema = z.object({
   message: z.string(),
 });
 
+export interface TeacherFilters {
+  name?: string;
+  lastName?: string;
+  govID?: string;
+  discipline_id?: string;
+}
+
+const buildQueryString = (params?: object): string => {
+  const searchParams = new URLSearchParams();
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== "" && value !== null && value !== false) searchParams.set(key, String(value));
+    });
+  }
+  const qs = searchParams.toString();
+  return qs ? `?${qs}` : "";
+};
+
 // 2. Funciones de Fetching
-const fetchTeachers = async () => {
+const fetchTeachers = async (filters?: TeacherFilters) => {
   try {
-    const res = await api.get("teachers").json();
+    const res = await api.get(`teachers${buildQueryString(filters)}`).json();
     const parsed = resTeachersSchema.parse(res);
     return parsed.data;
   } catch (error) {
@@ -40,10 +58,10 @@ const fetchTeacher = async (id?: string) => {
 };
 
 // 3. Hooks
-export function useTeachers() {
+export function useTeachers(filters?: TeacherFilters) {
   return useQuery({
-    queryKey: ["teachers"],
-    queryFn: fetchTeachers,
+    queryKey: ["teachers", filters],
+    queryFn: () => fetchTeachers(filters),
   });
 }
 

@@ -27,8 +27,27 @@ const resTeamSchema = z.object({
 
 export type Team = z.infer<typeof teamsSchema>;
 
-const fetchTeams = async () => {
-  const res = await api.get("teams").json();
+export interface TeamFilters {
+  name?: string;
+  category?: string;
+  discipline_id?: string;
+  university_id?: string;
+  regular?: string;
+}
+
+const buildQueryString = (params?: object): string => {
+  const searchParams = new URLSearchParams();
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== "" && value !== null && value !== false) searchParams.set(key, String(value));
+    });
+  }
+  const qs = searchParams.toString();
+  return qs ? `?${qs}` : "";
+};
+
+const fetchTeams = async (filters?: TeamFilters) => {
+  const res = await api.get(`teams${buildQueryString(filters)}`).json();
   const parsed = resSchema.parse(res);
   return parsed.data;
 };
@@ -41,10 +60,10 @@ const fetchTeam = async (id?: string) => {
   return parsed.data;
 };
 
-export function useTeams() {
+export function useTeams(filters?: TeamFilters) {
   return useQuery({
-    queryKey: ["teams"],
-    queryFn: fetchTeams,
+    queryKey: ["teams", filters],
+    queryFn: () => fetchTeams(filters),
   });
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useDisciplines } from "@/hooks/disciplines/use-disciplines";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -40,29 +40,19 @@ import {
 import TeacherForm from "@/components/teacher-form";
 
 export default function Profesores() {
-  const { data: teachers, isLoading } = useTeachers();
-  const { data: disciplines } = useDisciplines();
-
   const deleteTeacher = useDeleteTeacher();
   const [deleteId, setDeleteId] = useState<number | null>(null);
-
   const [isOpen, setIsOpen] = useState(false);
 
-  // Lógica de filtrado
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 400);
   const [disciplineFilter, setDisciplineFilter] = useState("all");
 
-  const filteredTeachers = useMemo(() => {
-    if (!teachers) return [];
-
-    return teachers.filter((t) => {
-      const lowerSearch = debouncedSearch.toLowerCase();
-      const matchesSearch = t.FirstNames.toLowerCase().includes(lowerSearch) || t.LastNames.toLowerCase().includes(lowerSearch) || t.GovID.toLowerCase().includes(lowerSearch);
-      const matchesDiscipline = disciplineFilter === "all" || (t.Disciplines && Array.isArray(t.Disciplines) && t.Disciplines.some((d) => d.ID.toString() === disciplineFilter));
-      return matchesSearch && matchesDiscipline;
-    });
-  }, [teachers, debouncedSearch, disciplineFilter]);
+  const { data: teachers, isLoading } = useTeachers({
+    name: debouncedSearch || undefined,
+    discipline_id: disciplineFilter !== "all" ? disciplineFilter : undefined,
+  });
+  const { data: disciplines } = useDisciplines();
 
   const confirmDelete = async () => {
     if (deleteId) {
@@ -126,7 +116,7 @@ export default function Profesores() {
       <div className="border rounded-lg bg-white shadow-sm overflow-hidden">
         <Table>
           <TableCaption>
-            {filteredTeachers.length === 0 && !isLoading
+            {(teachers?.length === 0 || !teachers) && !isLoading
               ? "No se encontraron profesores con ese criterio."
               : "Lista de profesores registrados."}
           </TableCaption>
@@ -152,7 +142,7 @@ export default function Profesores() {
               ))}
 
             {/* Mapeo de Datos Reales */}
-            {filteredTeachers?.map((teacher) => (
+            {teachers?.map((teacher) => (
               <TableRow key={teacher.ID}>
                 <TableCell>{teacher.GovID}</TableCell>
                 <TableCell>{teacher.FirstNames}</TableCell>

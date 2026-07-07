@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useTourneys, useDeleteTourney, Tourney } from "@/hooks/tourneys/use-tourneys";
 import { TourneyCard } from "@/components/tourney-card";
 import { Loader2 } from "lucide-react";
@@ -20,39 +20,14 @@ interface TourneyListProps {
 }
 
 export function TourneyList({ searchTerm, selectedDiscipline }: TourneyListProps) {
-    const { data: tourneys, isLoading, isError } = useTourneys();
+    const { data: tourneys, isLoading, isError } = useTourneys({
+        name: searchTerm || undefined,
+        discipline_id: selectedDiscipline || undefined,
+    });
     const deleteMutation = useDeleteTourney();
 
     const [deletingTourney, setDeletingTourney] = useState<Tourney | null>(null);
     const [openDelete, setOpenDelete] = useState(false);
-
-    console.log("TourneyList - Data recibida del hook:", tourneys);
-
-    const filteredTourneys = useMemo(() => {
-        if (!tourneys) return [];
-
-        let result = tourneys;
-
-        // 1. Filtrar por nombre del torneo
-        if (searchTerm) {
-            result = result.filter(tourney =>
-                tourney.Name.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-        }
-
-        // 2. Filtrar por disciplina
-        if (selectedDiscipline) {
-            result = result.filter(tourney =>
-                tourney.Events?.some(event =>
-                    (event.Discipline?.ID?.toString()) === selectedDiscipline
-                )
-            );
-        }
-
-        return result;
-    }, [tourneys, searchTerm, selectedDiscipline,]);
-
-    console.log("TourneyList - Data filtrada a renderizar:", filteredTourneys);
 
     const handleConfirmDelete = async () => {
         if (!deletingTourney) return;
@@ -84,7 +59,7 @@ export function TourneyList({ searchTerm, selectedDiscipline }: TourneyListProps
     return (
         <>
             <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-                {filteredTourneys?.map((tourney) => (
+                {tourneys?.map((tourney) => (
                     <Link key={tourney.ID} href={`/torneos/${tourney.ID}`} className="block h-full">
                         <TourneyCard
                             tourney={tourney}
@@ -98,7 +73,7 @@ export function TourneyList({ searchTerm, selectedDiscipline }: TourneyListProps
                         />
                     </Link>
                 ))}
-                {filteredTourneys?.length === 0 && (
+                {tourneys?.length === 0 && (
                     <p className="col-span-full text-center text-muted-foreground py-8">No se encontraron torneos con los filtros aplicados.</p>
                 )}
             </div>

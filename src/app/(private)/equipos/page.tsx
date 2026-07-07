@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -37,16 +37,10 @@ import EquipoForm from "@/components/equipo-form";
 import Link from "next/link";
 
 export default function Equipos() {
-  const { data: teams, isLoading } = useTeams();
-  const { data: disciplines } = useDisciplines();
-  const { data: universities } = useUniversities();
   const deleteTeam = useDeleteTeam();
   const [deleteId, setDeleteId] = useState<number | null>(null);
-
-  // Estado para controlar la apertura del modal de creación
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Lógica de filtrado
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 400);
   const [onlyRegular, setOnlyRegular] = useState(false);
@@ -54,20 +48,15 @@ export default function Equipos() {
   const [disciplineFilter, setDisciplineFilter] = useState("all");
   const [universityFilter, setUniversityFilter] = useState("all");
 
-  const filteredTeams = useMemo(() => {
-    if (!teams) return [];
-
-    return teams.filter((t) => {
-      const lowerSearch = debouncedSearch.toLowerCase();
-      const matchesSearch = t.Name.toLowerCase().includes(lowerSearch);
-      const matchesRegular = onlyRegular ? t.Regular : true;
-      const matchesCategory = categoryFilter === "all" || t.Category === categoryFilter;
-      const matchesDiscipline = disciplineFilter === "all" || t.DisciplineID?.toString() === disciplineFilter;
-      const matchesUniversity = universityFilter === "all" || t.UniversityID?.toString() === universityFilter;
-
-      return matchesSearch && matchesRegular && matchesCategory && matchesDiscipline && matchesUniversity;
-    });
-  }, [teams, debouncedSearch, onlyRegular, categoryFilter, disciplineFilter, universityFilter]);
+  const { data: teams, isLoading } = useTeams({
+    name: debouncedSearch || undefined,
+    regular: onlyRegular ? "true" : undefined,
+    category: categoryFilter !== "all" ? categoryFilter : undefined,
+    discipline_id: disciplineFilter !== "all" ? disciplineFilter : undefined,
+    university_id: universityFilter !== "all" ? universityFilter : undefined,
+  });
+  const { data: disciplines } = useDisciplines();
+  const { data: universities } = useUniversities();
 
   const confirmDelete = async () => {
     if (deleteId) {
@@ -179,7 +168,7 @@ export default function Equipos() {
       <div className="border rounded-lg bg-white shadow-sm overflow-hidden">
         <Table>
           <TableCaption>
-            {filteredTeams.length === 0 && !isLoading
+            {(teams?.length === 0 || !teams) && !isLoading
               ? "No se encontraron equipos con ese criterio."
               : "Lista de equipos deportivos registrados en el sistema."}
           </TableCaption>
@@ -206,7 +195,7 @@ export default function Equipos() {
             }
 
             {/* Renderizado de equipos */}
-            {filteredTeams?.map((team) => (
+            {teams?.map((team) => (
               <TableRow key={team.ID} className="hover:bg-slate-50/50">
                 <TableCell className="font-medium text-slate-700">{team.Name}</TableCell>
                 <TableCell>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -27,8 +27,6 @@ import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
 
 export default function Universidad() {
-  const { data: universities, isLoading, isError } = useUniversities();
-  console.log(universities)
   const deleteMutation = useDeleteUniversity();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,13 +38,9 @@ export default function Universidad() {
   const [deletingUniversity, setDeletingUniversity] = useState<University | null>(null);
   const [openDelete, setOpenDelete] = useState(false);
 
-  const filteredUniversities = useMemo(() => {
-    if (!universities) return [];
-    if (!debouncedSearch) return universities;
-    return universities.filter((u) =>
-      u.Name.toLowerCase().includes(debouncedSearch.toLowerCase())
-    );
-  }, [universities, debouncedSearch]);
+  const { data: universities, isLoading, isError } = useUniversities({
+    name: debouncedSearch || undefined,
+  });
 
   const confirmDelete = async () => {
     if (!deletingUniversity) return;
@@ -104,7 +98,7 @@ export default function Universidad() {
       <div className="border rounded-xl bg-white shadow-sm overflow-hidden">
         <Table>
           <TableCaption>
-            {filteredUniversities.length === 0 && !isLoading
+            {(universities?.length === 0 || !universities) && !isLoading
               ? "No se encontraron universidades."
               : "Lista oficial de universidades registradas."}
           </TableCaption>
@@ -128,7 +122,7 @@ export default function Universidad() {
               ))}
 
             {/* Renderizado de datos */}
-            {filteredUniversities?.map((uni) => (
+            {universities?.map((uni) => (
               <TableRow key={uni.ID} className="hover:bg-slate-50/50 transition-colors">
                 <TableCell className="font-mono text-muted-foreground">{uni.ID}</TableCell>
                 <TableCell className="font-medium">{uni.Name}</TableCell>
