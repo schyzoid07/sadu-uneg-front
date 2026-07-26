@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useDeleteAthlete() {
     const qc = useQueryClient();
