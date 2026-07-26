@@ -1,6 +1,8 @@
 import ky from "ky";
 
-const API_BASE_URL = "http://localhost:8080";
+// Configurable por entorno. Si NEXT_PUBLIC_API_URL no está definida se asume el
+// backend local, así que el desarrollo sigue funcionando sin configurar nada.
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 const SESSION_COOKIE_NAME = "session_token";
 
 // Helper to get a cookie value (client or server)

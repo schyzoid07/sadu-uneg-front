@@ -49,7 +49,6 @@ export default function Eventos() {
   // Hook personalizado
   // useEvents no acepta argumentos en el hook definido, así que filtramos en cliente
   const { data: events, isLoading } = useEvents();
-  console.log(events);
   const { data: disciplines } = useDisciplines();
   const { data: universities } = useUniversities();
   const [disciplineFilter, setDisciplineFilter] = useState("all");

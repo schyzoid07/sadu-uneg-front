@@ -26,7 +26,6 @@ export function TourneyList({ searchTerm, selectedDiscipline }: TourneyListProps
     const [deletingTourney, setDeletingTourney] = useState<Tourney | null>(null);
     const [openDelete, setOpenDelete] = useState(false);
 
-    console.log("TourneyList - Data recibida del hook:", tourneys);
 
     const filteredTourneys = useMemo(() => {
         if (!tourneys) return [];
@@ -52,7 +51,6 @@ export function TourneyList({ searchTerm, selectedDiscipline }: TourneyListProps
         return result;
     }, [tourneys, searchTerm, selectedDiscipline,]);
 
-    console.log("TourneyList - Data filtrada a renderizar:", filteredTourneys);
 
     const handleConfirmDelete = async () => {
         if (!deletingTourney) return;

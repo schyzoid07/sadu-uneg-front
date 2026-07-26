@@ -37,7 +37,6 @@ import { useDebounce } from "@/hooks/use-debounce";
 export default function Atletas() {
   const { data: athletes, isLoading, isError } = useAthletes();
   const { data: disciplines } = useDisciplines();
-  console.log(athletes)
   const [openCreate, setOpenCreate] = useState(false);
 
   //logica de filtrado
@@ -252,6 +251,11 @@ export default function Atletas() {
               <strong>{deletingAthlete?.FirstNames} {deletingAthlete?.LastNames}</strong> (Cédula: {deletingAthlete?.GovID})?
               Esta acción no se puede deshacer.
             </p>
+            {deleteMutation.isError && (
+              <p className="mt-3 p-3 rounded-md bg-red-50 text-red-600 text-sm">
+                No se pudo eliminar el atleta. Puede que ya haya sido eliminado; recarga la lista e intenta de nuevo.
+              </p>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-2">

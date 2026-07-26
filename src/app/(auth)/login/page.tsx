@@ -32,7 +32,6 @@ export default function ProfileForm() {
     })
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log("Formulario válido, enviando a actions.ts:", values);
         setIsLoading(true);
         setError(null);
         try {
@@ -40,7 +39,6 @@ export default function ProfileForm() {
             if (result?.error) {
                 setError(result.error);
             }
-            console.log("Resultado del login:", result);
         } catch (err) {
             setError("Algo salio mal. Intenta nuevamente.");
         } finally {
@@ -53,7 +51,7 @@ export default function ProfileForm() {
             <div className="w-full max-w-md bg-white rounded-xl shadow-lg border border-slate-200 p-8">
                 <Form {...form}>
                     <form
-                        onSubmit={form.handleSubmit(onSubmit, (errors) => console.log("Errores de validación (actions.ts no se ejecutará):", errors))}
+                        onSubmit={form.handleSubmit(onSubmit)}
                         className="space-y-4"
                     >
                         <h1 className="text-2xl font-bold mb-6 text-center text-[#2f34a0]">Iniciar Sesión</h1>

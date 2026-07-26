@@ -28,7 +28,6 @@ import { useDebounce } from "@/hooks/use-debounce";
 
 export default function Universidad() {
   const { data: universities, isLoading, isError } = useUniversities();
-  console.log(universities)
   const deleteMutation = useDeleteUniversity();
 
   const [searchTerm, setSearchTerm] = useState("");

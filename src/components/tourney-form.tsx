@@ -33,7 +33,6 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
 
     // Hooks de datos
     const { data: tourney, isLoading: isLoadingTourney } = useTourney(tourneyId);
-    console.log(tourney)
     const { data: events, isLoading: isLoadingEvents } = useEvents(); // Obtenemos todos los eventos disponibles
     const { data: disciplines } = useDisciplines();
     const createMutation = useCreateTourney();

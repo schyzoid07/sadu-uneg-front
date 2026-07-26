@@ -59,7 +59,7 @@ export default function CrearCarreraForm({ majorId, onSuccess }: CrearCarreraFor
 
     const canSubmit = !isInvalid && !isUnchanged;
 
-    const isSubmitting = createMutation.isLoading || updateMutation.isLoading;
+    const isSubmitting = createMutation.isPending || updateMutation.isPending;
     // ----------------------------
 
 

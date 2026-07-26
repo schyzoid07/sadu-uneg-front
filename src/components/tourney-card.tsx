@@ -18,7 +18,6 @@ interface TourneyCardProps {
 }
 
 export const TourneyCard = memo(function TourneyCard({ tourney, totalEvents, startDate, endDate, onDelete }: TourneyCardProps) {
-    console.log("no se quejesto " + tourney)
 
     const handleDeleteClick = (e: React.MouseEvent) => {
         e.preventDefault();

@@ -96,10 +96,11 @@ export default function CrearAtletaForm({ athleteId, onSuccess }: CrearAtletaFor
     const teamsWithDisciplines = useMemo(() => {
         if (!teams || !disciplines) return [];
         const disciplineMap = new Map(disciplines.map(d => [d.ID, d.Name]));
-        return teams.map(team => ({
-            ...team,
-            disciplineName: disciplineMap.get(team.DisciplineID) || 'Sin Disciplina'
-        }));
+        return teams.map(team => {
+            // El equipo puede no traer DisciplineID: en ese caso no hay nada que buscar.
+            const nombre = team.DisciplineID != null ? disciplineMap.get(team.DisciplineID) : undefined;
+            return { ...team, disciplineName: nombre || 'Sin Disciplina' };
+        });
     }, [teams, disciplines]);
 
     const selectedTeamObjects = useMemo(() => {
@@ -149,14 +150,26 @@ export default function CrearAtletaForm({ athleteId, onSuccess }: CrearAtletaFor
     };
 
     const canSubmit = isFormValid && hasChanges();
-    const isSubmitting = createMutation.isLoading || updateMutation.isLoading;
+    const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
 
 
+
+    // Muestra el detalle que envía el backend (por ejemplo, cédula duplicada)
+    // en lugar de dejar el formulario sin respuesta.
+    const mostrarError = async (err: any) => {
+        let detalle = "No se pudo guardar el atleta.";
+        try {
+            const body = await err?.response?.json();
+            if (body?.detail) detalle = body.detail;
+        } catch { }
+        setMensaje(`Error: ${detalle}`);
+    };
 
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault?.();
         if (!canSubmit) return;
+        setMensaje(null);
 
         const payload: AthleteInput = {
 
@@ -185,6 +198,7 @@ export default function CrearAtletaForm({ athleteId, onSuccess }: CrearAtletaFor
                         setTimeout(() => setMensaje(null), 3000); // Se borra tras 3 segundos
                         if (onSuccess) onSuccess();
                     },
+                    onError: (err: any) => mostrarError(err),
                 }
             );
         } else {
@@ -195,6 +209,7 @@ export default function CrearAtletaForm({ athleteId, onSuccess }: CrearAtletaFor
                     setTimeout(() => setMensaje(null), 3000);
                     if (onSuccess) onSuccess();
                 },
+                onError: (err: any) => mostrarError(err),
             });
         }
     };
@@ -332,6 +347,12 @@ export default function CrearAtletaForm({ athleteId, onSuccess }: CrearAtletaFor
                 </div>
 
 
+
+                {mensaje && (
+                    <div className={`p-3 rounded-md text-sm ${mensaje.includes("Error") ? "bg-red-50 text-red-600" : "bg-green-50 text-green-600"}`}>
+                        {mensaje}
+                    </div>
+                )}
 
                 <div className="flex justify-end gap-3 pt-2 border-t mt-4">
                     <Link href="/atletas">

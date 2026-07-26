@@ -56,7 +56,6 @@ export function EventoForm({ eventId, onSuccess }: EventFormProps) {
     // Cargar datos al editar
     useEffect(() => {
         if (event) {
-            console.log(event);
             setName(event.Name || "");
 
             // Formatear fecha para el input datetime-local (YYYY-MM-DDThh:mm)
@@ -71,17 +70,14 @@ export function EventoForm({ eventId, onSuccess }: EventFormProps) {
             }
 
             setStatus(event.Status || "Pendiente");
-            console.log(event.Status)
 
             const dId = event.Discipline?.ID;
             setDisciplineId(dId ? dId.toString() : "");
             const hId = event.HomeTeam?.ID;
 
-            console.log(event.HomeTeam?.ID)
             setHomeTeamId(hId ? hId.toString() : "");
             const oId = event.OppositeTeam?.ID;
 
-            console.log(event.OppositeTeam?.ID)
             setOppositeTeamId(oId ? oId.toString() : "");
             const tId = event.ResponsableTeacher?.ID;
             setTeacherId(tId ? tId.toString() : "");

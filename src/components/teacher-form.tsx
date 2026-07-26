@@ -20,7 +20,6 @@ interface TeacherFormProps {
 export default function TeacherForm({ teacherId, onSuccess }: TeacherFormProps) {
     // Hooks
     const { data: teacher, isLoading: isLoadingTeacher } = useTeacher(teacherId);
-    console.log(teacher)
     const { data: disciplines } = useDisciplines();
     const createMutation = useCreateTeacher();
     const updateMutation = useUpdateTeacher();
@@ -73,9 +72,15 @@ export default function TeacherForm({ teacherId, onSuccess }: TeacherFormProps) 
                 setMessage("Profesor creado correctamente.");
             }
             if (onSuccess) onSuccess();
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error saving teacher:", error);
-            setMessage("Error al guardar el profesor.");
+            // El backend explica el motivo en `detail` (por ejemplo, cédula duplicada).
+            let detalle = "Error al guardar el profesor.";
+            try {
+                const body = await error?.response?.json();
+                if (body?.detail) detalle = `Error: ${body.detail}`;
+            } catch { }
+            setMessage(detalle);
         }
     };
 
