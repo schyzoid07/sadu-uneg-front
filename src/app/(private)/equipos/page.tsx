@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -37,7 +37,23 @@ import EquipoForm from "@/components/equipo-form";
 import Link from "next/link";
 
 export default function Equipos() {
-  const { data: teams, isLoading } = useTeams();
+  // Lógica de filtrado: el estado alimenta la consulta, así que se declara antes
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 400);
+  const [onlyRegular, setOnlyRegular] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [disciplineFilter, setDisciplineFilter] = useState("all");
+  const [universityFilter, setUniversityFilter] = useState("all");
+
+  // Los filtros los resuelve el backend. `regular` solo se envía cuando está
+  // marcado: enviarlo en false filtraría a los equipos NO titulares.
+  const { data: teams, isLoading } = useTeams({
+    name: debouncedSearch,
+    category: categoryFilter,
+    discipline_id: disciplineFilter,
+    university_id: universityFilter,
+    regular: onlyRegular ? "true" : undefined,
+  });
   const { data: disciplines } = useDisciplines();
   const { data: universities } = useUniversities();
   const deleteTeam = useDeleteTeam();
@@ -46,28 +62,7 @@ export default function Equipos() {
   // Estado para controlar la apertura del modal de creación
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Lógica de filtrado
-  const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearch = useDebounce(searchTerm, 400);
-  const [onlyRegular, setOnlyRegular] = useState(false);
-  const [categoryFilter, setCategoryFilter] = useState("all");
-  const [disciplineFilter, setDisciplineFilter] = useState("all");
-  const [universityFilter, setUniversityFilter] = useState("all");
-
-  const filteredTeams = useMemo(() => {
-    if (!teams) return [];
-
-    return teams.filter((t) => {
-      const lowerSearch = debouncedSearch.toLowerCase();
-      const matchesSearch = t.Name.toLowerCase().includes(lowerSearch);
-      const matchesRegular = onlyRegular ? t.Regular : true;
-      const matchesCategory = categoryFilter === "all" || t.Category === categoryFilter;
-      const matchesDiscipline = disciplineFilter === "all" || t.DisciplineID?.toString() === disciplineFilter;
-      const matchesUniversity = universityFilter === "all" || t.UniversityID?.toString() === universityFilter;
-
-      return matchesSearch && matchesRegular && matchesCategory && matchesDiscipline && matchesUniversity;
-    });
-  }, [teams, debouncedSearch, onlyRegular, categoryFilter, disciplineFilter, universityFilter]);
+  const filteredTeams = teams ?? [];
 
   const confirmDelete = async () => {
     if (deleteId) {

@@ -1,7 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import * as z from "zod";
 import { baseAthletesSchema, detailAthleteSchema } from "@/schemas/athletes";
+import { buildSearchParams } from "@/lib/query-params";
 
 // 1. Definimos los esquemas y tipos fuera del hook
 
@@ -18,9 +19,20 @@ const resAthleteSchema = z.object({
 export type Athletes = z.infer<typeof baseAthletesSchema>;
 export type Athlete = z.infer<typeof detailAthleteSchema>;
 
-const fetchAllAthletes = async () => {
+/** Filtros que resuelve el backend en `GET /athletes`. */
+export type AthleteFilters = {
+  /** Buscador único: coincide con nombre, apellido o cédula. */
+  search?: string;
+  name?: string;
+  last_name?: string;
+  gov_id?: string;
+  gender?: string;
+  discipline_id?: string | number;
+};
+
+const fetchAllAthletes = async (filters: AthleteFilters) => {
   try {
-    const res = await api.get("athletes").json();
+    const res = await api.get("athletes", { searchParams: buildSearchParams(filters) }).json();
     const parsed = resAthletesSchema.parse(res);
     return parsed.data;
   }
@@ -44,10 +56,16 @@ const fetchAthlete = async (id?: string) => {
 };
 
 
-export function useAthletes() {
+/**
+ * Los filtros forman parte de la `queryKey`, así que cada combinación se cachea por
+ * separado. `keepPreviousData` mantiene visible el listado anterior mientras llega el
+ * nuevo, para que la tabla no parpadee al escribir en el buscador.
+ */
+export function useAthletes(filters: AthleteFilters = {}) {
   return useQuery({
-    queryKey: ["athletes"],
-    queryFn: fetchAllAthletes,
+    queryKey: ["athletes", filters],
+    queryFn: () => fetchAllAthletes(filters),
+    placeholderData: keepPreviousData,
   });
 }
 

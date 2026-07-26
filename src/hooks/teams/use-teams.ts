@@ -1,4 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { buildSearchParams } from "@/lib/query-params";
 import { api } from "@/lib/api";
 import * as z from "zod";
 import { teamsSchema } from "@/schemas/teams";
@@ -27,8 +28,18 @@ const resTeamSchema = z.object({
 
 export type Team = z.infer<typeof teamsSchema>;
 
-const fetchTeams = async () => {
-  const res = await api.get("teams").json();
+/** Filtros que resuelve el backend en `GET /teams`. */
+export type TeamFilters = {
+  name?: string;
+  category?: string;
+  discipline_id?: string | number;
+  university_id?: string | number;
+  /** Se envía solo cuando se quiere ver únicamente los titulares. */
+  regular?: "true";
+};
+
+const fetchTeams = async (filters: TeamFilters) => {
+  const res = await api.get("teams", { searchParams: buildSearchParams(filters) }).json();
   const parsed = resSchema.parse(res);
   return parsed.data;
 };
@@ -40,10 +51,11 @@ const fetchTeam = async (id?: string) => {
   return parsed.data;
 };
 
-export function useTeams() {
+export function useTeams(filters: TeamFilters = {}) {
   return useQuery({
-    queryKey: ["teams"],
-    queryFn: fetchTeams,
+    queryKey: ["teams", filters],
+    queryFn: () => fetchTeams(filters),
+    placeholderData: keepPreviousData,
   });
 }
 

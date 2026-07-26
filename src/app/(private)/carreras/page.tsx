@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useDebounce } from "@/hooks/use-debounce";
 import {
     Table,
@@ -24,29 +24,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Major, useMajors } from "@/hooks/majors/use-major";
 import Link from "next/link";
 import CrearCarreraForm from "@/components/carrera-form";
-import { useDeleteMajor } from "@/hooks/majors/use-delete-major";
+import { useDeleteMajor } from "@/hooks/majors/use-major";
 
 
 export default function Carreras() {
-    const { data: majors, isLoading, isError } = useMajors();
-    const [openCreate, setOpenCreate] = useState(false);
-
-    //logica de filtrado
+    //logica de filtrado: el estado alimenta la consulta
     const [searchTerm, setSearchTerm] = useState('')
     const debouncedSearch = useDebounce(searchTerm, 400)
 
-    const filteredMajors = useMemo(() => {
-        if (!majors) return [];
-        if (!debouncedSearch) return majors;
+    // El filtro por nombre lo resuelve el backend
+    const { data: majors, isLoading, isError } = useMajors({ name: debouncedSearch });
+    const [openCreate, setOpenCreate] = useState(false);
 
-        const lowerSearch = debouncedSearch.toLowerCase()
-
-        return majors.filter((m) => {
-            return (
-                m.Name.toLowerCase().includes(lowerSearch)
-            )
-        })
-    }, [majors, debouncedSearch])
+    const filteredMajors = majors ?? [];
 
 
 
