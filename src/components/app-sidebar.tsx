@@ -67,6 +67,10 @@ const data = {
           url: "/eventos",
         },
         {
+          title: "Torneos",
+          url: "/torneos",
+        },
+        {
           title: "Universidad",
           url: "/universidad",
         },
@@ -74,10 +78,6 @@ const data = {
           title: "Carreras",
           url: "/carreras",
         },
-        /*{ 
-          title: "Torneos",
-          url: "/torneos",
-        },*/
       ],
     },
   ],

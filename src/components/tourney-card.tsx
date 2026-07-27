@@ -37,6 +37,13 @@ export const TourneyCard = memo(function TourneyCard({ tourney, totalEvents, sta
 
     const eventsCount = totalEvents || 0;
 
+    // Los torneos guardados sin fechas llegan con el cero de Go (`0001-01-01`), que
+    // es una fecha válida para `Date`: sin este descarte la tarjeta mostraría
+    // "1 ene 1" en lugar de "Fechas por definir".
+    const fechaDefinida = (fecha?: Date) =>
+        !!fecha && !Number.isNaN(fecha.getTime()) && fecha.getUTCFullYear() > 1900;
+    const tieneFechas = fechaDefinida(startDate) && fechaDefinida(endDate);
+
     return (
         <div className="bg-white border rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden flex flex-col group relative">
             {/* Header y Contenido */}
@@ -49,9 +56,9 @@ export const TourneyCard = memo(function TourneyCard({ tourney, totalEvents, sta
                         </h3>
                         <div className="text-sm text-muted-foreground flex items-center gap-1">
                             <CalendarDays className="h-4 w-4" />
-                            {(startDate && endDate) ? (
+                            {tieneFechas ? (
                                 <span>
-                                    {format(startDate, "d MMM yyyy", { locale: es })} - {format(endDate, "d MMM yyyy", { locale: es })}
+                                    {format(startDate!, "d MMM yyyy", { locale: es })} - {format(endDate!, "d MMM yyyy", { locale: es })}
                                 </span>
                             ) : (
                                 <span>Fechas por definir</span>
