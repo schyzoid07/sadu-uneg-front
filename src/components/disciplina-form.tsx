@@ -10,10 +10,16 @@ import { Discipline } from "@/hooks/disciplines/use-disciplines";
 
 interface DisciplinaFormProps {
     onSuccess?: () => void;
+    /**
+     * Cómo se sale sin guardar. Si no se pasa, el botón cae en `onSuccess`, que es
+     * lo que hacía antes: sirve para cerrar el diálogo, pero anunciar un guardado
+     * que no ocurrió confunde a quien añada un aviso a `onSuccess`.
+     */
+    onCancel?: () => void;
     discipline?: Discipline | null; // si se pasa, entra en modo edición
 }
 
-export default function DisciplinaForm({ onSuccess, discipline }: DisciplinaFormProps) {
+export default function DisciplinaForm({ onSuccess, onCancel, discipline }: DisciplinaFormProps) {
     const [name, setName] = useState("");
     const createMutation = useCreateDiscipline();
     const updateMutation = useUpdateDiscipline();
@@ -60,7 +66,7 @@ export default function DisciplinaForm({ onSuccess, discipline }: DisciplinaForm
             </div>
 
             <div className="flex justify-end gap-3 pt-2">
-                <Button variant="outline" type="button" onClick={() => { if (onSuccess) onSuccess(); }}>
+                <Button variant="outline" type="button" onClick={() => (onCancel ?? onSuccess)?.()}>
                     Cancelar
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>

@@ -22,10 +22,17 @@ import Link from "next/link";
 
 interface EventFormProps {
     onSuccess?: () => void;
+    /**
+     * Cómo se sale del formulario sin guardar. Cuando el formulario está dentro de
+     * un diálogo hay que cerrarlo desde aquí: navegar a la lista no sirve, porque
+     * ya se está en esa misma ruta y el diálogo se quedaría abierto. Sin este
+     * manejador —el caso de la página de edición— el botón vuelve al listado.
+     */
+    onCancel?: () => void;
     eventId?: string;
 }
 
-export function EventoForm({ eventId, onSuccess }: EventFormProps) {
+export function EventoForm({ eventId, onSuccess, onCancel }: EventFormProps) {
     const isEditMode = !!eventId;
 
     // Hooks de datos
@@ -375,11 +382,17 @@ export function EventoForm({ eventId, onSuccess }: EventFormProps) {
 
             {/* Botones de Acción */}
             <div className="flex justify-end gap-3 pt-4 border-t">
-                <Link href="/eventos">
-                    <Button variant="outline" type="button">
-                        Cancelar / Volver
+                {onCancel ? (
+                    <Button variant="outline" type="button" onClick={onCancel}>
+                        Cancelar
                     </Button>
-                </Link>
+                ) : (
+                    <Link href="/eventos">
+                        <Button variant="outline" type="button">
+                            Cancelar / Volver
+                        </Button>
+                    </Link>
+                )}
                 <Button
                     type="submit"
                     disabled={isSubmitting || !isFormValid}

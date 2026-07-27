@@ -163,7 +163,10 @@ export default function Equipos() {
                 <DialogTitle>Registrar Nuevo Equipo</DialogTitle>
               </DialogHeader>
               <div className="max-h-[80vh] overflow-y-auto px-1">
-                <EquipoForm onSuccess={() => setIsModalOpen(false)} />
+                <EquipoForm
+                  onSuccess={() => setIsModalOpen(false)}
+                  onCancel={() => setIsModalOpen(false)}
+                />
               </div>
             </DialogContent>
           </Dialog>

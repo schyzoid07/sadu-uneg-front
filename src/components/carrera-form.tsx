@@ -15,12 +15,18 @@ import { MajorInputType } from "@/schemas/majors";
 interface CrearCarreraFormProps {
 
     onSuccess?: () => void;
+    /**
+     * Cómo se sale sin guardar. Dentro de un diálogo hay que cerrarlo desde aquí:
+     * navegar al listado no hace nada visible, porque ya se está en esa ruta y el
+     * diálogo sigue abierto. Sin este manejador el botón vuelve al listado.
+     */
+    onCancel?: () => void;
     majorId?: string; // si se pasa, el formulario actúa en modo edición
 }
 
 type MajorInput = z.infer<typeof MajorInputType>
 
-export default function CrearCarreraForm({ majorId, onSuccess }: CrearCarreraFormProps) {
+export default function CrearCarreraForm({ majorId, onSuccess, onCancel }: CrearCarreraFormProps) {
 
     const { data: major } = useMajor(majorId)
     const [id, setId] = useState<number | null>(null)
@@ -116,11 +122,17 @@ export default function CrearCarreraForm({ majorId, onSuccess }: CrearCarreraFor
 
 
                 <div className="flex justify-end gap-3 pt-2">
-                    <Link href="/carreras">
-                        <Button variant="outline" type="button" >
-                            Retroceder
+                    {onCancel ? (
+                        <Button variant="outline" type="button" onClick={onCancel}>
+                            Cancelar
                         </Button>
-                    </Link>
+                    ) : (
+                        <Link href="/carreras">
+                            <Button variant="outline" type="button" >
+                                Retroceder
+                            </Button>
+                        </Link>
+                    )}
                     <Button type="submit" disabled={!canSubmit || isSubmitting} onClick={handleSubmit}>
                         {isSubmitting ? <Loader2 className="animate-spin h-4 w-4" /> : (major ? "Guardar cambios" : "Crear carrera")}
                     </Button>

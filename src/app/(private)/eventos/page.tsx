@@ -190,7 +190,10 @@ export default function Eventos() {
               <DialogHeader>
                 <DialogTitle>Añadir Nuevo Evento</DialogTitle>
               </DialogHeader>
-              <EventoForm onSuccess={() => setOpenCreate(false)} />
+              <EventoForm
+                onSuccess={() => setOpenCreate(false)}
+                onCancel={() => setOpenCreate(false)}
+              />
             </DialogContent>
           </Dialog>
         </div>

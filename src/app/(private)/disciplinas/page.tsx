@@ -69,6 +69,7 @@ export default function DisciplinasPage() {
               onSuccess={() => {
                 setOpenCreate(false);
               }}
+              onCancel={() => setOpenCreate(false)}
             />
           </DialogContent>
         </Dialog>
@@ -148,6 +149,10 @@ export default function DisciplinasPage() {
             <DisciplinaForm
               discipline={editing}
               onSuccess={() => {
+                setOpenEdit(false);
+                setEditing(null);
+              }}
+              onCancel={() => {
                 setOpenEdit(false);
                 setEditing(null);
               }}

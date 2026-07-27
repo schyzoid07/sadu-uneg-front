@@ -144,6 +144,7 @@ export default function Atletas() {
                 onSuccess={() => {
                   setOpenCreate(false);
                 }}
+                onCancel={() => setOpenCreate(false)}
               /></div>
 
           </DialogContent>
