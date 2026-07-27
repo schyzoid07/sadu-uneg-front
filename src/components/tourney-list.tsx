@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useTourneys, useDeleteTourney, Tourney } from "@/hooks/tourneys/use-tourneys";
 import { TourneyCard } from "@/components/tourney-card";
 import { Loader2 } from "lucide-react";
@@ -20,39 +20,21 @@ interface TourneyListProps {
 }
 
 export function TourneyList({ searchTerm, selectedDiscipline }: TourneyListProps) {
-    const { data: tourneys, isLoading, isError } = useTourneys();
+    // Los filtros los resuelve el backend, por nombre y por la disciplina del torneo.
+    // Antes se filtraba en cliente por la disciplina de los *eventos* del torneo, pero
+    // el listado devuelve `TourneyGetBareDTO`, que no incluye `Events`: al elegir una
+    // disciplina no aparecía ningún torneo.
+    const { data: tourneys, isLoading, isError } = useTourneys({
+        name: searchTerm,
+        discipline_id: selectedDiscipline,
+    });
     const deleteMutation = useDeleteTourney();
 
     const [deletingTourney, setDeletingTourney] = useState<Tourney | null>(null);
     const [openDelete, setOpenDelete] = useState(false);
 
-    console.log("TourneyList - Data recibida del hook:", tourneys);
+    const filteredTourneys = tourneys ?? [];
 
-    const filteredTourneys = useMemo(() => {
-        if (!tourneys) return [];
-
-        let result = tourneys;
-
-        // 1. Filtrar por nombre del torneo
-        if (searchTerm) {
-            result = result.filter(tourney =>
-                tourney.Name.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-        }
-
-        // 2. Filtrar por disciplina
-        if (selectedDiscipline) {
-            result = result.filter(tourney =>
-                tourney.Events?.some(event =>
-                    (event.Discipline?.ID?.toString()) === selectedDiscipline
-                )
-            );
-        }
-
-        return result;
-    }, [tourneys, searchTerm, selectedDiscipline,]);
-
-    console.log("TourneyList - Data filtrada a renderizar:", filteredTourneys);
 
     const handleConfirmDelete = async () => {
         if (!deletingTourney) return;

@@ -41,7 +41,6 @@ export default function EquipoForm({ onSuccess, teamId }: EquipoFormProps) {
   // Cargar datos al editar cuando 'team' esté disponible
   useEffect(() => {
     if (teamId && team) {
-      console.log("📝 [FORM] Datos cargados para editar:", team);
       setTeamName(team.Name || "");
       setRegular(team.Regular || false);
       setCategory(team.Category || "");
@@ -102,7 +101,6 @@ export default function EquipoForm({ onSuccess, teamId }: EquipoFormProps) {
       Regular: regular,
     };
 
-    console.log("🚀 [POST/PUT] Payload a enviar:", payload);
 
     try {
       if (teamId && team) {

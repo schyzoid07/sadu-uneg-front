@@ -1,5 +1,6 @@
 // hooks/majors/use-major.ts
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { buildSearchParams } from "@/lib/query-params";
 import { api } from "@/lib/api";
 import * as z from "zod";
 
@@ -27,9 +28,14 @@ const resMajorSchema = z.object({
 // Inferimos el tipo para usarlo en el componente si fuera necesario
 export type Major = z.infer<typeof majorSchema>;
 
-const fetchMajors = async () => {
+/** Filtros que resuelve el backend en `GET /majors`. */
+export type MajorFilters = {
+    name?: string;
+};
+
+const fetchMajors = async (filters: MajorFilters) => {
     try {
-        const res = await api.get("majors").json();
+        const res = await api.get("majors", { searchParams: buildSearchParams(filters) }).json();
         const parsed = resMajorsSchema.parse(res);
         return parsed.data;
     } catch (error) {
@@ -38,10 +44,11 @@ const fetchMajors = async () => {
     }
 };
 
-export function useMajors() {
+export function useMajors(filters: MajorFilters = {}) {
     return useQuery({
-        queryKey: ["majors"],
-        queryFn: fetchMajors,
+        queryKey: ["majors", filters],
+        queryFn: () => fetchMajors(filters),
+        placeholderData: keepPreviousData,
     });
 }
 

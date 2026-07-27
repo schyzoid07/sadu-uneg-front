@@ -1,5 +1,6 @@
 // src/hooks/events/use-events.ts
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { buildSearchParams } from "@/lib/query-params";
 import { api } from "@/lib/api";
 import * as z from "zod";
 import { eventBareSchema, eventDetailSchema, Event } from "@/schemas/event";
@@ -28,10 +29,21 @@ export type CreateEventInput = z.infer<typeof eventInputSchema>;
 export type UpdateEventInput = Partial<CreateEventInput>;
 
 // 2. Funciones de Fetching
-const fetchEvents = async () => {
+/** Filtros que resuelve el backend en `GET /events`. */
+export type EventFilters = {
+  name?: string;
+  status?: string;
+  discipline_id?: string | number;
+  university_id?: string | number;
+  team_name?: string;
+  date_from?: string;
+  date_to?: string;
+};
+
+const fetchEvents = async (filters: EventFilters) => {
   try {
     // El backend devuelve []EventGetBareDTO directamente
-    const res: any = await api.get("events").json();
+    const res: any = await api.get("events", { searchParams: buildSearchParams(filters) }).json();
 
     // Si viene envuelto en { data: [...] }, extraemos data, sino usamos res directo
     const data = (res && typeof res === 'object' && 'data' in res) ? res.data : res;
@@ -69,10 +81,11 @@ const fetchEvent = async (id?: string) => {
 };
 
 // 3. Hooks
-export function useEvents() {
+export function useEvents(filters: EventFilters = {}) {
   return useQuery({
-    queryKey: ["events"],
-    queryFn: fetchEvents,
+    queryKey: ["events", filters],
+    queryFn: () => fetchEvents(filters),
+    placeholderData: keepPreviousData,
   });
 }
 

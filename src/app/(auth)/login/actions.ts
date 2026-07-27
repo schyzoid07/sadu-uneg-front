@@ -8,7 +8,6 @@ import { api } from "@/lib/api";
 
 export async function loginAction(values: z.infer<typeof formSchema>) {
     // Aquí es donde harías la llamada a tu API de backend para verificar las credenciales.
-    console.log("Intentando iniciar sesión con:", values.email);
 
     let token;
 
@@ -25,11 +24,9 @@ export async function loginAction(values: z.infer<typeof formSchema>) {
             }
         }).json(); // .json() ya convierte la respuesta a objeto, no necesitas JSON.parse
 
-        console.log("Respuesta del Backend:", data);
 
         if (data && data.data) {
             token = data.data;
-            console.log("Token asignado:", token);
         } else {
             console.error("El backend no envió la propiedad 'data' con el token");
         }

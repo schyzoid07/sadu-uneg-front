@@ -1,5 +1,6 @@
 // src/hooks/teachers/use-teachers.ts
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { buildSearchParams } from "@/lib/query-params";
 import { api } from "@/lib/api";
 import * as z from "zod";
 import { TeacherInput, baseTeacherSchema } from "@/schemas/teachers";
@@ -16,9 +17,16 @@ const resTeacherSchema = z.object({
 });
 
 // 2. Funciones de Fetching
-const fetchTeachers = async () => {
+/** Filtros que resuelve el backend en `GET /teachers`. */
+export type TeacherFilters = {
+  /** Buscador único: nombre, apellido o cédula. */
+  search?: string;
+  discipline_id?: string | number;
+};
+
+const fetchTeachers = async (filters: TeacherFilters) => {
   try {
-    const res = await api.get("teachers").json();
+    const res = await api.get("teachers", { searchParams: buildSearchParams(filters) }).json();
     const parsed = resTeachersSchema.parse(res);
     return parsed.data;
   } catch (error) {
@@ -40,10 +48,11 @@ const fetchTeacher = async (id?: string) => {
 };
 
 // 3. Hooks
-export function useTeachers() {
+export function useTeachers(filters: TeacherFilters = {}) {
   return useQuery({
-    queryKey: ["teachers"],
-    queryFn: fetchTeachers,
+    queryKey: ["teachers", filters],
+    queryFn: () => fetchTeachers(filters),
+    placeholderData: keepPreviousData,
   });
 }
 

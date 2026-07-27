@@ -1,4 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { buildSearchParams } from "@/lib/query-params";
 import { api } from "@/lib/api";
 import { universitySchema, UniversityInput } from "@/schemas/universities";
 import * as z from "zod";
@@ -13,8 +14,14 @@ const resUniversitySchema = z.object({
   message: z.string(),
 });
 
-const fetchUniversities = async () => {
-  const res = await api.get("universities").json();
+/** Filtros que resuelve el backend en `GET /universities`. */
+export type UniversityFilters = {
+  name?: string;
+  local?: "true" | "false";
+};
+
+const fetchUniversities = async (filters: UniversityFilters) => {
+  const res = await api.get("universities", { searchParams: buildSearchParams(filters) }).json();
   const parsed = resUniversitiesSchema.parse(res);
   return parsed.data;
 };
@@ -26,10 +33,11 @@ const fetchUniversity = async (id?: string) => {
   return parsed.data;
 };
 
-export function useUniversities() {
+export function useUniversities(filters: UniversityFilters = {}) {
   return useQuery({
-    queryKey: ["universities"],
-    queryFn: fetchUniversities,
+    queryKey: ["universities", filters],
+    queryFn: () => fetchUniversities(filters),
+    placeholderData: keepPreviousData,
   });
 }
 

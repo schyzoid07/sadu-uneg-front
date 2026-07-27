@@ -115,7 +115,7 @@ export default function EventCalendar({ events = [] }: EventCalendarProps) {
                                                 <DialogTitle>{event.Name}</DialogTitle>
                                             </DialogHeader>
                                             <div className="space-y-2 text-sm">
-                                                <p><strong>Fecha:</strong> {new Date(event.Date).toLocaleDateString()}</p>
+                                                <p><strong>Fecha:</strong> {event.Date ? new Date(event.Date).toLocaleDateString() : "Sin fecha"}</p>
                                                 <p><strong>Disciplina:</strong> {event.Discipline?.Name || "Sin asignar"}</p>
                                                 <p><strong>Estado:</strong> <Badge variant="outline">{event.Status}</Badge></p>
                                                 <div className="grid grid-cols-2 gap-4 mt-4 p-4 bg-slate-50 rounded-md">

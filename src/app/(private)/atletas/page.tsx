@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -35,35 +35,23 @@ import Link from "next/link";
 import { useDebounce } from "@/hooks/use-debounce";
 
 export default function Atletas() {
-  const { data: athletes, isLoading, isError } = useAthletes();
-  const { data: disciplines } = useDisciplines();
-  console.log(athletes)
-  const [openCreate, setOpenCreate] = useState(false);
-
-  //logica de filtrado
+  //logica de filtrado: el estado se declara antes porque alimenta la consulta
   const [searchTerm, setSearchTerm] = useState('')
   const debouncedSearch = useDebounce(searchTerm, 400)
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [disciplineFilter, setDisciplineFilter] = useState("all");
 
-  const filteredAthletes = useMemo(() => {
-    if (!athletes) return [];
+  // Los filtros los resuelve el backend. buildSearchParams descarta los vacíos y
+  // los "all", así que no hace falta traducirlos aquí.
+  const { data: athletes, isLoading, isError } = useAthletes({
+    search: debouncedSearch,
+    gender: categoryFilter,
+    discipline_id: disciplineFilter,
+  });
+  const { data: disciplines } = useDisciplines();
+  const [openCreate, setOpenCreate] = useState(false);
 
-    return athletes.filter((a) => {
-      const lowerSearch = debouncedSearch.toLowerCase();
-      const matchesSearch =
-        (a.FirstNames?.toLowerCase().includes(lowerSearch) ?? false) ||
-        (a.LastNames?.toLowerCase().includes(lowerSearch) ?? false) ||
-        (a.GovID?.toLowerCase().includes(lowerSearch) ?? false);
-
-      const matchesCategory = categoryFilter === "all" || a.Gender === categoryFilter;
-
-      const matchesDiscipline = disciplineFilter === "all" ||
-        (Array.isArray(a.Disciplines) && a.Disciplines.some(d => String(d.ID) === disciplineFilter));
-
-      return matchesSearch && matchesCategory && matchesDiscipline;
-    })
-  }, [athletes, debouncedSearch, categoryFilter, disciplineFilter])
+  const filteredAthletes = athletes ?? [];
 
   // Eliminación
   const [deletingAthlete, setDeletingAthlete] = useState<Athletes | null>(null);
@@ -252,6 +240,11 @@ export default function Atletas() {
               <strong>{deletingAthlete?.FirstNames} {deletingAthlete?.LastNames}</strong> (Cédula: {deletingAthlete?.GovID})?
               Esta acción no se puede deshacer.
             </p>
+            {deleteMutation.isError && (
+              <p className="mt-3 p-3 rounded-md bg-red-50 text-red-600 text-sm">
+                No se pudo eliminar el atleta. Puede que ya haya sido eliminado; recarga la lista e intenta de nuevo.
+              </p>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-2">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useDisciplines } from "@/hooks/disciplines/use-disciplines";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -40,7 +40,16 @@ import {
 import TeacherForm from "@/components/teacher-form";
 
 export default function Profesores() {
-  const { data: teachers, isLoading } = useTeachers();
+  // Lógica de filtrado: el estado alimenta la consulta, así que se declara antes
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 400);
+  const [disciplineFilter, setDisciplineFilter] = useState("all");
+
+  // Los filtros los resuelve el backend
+  const { data: teachers, isLoading } = useTeachers({
+    search: debouncedSearch,
+    discipline_id: disciplineFilter,
+  });
   const { data: disciplines } = useDisciplines();
 
   const deleteTeacher = useDeleteTeacher();
@@ -48,21 +57,7 @@ export default function Profesores() {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  // Lógica de filtrado
-  const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearch = useDebounce(searchTerm, 400);
-  const [disciplineFilter, setDisciplineFilter] = useState("all");
-
-  const filteredTeachers = useMemo(() => {
-    if (!teachers) return [];
-
-    return teachers.filter((t) => {
-      const lowerSearch = debouncedSearch.toLowerCase();
-      const matchesSearch = t.FirstNames.toLowerCase().includes(lowerSearch) || t.LastNames.toLowerCase().includes(lowerSearch) || t.GovID.toLowerCase().includes(lowerSearch);
-      const matchesDiscipline = disciplineFilter === "all" || (t.Disciplines && Array.isArray(t.Disciplines) && t.Disciplines.some((d) => d.ID.toString() === disciplineFilter));
-      return matchesSearch && matchesDiscipline;
-    });
-  }, [teachers, debouncedSearch, disciplineFilter]);
+  const filteredTeachers = teachers ?? [];
 
   const confirmDelete = async () => {
     if (deleteId) {

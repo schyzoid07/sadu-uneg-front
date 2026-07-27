@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -27,12 +27,12 @@ import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
 
 export default function Universidad() {
-  const { data: universities, isLoading, isError } = useUniversities();
-  console.log(universities)
-  const deleteMutation = useDeleteUniversity();
-
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 400);
+
+  // El filtro por nombre lo resuelve el backend
+  const { data: universities, isLoading, isError } = useUniversities({ name: debouncedSearch });
+  const deleteMutation = useDeleteUniversity();
 
   const [openCreate, setOpenCreate] = useState(false);
   const [editingUniversity, setEditingUniversity] = useState<University | null>(null);
@@ -40,13 +40,7 @@ export default function Universidad() {
   const [deletingUniversity, setDeletingUniversity] = useState<University | null>(null);
   const [openDelete, setOpenDelete] = useState(false);
 
-  const filteredUniversities = useMemo(() => {
-    if (!universities) return [];
-    if (!debouncedSearch) return universities;
-    return universities.filter((u) =>
-      u.Name.toLowerCase().includes(debouncedSearch.toLowerCase())
-    );
-  }, [universities, debouncedSearch]);
+  const filteredUniversities = universities ?? [];
 
   const confirmDelete = async () => {
     if (!deletingUniversity) return;

@@ -1,4 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { buildSearchParams } from "@/lib/query-params";
 import { api } from "@/lib/api";
 import { z } from "zod";
 import { tourneySchema, tourneyInputSchema, Tourney, TourneyInput } from "@/schemas/tourney";
@@ -9,8 +10,15 @@ export type UpdateTourneyInput = Partial<TourneyInput>;
 
 // --- Funciones de API ---
 
-const fetchTourneys = async (): Promise<Tourney[]> => {
-    const res: any = await api.get("tourneys").json();
+/** Filtros que resuelve el backend en `GET /tourneys`. */
+export type TourneyFilters = {
+    name?: string;
+    status?: string;
+    discipline_id?: string | number;
+};
+
+const fetchTourneys = async (filters: TourneyFilters): Promise<Tourney[]> => {
+    const res: any = await api.get("tourneys", { searchParams: buildSearchParams(filters) }).json();
     // Asumimos que la data puede venir en un campo 'data' o directamente
     const data = (res && typeof res === 'object' && 'data' in res) ? res.data : res;
     return z.array(tourneySchema).parse(data);
@@ -41,10 +49,11 @@ const deleteTourney = async (id: number): Promise<any> => {
 
 // --- Hooks de React Query ---
 
-export function useTourneys() {
+export function useTourneys(filters: TourneyFilters = {}) {
     return useQuery({
-        queryKey: ["tourneys"],
-        queryFn: fetchTourneys,
+        queryKey: ["tourneys", filters],
+        queryFn: () => fetchTourneys(filters),
+        placeholderData: keepPreviousData,
     });
 }
 

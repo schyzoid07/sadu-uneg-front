@@ -12,7 +12,7 @@ interface CreateAthleteInput {
     Regular?: boolean;
     MajorID?: number | null;
     Enrolled?: boolean;
-    TeamsIDs?: number[];
+    Teams?: { ID: number }[];
 }
 
 export function useCreateAthlete() {

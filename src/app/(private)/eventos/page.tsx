@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlusIcon, ListIcon, SearchIcon, Loader2 } from "lucide-react";
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
+import { useDebounce } from "@/hooks/use-debounce";
 import { useEvents, useDeleteEvent } from "@/hooks/events/use-events";
 import { useDisciplines } from "@/hooks/disciplines/use-disciplines";
 import {
@@ -46,65 +47,30 @@ export default function Eventos() {
     replace(`${pathname}?${params.toString()}`);
   }, 300);
 
-  // Hook personalizado
-  // useEvents no acepta argumentos en el hook definido, así que filtramos en cliente
-  const { data: events, isLoading } = useEvents();
-  console.log(events);
-  const { data: disciplines } = useDisciplines();
-  const { data: universities } = useUniversities();
+  // Estado de los filtros: alimenta la consulta, así que se declara antes
   const [disciplineFilter, setDisciplineFilter] = useState("all");
   const [universityFilter, setUniversityFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [startDate, setStartDate] = useState("");
   const [teamFilter, setTeamFilter] = useState(""); // Nuevo estado para el filtro de equipo
   const [endDate, setEndDate] = useState("");
+  // El nombre de equipo se escribe libremente: se espera a que el usuario termine
+  const debouncedTeam = useDebounce(teamFilter, 400);
 
-  const filteredEvents = useMemo(() => {
-    if (!events) return [];
+  // Los seis filtros los resuelve el backend
+  const { data: events, isLoading } = useEvents({
+    name: searchTerm,
+    discipline_id: disciplineFilter,
+    university_id: universityFilter,
+    status: statusFilter,
+    team_name: debouncedTeam,
+    date_from: startDate,
+    date_to: endDate,
+  });
+  const { data: disciplines } = useDisciplines();
+  const { data: universities } = useUniversities();
 
-    return events.filter((e) => {
-      const lowerSearch = searchTerm.toLowerCase();
-      const matchesSearch = e.Name?.toLowerCase().includes(lowerSearch);
-      const matchesDiscipline =
-        disciplineFilter === "all" ||
-        e.Discipline?.ID.toString() === disciplineFilter;
-
-      const homeTeamUniversityId = e.HomeTeam?.University?.ID ?? e.HomeTeam?.UniversityID;
-      const oppositeTeamUniversityId = e.OppositeTeam?.University?.ID ?? e.OppositeTeam?.UniversityID;
-      const matchesUniversity =
-        universityFilter === "all" ||
-        homeTeamUniversityId?.toString() === universityFilter ||
-        oppositeTeamUniversityId?.toString() === universityFilter;
-      const matchesStatus =
-        statusFilter === "all" ||
-        e.Status?.toLowerCase() === statusFilter.toLowerCase();
-
-      let matchesDate = true;
-      if (startDate || endDate) {
-        if (!e.Date) {
-          matchesDate = false;
-        } else {
-          const eventDate = new Date(e.Date);
-          if (startDate) {
-            const start = new Date(startDate + "T00:00:00");
-            if (eventDate < start) matchesDate = false;
-          }
-          if (endDate) {
-            const end = new Date(endDate + "T23:59:59");
-            if (eventDate > end) matchesDate = false;
-          }
-        }
-      }
-
-      // Nuevo filtro para el nombre del equipo
-      const matchesTeam =
-        teamFilter === "" ||
-        e.HomeTeam?.Name?.toLowerCase().includes(teamFilter.toLowerCase()) ||
-        e.OppositeTeam?.Name?.toLowerCase().includes(teamFilter.toLowerCase());
-
-      return matchesSearch && matchesDiscipline && matchesUniversity && matchesStatus && matchesDate && matchesTeam;
-    });
-  }, [events, searchTerm, disciplineFilter, universityFilter, statusFilter, startDate, endDate, teamFilter]);
+  const filteredEvents = events ?? [];
 
 
 
