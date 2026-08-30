@@ -2,16 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/Providers";
-import HeaderBar from "@/components/HeaderBar";
-import { AppSidebar } from "@/components/app-sidebar";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
 import { AuthProvider } from "@/components/AuthProvider";
 import { getSession } from "@/lib/session";
-import { Separator } from "@/components/ui/separator";
 
 
 const geistSans = Geist({
@@ -29,6 +21,14 @@ export const metadata: Metadata = {
   description: "App para la administracion de SADUNEG",
 };
 
+/**
+ * Layout raíz: solo lo que necesitan todas las pantallas, con y sin sesión.
+ *
+ * La barra lateral vive en el layout de `(private)`, no aquí: montada en la raíz
+ * también se dibujaba sobre el login —que es adonde manda `middleware.ts` a quien
+ * no ha iniciado sesión— con enlaces a secciones que en ese momento devuelven al
+ * propio login.
+ */
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -43,18 +43,7 @@ export default async function RootLayout({
       >
         <AuthProvider session={session}>
           <Providers>
-            <SidebarProvider>
-              <AppSidebar />
-              <SidebarInset>
-                <SidebarTrigger className="-ml-1" />
-
-                <HeaderBar />
-                <Separator />
-                <main className="min-h-[calc(100vh-64px)]">
-                  {children}
-                </main>
-              </SidebarInset>
-            </SidebarProvider>
+            {children}
           </Providers>
         </AuthProvider>
       </body>

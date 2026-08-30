@@ -12,7 +12,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Loader2, CheckCircle2 } from "lucide-react";
-import { useTourney, useCreateTourney, useUpdateTourney } from "@/hooks/tourneys/use-tourneys";
+import { useTourney, useCreateTourney, useUpdateTourney, TourneyInput } from "@/hooks/tourneys/use-tourneys";
 import { useDisciplines } from "@/hooks/disciplines/use-disciplines";
 import { useEvents } from "@/hooks/events/use-events";
 import Link from "next/link";
@@ -21,6 +21,19 @@ import { Badge } from "@/components/ui/badge";
 
 // Función vacía estable para evitar re-renders innecesarios en EventCard
 const noop = () => { };
+
+/**
+ * Convierte una fecha del backend al valor de un `<input type="date">`.
+ * Los torneos guardados sin fechas llegan con el cero de Go (`0001-01-01`), que hay
+ * que mostrar como campo vacío. Se lee en UTC para no correr el día.
+ */
+const aValorDeFecha = (fecha?: Date | null): string => {
+    if (!fecha || Number.isNaN(fecha.getTime()) || fecha.getUTCFullYear() < 1900) return "";
+    return fecha.toISOString().slice(0, 10);
+};
+
+/** Convierte el valor de un `<input type="date">` a ISO 8601, que es lo que espera Go. */
+const aISO = (valor: string): string => new Date(`${valor}T00:00:00Z`).toISOString();
 
 interface TourneyFormProps {
     onSuccess?: () => void;
@@ -31,25 +44,37 @@ interface TourneyFormProps {
 export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps) {
     const isEditMode = !!tourneyId;
 
-    // Hooks de datos
-    const { data: tourney, isLoading: isLoadingTourney } = useTourney(tourneyId);
-    const { data: events, isLoading: isLoadingEvents } = useEvents(); // Obtenemos todos los eventos disponibles
-    const { data: disciplines } = useDisciplines();
-    const createMutation = useCreateTourney();
-    const updateMutation = useUpdateTourney();
-
     // Estados del formulario
     const [name, setName] = useState("");
     const [status, setStatus] = useState("Pendiente");
+    const [disciplineId, setDisciplineId] = useState<string>("");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+    // Las fechas se sugieren a partir de los partidos elegidos, pero solo mientras
+    // nadie las haya escrito a mano: a partir de ahí manda lo que puso el usuario.
+    const [fechasEditadas, setFechasEditadas] = useState(false);
     const [selectedEventIds, setSelectedEventIds] = useState<number[]>([]);
-    const [filterDisciplineId, setFilterDisciplineId] = useState<string>("all");
     const [message, setMessage] = useState<string | null>(null);
+
+    // Hooks de datos
+    const { data: tourney, isLoading: isLoadingTourney } = useTourney(tourneyId);
+    const { data: disciplines } = useDisciplines();
+    // El filtro por disciplina lo resuelve el backend. Un torneo pertenece a una
+    // disciplina, así que solo se pueden elegir partidos de esa misma disciplina.
+    const { data: events, isLoading: isLoadingEvents } = useEvents({ discipline_id: disciplineId });
+    const createMutation = useCreateTourney();
+    const updateMutation = useUpdateTourney();
 
     // Cargar datos al editar
     useEffect(() => {
         if (tourney) {
             setName(tourney.Name);
             setStatus(tourney.Status);
+            setDisciplineId(tourney.DisciplineID ? tourney.DisciplineID.toString() : "");
+            setStartDate(aValorDeFecha(tourney.StartDate));
+            setEndDate(aValorDeFecha(tourney.EndDate));
+            // Lo guardado no se sobrescribe con una sugerencia.
+            setFechasEditadas(true);
 
             // Si el torneo ya tiene eventos asociados, extraemos sus IDs para marcarlos como seleccionados
             if (tourney.Events && Array.isArray(tourney.Events)) {
@@ -58,8 +83,29 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
         }
     }, [tourney]);
 
+    // Sugerir el rango de fechas a partir de los partidos seleccionados.
+    useEffect(() => {
+        if (fechasEditadas || selectedEventIds.length === 0) return;
+
+        const fechas = (events ?? [])
+            .filter(e => selectedEventIds.includes(e.ID) && e.Date)
+            .map(e => e.Date!.slice(0, 10))
+            .sort();
+        if (fechas.length === 0) return;
+
+        setStartDate(fechas[0]);
+        setEndDate(fechas[fechas.length - 1]);
+    }, [selectedEventIds, events, fechasEditadas]);
+
     const isSubmitting = createMutation.isPending || updateMutation.isPending;
-    const isFormValid = name.length > 0;
+    const isFormValid = name.trim().length > 0 && disciplineId !== "";
+
+    // Al cambiar de disciplina la selección anterior deja de ser válida. Se limpia
+    // aquí, en el manejador, y no en un efecto, para no pisar la precarga al editar.
+    const handleDisciplineChange = (valor: string) => {
+        setDisciplineId(valor);
+        setSelectedEventIds([]);
+    };
 
     // Manejador para seleccionar/deseleccionar eventos
     const toggleEventSelection = useCallback((eventId: number) => {
@@ -76,14 +122,20 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
         e.preventDefault();
         if (!isFormValid) return;
 
-        // Construir payload
-        const payload = {
-            Name: name,
-            Status: status as "Activo" | "Finalizado" | "Pendiente",
-            EventIDs: selectedEventIds,
-            StartDate: tourney?.StartDate,
-            EndDate: tourney?.EndDate,
+        if (startDate && endDate && endDate < startDate) {
+            setMessage("Error: la fecha de fin no puede ser anterior a la de inicio.");
+            return;
+        }
 
+        // El tipo explícito hace que `tsc` compare las claves con lo que espera el
+        // backend: un nombre mal escrito no llega en silencio a la petición.
+        const payload: TourneyInput = {
+            Name: name.trim(),
+            Status: status as "Activo" | "Finalizado" | "Pendiente",
+            DisciplineID: parseInt(disciplineId),
+            EventIDs: selectedEventIds,
+            ...(startDate ? { StartDate: aISO(startDate) } : {}),
+            ...(endDate ? { EndDate: aISO(endDate) } : {}),
         };
 
         try {
@@ -145,6 +197,44 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
                 </div>
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Disciplina del torneo */}
+                <div className="space-y-2">
+                    <Label>Disciplina del Torneo</Label>
+                    <Select value={disciplineId} onValueChange={handleDisciplineChange}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar disciplina" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {disciplines?.map(d => (
+                                <SelectItem key={d.ID} value={d.ID.toString()}>{d.Name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Fecha de inicio */}
+                <div className="space-y-2">
+                    <Label>Fecha de Inicio</Label>
+                    <Input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => { setStartDate(e.target.value); setFechasEditadas(true); }}
+                    />
+                </div>
+
+                {/* Fecha de fin */}
+                <div className="space-y-2">
+                    <Label>Fecha de Fin</Label>
+                    <Input
+                        type="date"
+                        value={endDate}
+                        min={startDate || undefined}
+                        onChange={(e) => { setEndDate(e.target.value); setFechasEditadas(true); }}
+                    />
+                </div>
+            </div>
+
             {/* Selección de Eventos */}
             <div className="space-y-3">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -154,31 +244,22 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
                             Click para seleccionar
                         </Badge>
                     </div>
-
-                    {/* Filtro de Disciplina */}
-                    <div className="w-full md:w-64">
-                        <Select value={filterDisciplineId} onValueChange={setFilterDisciplineId}>
-                            <SelectTrigger className="bg-white">
-                                <SelectValue placeholder="Filtrar por disciplina" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Todas las disciplinas</SelectItem>
-                                {disciplines?.map(d => (
-                                    <SelectItem key={d.ID} value={d.ID.toString()}>{d.Name}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                    {!fechasEditadas && selectedEventIds.length > 0 && (
+                        <p className="text-sm text-muted-foreground">
+                            Las fechas se sugieren según los partidos seleccionados.
+                        </p>
+                    )}
                 </div>
 
-                {isLoadingEvents ? (
+                {!disciplineId ? (
+                    <p className="text-center text-muted-foreground py-8 border rounded-lg bg-slate-50/50">
+                        Elige primero la disciplina del torneo para ver sus partidos.
+                    </p>
+                ) : isLoadingEvents ? (
                     <div className="flex justify-center p-8"><Loader2 className="animate-spin text-slate-400" /></div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto p-2 border rounded-lg bg-slate-50/50">
-                        {events?.filter(event => {
-                            const dId = event.Discipline?.ID;
-                            return filterDisciplineId === "all" || dId?.toString() === filterDisciplineId;
-                        }).map((event) => {
+                        {events?.map((event) => {
                             const isSelected = selectedEventIds.includes(event.ID);
                             return (
                                 <div
@@ -199,7 +280,7 @@ export function TourneyForm({ tourneyId, onSuccess, onCancel }: TourneyFormProps
                         })}
                         {events?.length === 0 && (
                             <p className="col-span-full text-center text-muted-foreground py-8">
-                                No hay partidos disponibles.
+                                No hay partidos de esta disciplina.
                             </p>
                         )}
                     </div>

@@ -15,9 +15,15 @@ import { Label } from "@/components/ui/label";
 interface TeacherFormProps {
     teacherId?: string;
     onSuccess?: () => void;
+    /**
+     * Cómo se sale sin guardar. Dentro de un diálogo hay que cerrarlo desde aquí:
+     * navegar al listado no hace nada visible, porque ya se está en esa ruta y el
+     * diálogo sigue abierto. Sin este manejador el botón vuelve al listado.
+     */
+    onCancel?: () => void;
 }
 
-export default function TeacherForm({ teacherId, onSuccess }: TeacherFormProps) {
+export default function TeacherForm({ teacherId, onSuccess, onCancel }: TeacherFormProps) {
     // Hooks
     const { data: teacher, isLoading: isLoadingTeacher } = useTeacher(teacherId);
     const { data: disciplines } = useDisciplines();
@@ -197,11 +203,17 @@ export default function TeacherForm({ teacherId, onSuccess }: TeacherFormProps) 
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t">
-                <Link href="/profesores">
-                    <Button variant="outline" type="button">
-                        Cancelar / Volver
+                {onCancel ? (
+                    <Button variant="outline" type="button" onClick={onCancel}>
+                        Cancelar
                     </Button>
-                </Link>
+                ) : (
+                    <Link href="/profesores">
+                        <Button variant="outline" type="button">
+                            Cancelar / Volver
+                        </Button>
+                    </Link>
+                )}
                 <Button
                     type="submit"
                     disabled={isSubmitting || !isFormValid}

@@ -105,6 +105,10 @@ export function useCreateEvent() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      // Al vincular un partido, el backend estira las fechas del torneo para que lo
+      // cubran, así que lo que hay en caché sobre torneos quedó viejo.
+      queryClient.invalidateQueries({ queryKey: ["tourneys"] });
+      queryClient.invalidateQueries({ queryKey: ["tourney"] });
     },
   });
 }
@@ -119,6 +123,10 @@ export function useUpdateEvent() {
     onSuccess: (_,variables) => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
       queryClient.invalidateQueries({ queryKey: ["event", String(variables.id)] });
+      // Igual que al crear: mover la fecha del partido o cambiarlo de torneo puede
+      // haber corrido las fechas del torneo destino.
+      queryClient.invalidateQueries({ queryKey: ["tourneys"] });
+      queryClient.invalidateQueries({ queryKey: ["tourney"] });
     },
   });
 }

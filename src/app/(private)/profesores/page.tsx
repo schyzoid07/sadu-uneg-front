@@ -111,7 +111,10 @@ export default function Profesores() {
                 <DialogTitle>Registrar Profesor</DialogTitle>
               </DialogHeader>
               <div className="max-h-[80vh] overflow-y-auto px-1">
-                <TeacherForm onSuccess={() => setIsOpen(false)} />
+                <TeacherForm
+                  onSuccess={() => setIsOpen(false)}
+                  onCancel={() => setIsOpen(false)}
+                />
               </div>
             </DialogContent>
           </Dialog>

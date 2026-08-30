@@ -10,10 +10,16 @@ import { University, UniversityInput } from "@/schemas/universities";
 
 interface UniversidadFormProps {
     onSuccess?: () => void;
+    /**
+     * Cómo se sale sin guardar. Si no se pasa, el botón cae en `onSuccess`, que es
+     * lo que hacía antes: sirve para cerrar el diálogo, pero anunciar un guardado
+     * que no ocurrió confunde a quien añada un aviso a `onSuccess`.
+     */
+    onCancel?: () => void;
     university?: University | null;
 }
 
-export default function UniversidadForm({ onSuccess, university }: UniversidadFormProps) {
+export default function UniversidadForm({ onSuccess, onCancel, university }: UniversidadFormProps) {
     const [name, setName] = useState("");
     const [isLocal, setIsLocal] = useState(false);
     const [mensaje, setMensaje] = useState<string | null>(null);
@@ -102,7 +108,7 @@ export default function UniversidadForm({ onSuccess, university }: UniversidadFo
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t">
-                <Button variant="outline" type="button" onClick={() => onSuccess?.()} disabled={isSubmitting}>
+                <Button variant="outline" type="button" onClick={() => (onCancel ?? onSuccess)?.()} disabled={isSubmitting}>
                     Cancelar
                 </Button>
                 <Button type="submit" disabled={!canSubmit || isSubmitting} className="bg-blue-600 hover:bg-blue-700">

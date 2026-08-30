@@ -8,6 +8,7 @@ import {
   Library, // Universidades
   GraduationCap, // Carreras
   Trophy, // Torneos
+  UserCog, // Perfil
   ChevronRight
 } from "lucide-react";
 
@@ -32,6 +33,7 @@ const getIcon = (title?: string) => {
   if (t?.includes("universidad")) return <Library className="size-5" />;
   if (t?.includes("carrera")) return <GraduationCap className="size-5" />;
   if (t?.includes("torneo")) return <Trophy className="size-5" />;
+  if (t?.includes("perfil")) return <UserCog className="size-5" />;
   return <ChevronRight className="size-5" />;
 };
 // This is sample data.
@@ -67,6 +69,10 @@ const data = {
           url: "/eventos",
         },
         {
+          title: "Torneos",
+          url: "/torneos",
+        },
+        {
           title: "Universidad",
           url: "/universidad",
         },
@@ -74,10 +80,18 @@ const data = {
           title: "Carreras",
           url: "/carreras",
         },
-        /*{ 
-          title: "Torneos",
-          url: "/torneos",
-        },*/
+      ],
+    },
+    // La cuenta va en su propio grupo: no es un recurso del sistema, es la sesión
+    // de quien está usándolo.
+    {
+      title: "Cuenta",
+      url: "#",
+      items: [
+        {
+          title: "Perfil",
+          url: "/perfil",
+        },
       ],
     },
   ],

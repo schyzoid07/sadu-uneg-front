@@ -23,12 +23,18 @@ import Link from "next/link";
 interface CrearAtletaFormProps {
 
     onSuccess?: () => void;
+    /**
+     * Cómo se sale sin guardar. Dentro de un diálogo hay que cerrarlo desde aquí:
+     * navegar al listado no hace nada visible, porque ya se está en esa ruta y el
+     * diálogo sigue abierto. Sin este manejador el botón vuelve al listado.
+     */
+    onCancel?: () => void;
     athleteId?: string; // si se pasa, el formulario actúa en modo edición
 }
 
 type AthleteInput = z.infer<typeof AthleteInputType>
 
-export default function CrearAtletaForm({ athleteId, onSuccess }: CrearAtletaFormProps) {
+export default function CrearAtletaForm({ athleteId, onSuccess, onCancel }: CrearAtletaFormProps) {
 
     const { data: athlete } = useAthlete(athleteId)
     const [id, setId] = useState<number | null>()
@@ -355,11 +361,17 @@ export default function CrearAtletaForm({ athleteId, onSuccess }: CrearAtletaFor
                 )}
 
                 <div className="flex justify-end gap-3 pt-2 border-t mt-4">
-                    <Link href="/atletas">
-                        <Button variant="outline" type="button" >
-                            Retroceder
+                    {onCancel ? (
+                        <Button variant="outline" type="button" onClick={onCancel}>
+                            Cancelar
                         </Button>
-                    </Link>
+                    ) : (
+                        <Link href="/atletas">
+                            <Button variant="outline" type="button" >
+                                Retroceder
+                            </Button>
+                        </Link>
+                    )}
                     <Button className={canSubmit ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-300"}
                         type="submit" disabled={!canSubmit || isSubmitting} onClick={handleSubmit}>
                         {isSubmitting ? <Loader2 className="animate-spin h-4 w-4" /> : (athlete ? "Guardar cambios" : "Crear atleta")}

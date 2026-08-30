@@ -14,10 +14,16 @@ import Link from "next/link";
 
 interface EquipoFormProps {
   onSuccess?: () => void;
+  /**
+   * Cómo se sale sin guardar. Dentro de un diálogo hay que cerrarlo desde aquí:
+   * navegar al listado no hace nada visible, porque ya se está en esa ruta y el
+   * diálogo sigue abierto. Sin este manejador el botón vuelve al listado.
+   */
+  onCancel?: () => void;
   teamId?: string; // Agregamos la prop opcional para el ID
 }
 
-export default function EquipoForm({ onSuccess, teamId }: EquipoFormProps) {
+export default function EquipoForm({ onSuccess, onCancel, teamId }: EquipoFormProps) {
   // 1. Hooks de datos
   const { data: athletes, isLoading: loadingAthletes } = useAthletes();
   // Hook para obtener datos del equipo si estamos editando
@@ -273,11 +279,8 @@ export default function EquipoForm({ onSuccess, teamId }: EquipoFormProps) {
 
       {/* Footer del Formulario */}
       <div className="flex justify-end gap-3 pt-4 border-t">
-        {teamId ? (
-          <Link href="/equipos">
-            <Button variant="outline" type="button">Cancelar / Volver</Button>
-          </Link>
-        ) : (
+        {/* Al crear se conserva "Limpiar", que vacía el formulario sin cerrarlo. */}
+        {!teamId && (
           <Button
             type="button"
             variant="outline"
@@ -287,6 +290,16 @@ export default function EquipoForm({ onSuccess, teamId }: EquipoFormProps) {
             Limpiar
           </Button>
         )}
+
+        {onCancel ? (
+          <Button variant="outline" type="button" onClick={onCancel} disabled={isSubmitting}>
+            Cancelar
+          </Button>
+        ) : teamId ? (
+          <Link href="/equipos">
+            <Button variant="outline" type="button">Cancelar / Volver</Button>
+          </Link>
+        ) : null}
 
         <Button
           onClick={handleSave}

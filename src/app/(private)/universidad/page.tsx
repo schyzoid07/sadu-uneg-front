@@ -89,7 +89,10 @@ export default function Universidad() {
               <DialogHeader>
                 <DialogTitle>Registrar Nueva Universidad</DialogTitle>
               </DialogHeader>
-              <UniversidadForm onSuccess={() => setOpenCreate(false)} />
+              <UniversidadForm
+                onSuccess={() => setOpenCreate(false)}
+                onCancel={() => setOpenCreate(false)}
+              />
             </DialogContent>
           </Dialog>
         </div>
@@ -176,6 +179,10 @@ export default function Universidad() {
           <UniversidadForm
             university={editingUniversity}
             onSuccess={() => {
+              setOpenEdit(false);
+              setEditingUniversity(null);
+            }}
+            onCancel={() => {
               setOpenEdit(false);
               setEditingUniversity(null);
             }}

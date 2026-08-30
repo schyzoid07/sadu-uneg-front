@@ -94,6 +94,7 @@ export default function Carreras() {
                                 onSuccess={() => {
                                     setOpenCreate(false);
                                 }}
+                                onCancel={() => setOpenCreate(false)}
                             /></div>
 
                     </DialogContent>
